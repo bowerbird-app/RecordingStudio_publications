@@ -3,6 +3,7 @@
 RecordingStudioAdmin.configure do |config|
   config.authentication_method = :authenticate_user!
   config.current_actor_method = :current_user
+  config.async_widgets.enabled = false
   config.access_recording_resolver = lambda do |_context|
     admin_root = AdminRoot.find_by(name: "Admin")
     RecordingStudio.root_recording_for(admin_root) if admin_root
