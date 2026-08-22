@@ -58,6 +58,8 @@ class PublicationsAdminTest < ActionDispatch::IntegrationTest
     assert_includes response.body, "New"
     refute_includes response.body, "Manage access"
     refute_includes response.body, "Manage-access"
+    refute_includes response.body, "+ Access"
+    assert_includes response.body, 'href="/recording_studio_publications/admin/publications/new"'
 
     get "/admin/screens/publications"
     assert_response :success
