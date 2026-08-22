@@ -20,22 +20,11 @@ module RecordingStudioPublications
       end
 
       def create
-        recording = perform_recording_studio_admin_action!(
-          RecordingStudioPublications::Admin::RESOURCE_KEY,
-          :create,
-          nil,
-          audit_action: :create
-        ) do
-          write_publication!
-        end
+        recording = persist_new_publication!
+        return render_new_invalid unless recording
 
-        if recording
-          attach_uploaded_logo!(recording.recordable)
-          redirect_to admin_publication_path(recording)
-        else
-          @publication ||= Publication.new(publication_params)
-          render :new, status: :unprocessable_entity
-        end
+        attach_uploaded_logo!(recording.recordable)
+        redirect_to admin_publication_path(recording)
       rescue ActiveRecord::RecordInvalid => e
         @publication = e.record
         render :new, status: :unprocessable_entity
@@ -46,21 +35,11 @@ module RecordingStudioPublications
       end
 
       def update
-        recording = perform_recording_studio_admin_action!(
-          RecordingStudioPublications::Admin::RESOURCE_KEY,
-          :update,
-          @publication,
-          audit_action: :update
-        ) do
-          RecordingStudioPublications.revise_publication!(@publication, publication_params, actor: current_user)
-        end
+        recording = persist_revised_publication!
+        return render :edit, status: :unprocessable_entity unless recording
 
-        if recording
-          attach_uploaded_logo!(recording.recordable)
-          redirect_to admin_publication_path(recording)
-        else
-          render :edit, status: :unprocessable_entity
-        end
+        attach_uploaded_logo!(recording.recordable)
+        redirect_to admin_publication_path(recording)
       rescue ActiveRecord::RecordInvalid => e
         @publication = e.record
         @recording = RecordingStudioPublications.recording_for(@publication) || @recording
@@ -80,6 +59,29 @@ module RecordingStudioPublications
 
       def authorize_current_publication!
         authorize_publications_admin_action!(@publication)
+      end
+
+      def persist_new_publication!
+        perform_recording_studio_admin_action!(
+          RecordingStudioPublications::Admin::RESOURCE_KEY,
+          :new,
+          nil,
+          audit_action: :create
+        ) { write_publication! }
+      end
+
+      def persist_revised_publication!
+        perform_recording_studio_admin_action!(
+          RecordingStudioPublications::Admin::RESOURCE_KEY,
+          :edit,
+          @publication,
+          audit_action: :update
+        ) { RecordingStudioPublications.revise_publication!(@publication, publication_params, actor: current_user) }
+      end
+
+      def render_new_invalid
+        @publication ||= Publication.new(publication_params)
+        render :new, status: :unprocessable_entity
       end
 
       def write_publication!

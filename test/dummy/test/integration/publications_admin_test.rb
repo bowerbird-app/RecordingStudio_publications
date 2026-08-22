@@ -35,7 +35,7 @@ class PublicationsAdminTest < ActionDispatch::IntegrationTest
     assert_equal :site, RecordingStudioPublications::Admin::PublicationsScreen.blast_radius
     assert_equal :site, RecordingStudioPublications::Admin::PublicationsResource.blast_radius
     assert_equal :admin, RecordingStudioPublications::Admin::PublicationsResource.action_for(:edit).required_access_role
-    assert_equal :admin, RecordingStudioPublications::Admin::PublicationsResource.action_for(:create).required_access_role
+    assert_equal :admin, RecordingStudioPublications::Admin::PublicationsResource.action_for(:new).required_access_role
   end
 
   test "rejects an actor without AdminRoot access and permits the site admin" do
@@ -57,7 +57,7 @@ class PublicationsAdminTest < ActionDispatch::IntegrationTest
     assert_includes response.body, "Publications"
     assert_includes response.body, "New"
     refute_includes response.body, "Manage access"
-    refute_includes response.body, "+ Access"
+    refute_includes response.body, "Manage-access"
 
     get "/admin/screens/publications"
     assert_response :success

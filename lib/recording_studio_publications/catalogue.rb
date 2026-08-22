@@ -1,9 +1,15 @@
 # frozen_string_literal: true
 
+require_relative "catalogue/writes"
+require_relative "catalogue/logos"
+
 module RecordingStudioPublications
   # Public write and lookup helpers for the shared Publications catalogue.
   module Catalogue
     PUBLICATION_ATTRIBUTE_KEYS = %i[name key kind website].freeze
+
+    extend Writes
+    extend Logos
 
     module_function
 
@@ -39,13 +45,6 @@ module RecordingStudioPublications
       )
     end
 
-    def logo_recording_for(publication)
-      recording = recording_for(publication)
-      return unless recording&.respond_to?(:images)
-
-      recording.images.first
-    end
-
     def key_in_use?(key, except_recording: nil)
       return false if key.blank?
 
@@ -54,79 +53,6 @@ module RecordingStudioPublications
 
         recording.recordable&.key == key
       end
-    end
-
-    def record_publication!(attrs = {}, actor: nil)
-      attributes = publication_attributes(attrs)
-      attributes[:key] = attributes[:key].presence || Publication.unique_key_for(attributes[:name])
-      publication = Publication.new(attributes)
-      if key_in_use?(publication.key)
-        publication.errors.add(:key, "has already been taken")
-        raise ActiveRecord::RecordInvalid, publication
-      end
-
-      catalogue_root.record(Publication, actor: actor) do |recordable|
-        assign_publication_attributes(recordable, attributes)
-      end
-    end
-
-    def revise_publication!(publication, attrs = {}, actor: nil)
-      recording = recording_for(publication)
-      raise ArgumentError, "Publication recording is missing" if recording.blank?
-
-      attributes = publication_attributes(attrs, publication)
-      draft = Publication.new(attributes)
-      if key_in_use?(draft.key, except_recording: recording)
-        draft.errors.add(:key, "has already been taken")
-        raise ActiveRecord::RecordInvalid, draft
-      end
-
-      catalogue_root.revise(recording, actor: actor) do |recordable|
-        assign_publication_attributes(recordable, attributes)
-      end
-    end
-
-    def attach_or_replace_logo!(publication, io:, filename:, content_type:, actor: nil)
-      recording = recording_for(publication)
-      raise ArgumentError, "Publication recording is missing" if recording.blank?
-
-      existing = logo_recording_for(recording)
-      if existing
-        blob = ActiveStorage::Blob.create_and_upload!(
-          io: io,
-          filename: filename,
-          content_type: content_type
-        )
-        existing.replace_attachment_file(
-          signed_blob_id: blob.signed_id,
-          name: "Logo",
-          actor: actor
-        )
-      else
-        recording.import_attachment(
-          io: io,
-          filename: filename,
-          content_type: content_type,
-          name: "Logo",
-          actor: actor
-        )
-      end
-    end
-
-    def publication_attributes(attrs, publication = nil)
-      values = attrs.to_h.symbolize_keys.slice(*PUBLICATION_ATTRIBUTE_KEYS)
-      values[:name] = values[:name].presence || publication&.name
-      values[:kind] = values[:kind].presence || publication&.kind
-      values[:website] = values.key?(:website) ? values[:website].presence : publication&.website
-      values[:key] = values[:key].presence || publication&.key
-      values
-    end
-
-    def assign_publication_attributes(publication, attributes)
-      publication.name = attributes[:name]
-      publication.kind = attributes[:kind]
-      publication.website = attributes[:website]
-      publication.key = attributes[:key] if attributes[:key].present?
     end
   end
 end

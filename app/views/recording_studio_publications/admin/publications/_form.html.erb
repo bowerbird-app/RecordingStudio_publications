@@ -46,20 +46,20 @@
       error: publication.errors[:website].to_sentence.presence
     ) %>
 
-    <div class="space-y-2">
-      <label for="publication_logo" class="text-sm font-medium text-(--surface-content-color)">Logo</label>
-      <% if local_assigns[:logo_recording]&.recordable&.file&.attached? %>
-        <div class="flex items-center gap-3">
-          <%= image_tag logo_recording.recordable.file, alt: "#{publication.name} logo", class: "h-16 w-16 object-contain" %>
-          <p class="text-sm text-(--surface-muted-content-color)">Choose a new image to replace this logo.</p>
-        </div>
-      <% end %>
-      <input id="publication_logo"
-             name="publication[logo]"
-             type="file"
-             accept="image/*"
-             class="flat-pack-input w-full text-sm">
-    </div>
+    <% if (logo_url = publication_logo_url(local_assigns[:logo_recording])) %>
+      <div class="flex items-center gap-3">
+        <%= image_tag logo_url, alt: "#{publication.name} logo", class: "h-16 w-16 object-contain" %>
+        <p class="text-sm text-(--surface-muted-content-color)">Current logo. Upload a new image to replace it.</p>
+      </div>
+    <% end %>
+
+    <%= render FlatPack::FileInput::Component.new(
+      name: "publication[logo]",
+      id: "publication_logo",
+      label: "Logo",
+      accept: "image/*",
+      help_text: "Images only. Uploading a new file replaces the current logo."
+    ) %>
 
     <div class="flex items-center gap-2 pt-2">
       <%= render FlatPack::Button::Component.new(text: "Cancel", href: cancel_url, style: :secondary) %>

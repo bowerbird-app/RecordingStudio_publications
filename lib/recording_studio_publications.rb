@@ -1,14 +1,12 @@
 # frozen_string_literal: true
 
 require "recording_studio"
-require "recording_studio_attachable"
 require "recording_studio_publications/version"
 require "recording_studio_publications/logo_authorization"
 require "recording_studio_publications/engine"
 require "recording_studio_publications/configuration"
 require "recording_studio_publications/capabilities/example"
 require "recording_studio_publications/catalogue"
-require "recording_studio_publications/admin"
 
 module RecordingStudioPublications
   class << self

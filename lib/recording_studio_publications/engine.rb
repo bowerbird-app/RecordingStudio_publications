@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module RecordingStudioPublications
-  class Engine < ::Rails::Engine
+  class Engine < ::Rails::Engine # rubocop:disable Metrics/ClassLength -- Rails engine hooks
     isolate_namespace RecordingStudioPublications
 
     class << self
@@ -123,8 +123,20 @@ module RecordingStudioPublications
       end
     end
 
+    initializer "recording_studio_publications.family_engines", before: :load_config_initializers do
+      require "recording_studio_attachable" if defined?(Bundler) || defined?(RecordingStudioAttachable)
+      require "recording_studio_admin" if defined?(Bundler) || defined?(RecordingStudioAdmin)
+    rescue LoadError
+      # Hosts that have not bundled Attachable or Admin yet still boot the engine.
+    end
+
     initializer "recording_studio_publications.admin_definitions" do
-      config.to_prepare { RecordingStudioPublications::Admin.register! }
+      config.to_prepare do
+        next unless defined?(RecordingStudioAdmin)
+
+        require "recording_studio_publications/admin"
+        RecordingStudioPublications::Admin.register!
+      end
     end
 
     initializer "recording_studio_publications.admin_view_paths" do
@@ -140,4 +152,3 @@ module RecordingStudioPublications
     end
   end
 end
-

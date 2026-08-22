@@ -7,7 +7,7 @@ module RecordingStudioPublications
   module LogoAuthorization
     module_function
 
-    def call(action:, actor:, recording:, role:)
+    def call(action:, actor:, recording:, role:) # rubocop:disable Lint/UnusedMethodArgument -- Attachable contract
       return false if actor.blank?
       return true if admin_catalogue_actor?(actor, role)
       return false unless defined?(RecordingStudioAccessible::Authorization)

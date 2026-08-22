@@ -9,8 +9,6 @@ module RecordingStudioPublications
 
     helper RecordingStudio::LayoutHelper if defined?(RecordingStudio::LayoutHelper)
 
-    if defined?(RecordingStudioAdmin::Engine)
-      append_view_path RecordingStudioAdmin::Engine.root.join("app/views")
-    end
+    append_view_path RecordingStudioAdmin::Engine.root.join("app/views") if defined?(RecordingStudioAdmin::Engine)
   end
 end

@@ -72,11 +72,6 @@ module RecordingStudioPublications
              url: ->(_row, context) { RecordingStudioPublications::Admin.new_publication_url(context) },
              required_role: :admin
 
-      action :create,
-             text: "Create",
-             method: :post,
-             required_role: :admin
-
       action :edit,
              text: "Edit",
              icon: "pencil-square",
@@ -86,11 +81,6 @@ module RecordingStudioPublications
              },
              required_role: :admin,
              visible_if: ->(row, _context) { RecordingStudioPublications.recording_for(row).present? }
-
-      action :update,
-             text: "Save",
-             method: :patch,
-             required_role: :admin
     end
 
     TotalPublicationsWidget = RecordingStudioAdmin::Widget.new(WIDGET_TOTAL, blast_radius: :site) do

@@ -27,10 +27,10 @@
       </div>
     <% end %>
 
-    <% if @logo_recording&.recordable&.file&.attached? %>
+    <% if (logo_url = publication_logo_url(@logo_recording)) %>
       <div class="space-y-2">
         <p class="text-sm font-medium text-(--surface-content-color)">Logo</p>
-        <%= image_tag @logo_recording.recordable.file, alt: "#{@publication.name} logo", class: "h-24 w-24 object-contain" %>
+        <%= image_tag logo_url, alt: "#{@publication.name} logo", class: "h-24 w-24 object-contain" %>
       </div>
     <% end %>
 

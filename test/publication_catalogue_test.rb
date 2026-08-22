@@ -1,10 +1,7 @@
 # frozen_string_literal: true
 
 ENV["RAILS_ENV"] = "test"
-require_relative "test_helper"
-require_relative "dummy/config/environment"
-
-require "rails/test_help"
+require_relative "dummy/test/test_helper"
 
 class PublicationCatalogueEngineTest < ActiveSupport::TestCase
   ONE_PIXEL_PNG = Base64.decode64(
@@ -34,7 +31,9 @@ class PublicationCatalogueEngineTest < ActiveSupport::TestCase
   end
 
   test "catalogue_root.record creates a Publication under the shared root" do
-    recording = RecordingStudioPublications.catalogue_root.record(RecordingStudioPublications::Publication) do |publication|
+    recording = RecordingStudioPublications.catalogue_root.record(
+      RecordingStudioPublications::Publication
+    ) do |publication|
       publication.name = "Engine Magazine"
       publication.kind = "magazine"
       publication.website = "https://engine.example"
@@ -78,39 +77,19 @@ class PublicationCatalogueEngineTest < ActiveSupport::TestCase
   end
 
   test "Publication attaches one image logo through Attachable replace" do
-    actor = User.create!(
-      email: "logo-#{SecureRandom.hex(4)}@example.com",
-      password: "Password",
-      password_confirmation: "Password"
-    )
-    admin_recording = admin_root_recording_for_test
-    bootstrap_owner_access!(actor, admin_recording)
-
+    actor = catalogue_admin_actor
     recording = RecordingStudioPublications.record_publication!(
       { name: "Logo Title", kind: "newspaper" },
       actor: actor
     )
-    logo = RecordingStudioPublications.attach_or_replace_logo!(
-      recording.recordable,
-      io: StringIO.new(ONE_PIXEL_PNG),
-      filename: "masthead.png",
-      content_type: "image/png",
-      actor: actor
-    )
+    logo = attach_png_logo!(recording.recordable, actor:, filename: "masthead.png")
 
     assert_equal "RecordingStudioAttachable::Attachment", logo.recordable_type
     assert_equal "image", logo.recordable.attachment_kind
     assert_equal recording, logo.parent_recording
     assert logo.recordable.file.attached?
 
-    replaced = RecordingStudioPublications.attach_or_replace_logo!(
-      recording.recordable,
-      io: StringIO.new(ONE_PIXEL_PNG),
-      filename: "replacement.png",
-      content_type: "image/png",
-      actor: actor
-    )
-
+    replaced = attach_png_logo!(recording.recordable, actor:, filename: "replacement.png")
     assert_equal logo.id, replaced.id
   end
 
@@ -120,14 +99,34 @@ class PublicationCatalogueEngineTest < ActiveSupport::TestCase
       password: "Password",
       password_confirmation: "Password"
     )
-    result = RecordingStudioAccessible.grant_access(
+    result = RecordingStudioAccessible.bootstrap_owner_access!(
       recording: RecordingStudioPublications.catalogue_root,
-      actor: actor,
-      role: :admin,
-      manager_actor: actor
+      actor: actor
     )
 
     assert result.failure?
-    assert_match(/shared root/i, result.error.to_s)
+    assert_equal RecordingStudioAccessible::SharedRootAccess::GRANT_DENIED_MESSAGE, result.error
+  end
+
+  private
+
+  def catalogue_admin_actor
+    actor = User.create!(
+      email: "logo-#{SecureRandom.hex(4)}@example.com",
+      password: "Password",
+      password_confirmation: "Password"
+    )
+    bootstrap_owner_access!(actor, admin_root_recording_for_test)
+    actor
+  end
+
+  def attach_png_logo!(publication, actor:, filename:)
+    RecordingStudioPublications.attach_or_replace_logo!(
+      publication,
+      io: StringIO.new(ONE_PIXEL_PNG),
+      filename: filename,
+      content_type: "image/png",
+      actor: actor
+    )
   end
 end
