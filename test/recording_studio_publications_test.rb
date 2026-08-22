@@ -2,26 +2,33 @@
 
 require "test_helper"
 
-class GemTemplateTest < Minitest::Test
+class RecordingStudioPublicationsTest < Minitest::Test
   def test_version_matches_release
-    assert_equal "0.2.0", ::GemTemplate::VERSION
+    assert_equal "0.1.0", ::RecordingStudioPublications::VERSION
   end
 
   def test_engine_exists
-    assert_kind_of Class, ::GemTemplate::Engine
+    assert_kind_of Class, ::RecordingStudioPublications::Engine
   end
 
-  def test_gemspec_pins_recording_studio_4_1
-    gemspec = File.read(File.expand_path("../gem_template.gemspec", __dir__))
+  def test_gemspec_pins_family_constraints
+    gemspec = File.read(File.expand_path("../recording_studio_publications.gemspec", __dir__))
 
-    assert_includes gemspec, 'spec.add_dependency "recording_studio", "~> 4.1"'
+    assert_includes gemspec, 'spec.add_dependency "recording_studio", "~> 4.2"'
+    assert_includes gemspec, 'spec.add_dependency "rails", "~> 8.1.0"'
+    assert_includes gemspec, 'spec.add_dependency "recording_studio_accessible", "~> 0.6"'
+    assert_includes gemspec, 'spec.add_dependency "recording_studio_admin", "~> 2.0"'
+    assert_includes gemspec, 'spec.add_dependency "recording_studio_attachable", "~> 0.4"'
+    assert_includes gemspec, 'spec.add_dependency "flat_pack", "~> 0.1.133"'
   end
 
   def test_dummy_gemfile_pins_verified_4x_github_tags
     gemfile = File.read(File.expand_path("dummy/Gemfile", __dir__))
 
     assert_includes gemfile, 'github: "bowerbird-app/RecordingStudio", tag: "v4.2.0"'
-    assert_includes gemfile, 'github: "bowerbird-app/RecordingStudio_accessible", tag: "v0.6.0"'
+    assert_includes gemfile, 'github: "bowerbird-app/RecordingStudio_accessible", tag: "v0.7.0"'
+    assert_includes gemfile, 'github: "bowerbird-app/RecordingStudio_attachable", tag: "0.4.0"'
+    assert_includes gemfile, 'github: "bowerbird-app/RecordingStudio_admin", tag: "2.0.1"'
     assert_includes gemfile, 'github: "bowerbird-app/RecordingStudio_root_switchable", tag: "v0.5.0"'
     assert_includes gemfile, 'github: "bowerbird-app/flatpack", tag: "v0.1.133"'
     refute_includes gemfile, "recording_studio/v3.0.0"
@@ -30,13 +37,13 @@ class GemTemplateTest < Minitest::Test
   end
 
   def test_template_does_not_ship_copied_core_hooks_or_base_service
-    refute File.exist?(File.expand_path("../lib/gem_template/hooks.rb", __dir__))
-    refute File.exist?(File.expand_path("../lib/gem_template/services/base_service.rb", __dir__))
-    refute File.exist?(File.expand_path("../lib/gem_template/services/example_service.rb", __dir__))
+    refute File.exist?(File.expand_path("../lib/recording_studio_publications/hooks.rb", __dir__))
+    refute File.exist?(File.expand_path("../lib/recording_studio_publications/services/base_service.rb", __dir__))
+    refute File.exist?(File.expand_path("../lib/recording_studio_publications/services/example_service.rb", __dir__))
   end
 
   def test_example_capability_wraps_include_for_and_is_not_enabled_globally
-    source = File.read(File.expand_path("../lib/gem_template/capabilities/example.rb", __dir__))
+    source = File.read(File.expand_path("../lib/recording_studio_publications/capabilities/example.rb", __dir__))
 
     assert_includes source, "def self.to(**)"
     assert_includes source, "RecordingStudio::Capabilities.include_for(:example, **)"
@@ -70,6 +77,22 @@ class GemTemplateTest < Minitest::Test
     refute_includes application_layout, "flat_pack_sidebar"
   end
 
+  def test_dummy_default_layout_head_sets_html_theme_without_chrome
+    default_layout_head = File.read(
+      File.expand_path("dummy/app/views/recording_studio/_default_layout_head.html.erb", __dir__)
+    )
+    helper_source = File.read(File.expand_path("dummy/app/helpers/application_helper.rb", __dir__))
+
+    assert_includes default_layout_head, 'document.documentElement.setAttribute("data-theme", "rounded")'
+    assert_includes default_layout_head, 'stylesheet_link_tag "flat_pack/application"'
+    refute_includes default_layout_head, "recording_studio_root_switch_dropdown"
+    refute_includes default_layout_head, "recording_studio_page_nav_right"
+    refute_includes default_layout_head, "Sign out"
+    refute_includes default_layout_head, "destroy_user_session_path"
+    refute_includes helper_source, "Sign out"
+    refute_includes helper_source, "recording_studio_root_switch_dropdown"
+  end
+
   def test_dummy_tailwind_keeps_flatpack_theme_selection_in_flatpack
     tailwind_source = File.read(File.expand_path("dummy/app/assets/tailwind/application.css", __dir__))
 
@@ -87,7 +110,10 @@ class GemTemplateTest < Minitest::Test
     initializer_source = File.read(initializer_path)
 
     assert_includes initializer_source, "config.require_recordable_declarations = true"
-    assert_includes initializer_source, "config.recordable_types = [ \"Workspace\", \"Folder\", \"Page\" ]"
+    assert_includes initializer_source, '"Workspace"'
+    assert_includes initializer_source, '"Folder"'
+    assert_includes initializer_source, '"Page"'
+    assert_includes initializer_source, '"RecordingStudioAttachable::Attachment"'
     refute_includes initializer_source, "config.include_children"
     refute_includes initializer_source, "config.features."
     refute_includes initializer_source, "v3"
@@ -172,7 +198,7 @@ class GemTemplateTest < Minitest::Test
   end
 
   def test_engine_does_not_ship_a_home_view
-    view_path = File.expand_path("../app/views/gem_template/home/index.html.erb", __dir__)
+    view_path = File.expand_path("../app/views/recording_studio_publications/home/index.html.erb", __dir__)
 
     refute File.exist?(view_path)
   end
