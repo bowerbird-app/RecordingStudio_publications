@@ -13,7 +13,7 @@
 
 ## Host layout
 
-Authenticated screens should use `RecordingStudio::UsesDefaultLayout`. Core still puts `data-theme` on `body`. Hosts that need Flatpack Rounded (charcoal) on `:root` should add `app/views/recording_studio/_default_layout_head.html.erb` and set `data-theme="rounded"` on `html`. That partial should load Flatpack CSS only. Do not put Sign out or a workspace switcher there.
+Authenticated screens should use `RecordingStudio::UsesDefaultLayout`. Core still puts `data-theme` on `<body>`. FlatPack themes belong on `<html>`. Hosts should add `app/views/recording_studio/_default_layout_head.html.erb` that renders `layouts/default_layout_head`, and `app/views/layouts/_default_layout_head.html.erb` that copies `data-theme="rounded"` onto `document.documentElement` with `javascript_tag nonce: true`. Do not put Sign out or a workspace switcher there.
 
 ## Verification
 

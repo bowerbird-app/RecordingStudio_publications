@@ -13,7 +13,7 @@ This gem is the `recording_studio_publications` engine (`RecordingStudioPublicat
 - **FlatPack** UI component library for all views
 - **Dummy app** (`test/dummy/`) with a FlatPack sign-in screen, a home page on Recording Studio's default layout, mounted Recording Studio routes, and FlatPack's built-in rounded theme
 
-Authenticated dummy pages use Recording Studio's shared default layout (`RecordingStudio::UsesDefaultLayout`) plus FlatPack CSS and JS. Core still puts `data-theme` on `body`; the dummy host sets `data-theme="rounded"` on `html` through `app/views/recording_studio/_default_layout_head.html.erb` so Flatpack Rounded (charcoal) resolves on `:root`. Devise keeps its own sign-in layout. Dummy `/docs/*` pages stay in the dummy app as a host-app sandbox; they are not the product README.
+Authenticated dummy pages use Recording Studio's shared default layout (`RecordingStudio::UsesDefaultLayout`) plus FlatPack CSS and JS. Recording Studio's default layout still puts `data-theme` on `<body>`. The dummy copies FlatPack's `rounded` theme onto `<html>` through `test/dummy/app/views/layouts/_default_layout_head.html.erb`, rendered from the core `recording_studio/default_layout_head` hook. Devise sign-in already sets `data-theme="rounded"` on the `<html>` element. Dummy `/docs/*` pages stay in the dummy app as a host-app sandbox; they are not the product README.
 
 ## Quick Start
 

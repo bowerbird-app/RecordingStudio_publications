@@ -78,17 +78,17 @@ class RecordingStudioPublicationsTest < Minitest::Test
   end
 
   def test_dummy_default_layout_head_sets_html_theme_without_chrome
-    default_layout_head = File.read(
-      File.expand_path("dummy/app/views/recording_studio/_default_layout_head.html.erb", __dir__)
-    )
+    layout_head = File.read(File.expand_path("dummy/app/views/layouts/_default_layout_head.html.erb", __dir__))
+    core_hook = File.read(File.expand_path("dummy/app/views/recording_studio/_default_layout_head.html.erb", __dir__))
     helper_source = File.read(File.expand_path("dummy/app/helpers/application_helper.rb", __dir__))
 
-    assert_includes default_layout_head, 'document.documentElement.setAttribute("data-theme", "rounded")'
-    assert_includes default_layout_head, 'stylesheet_link_tag "flat_pack/application"'
-    refute_includes default_layout_head, "recording_studio_root_switch_dropdown"
-    refute_includes default_layout_head, "recording_studio_page_nav_right"
-    refute_includes default_layout_head, "Sign out"
-    refute_includes default_layout_head, "destroy_user_session_path"
+    assert_includes core_hook, 'render "layouts/default_layout_head"'
+    assert_includes layout_head, 'document.documentElement.setAttribute("data-theme", "rounded")'
+    assert_includes layout_head, "javascript_tag nonce: true"
+    refute_includes layout_head, "recording_studio_root_switch_dropdown"
+    refute_includes layout_head, "recording_studio_page_nav_right"
+    refute_includes layout_head, "Sign out"
+    refute_includes layout_head, "destroy_user_session_path"
     refute_includes helper_source, "Sign out"
     refute_includes helper_source, "recording_studio_root_switch_dropdown"
   end
