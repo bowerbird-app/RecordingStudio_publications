@@ -21,7 +21,7 @@
       <div class="flex items-center gap-2 pt-2">
         <%= render FlatPack::Button::Component.new(
           text: "Edit",
-          url: preserve_anchor_url(@edit_publication_action.url),
+          href: preserve_anchor_url(@edit_publication_action.url),
           style: :primary
         ) %>
       </div>
