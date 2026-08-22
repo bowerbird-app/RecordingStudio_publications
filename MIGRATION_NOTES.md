@@ -4,10 +4,16 @@
 
 - Ruby 3.3 or newer
 - Rails 8.1 or newer
-- Recording Studio 4.x (`~> 4.1` in the gemspec; dummy GitHub tag `v4.2.0`)
-- Accessible dummy tag `v0.6.0` and Root Switchable dummy tag `v0.5.0`
-- FlatPack dummy tag `v0.1.133`
+- Recording Studio 4.x (`~> 4.2` in the gemspec; dummy GitHub tag `v4.2.0`)
+- Accessible `~> 0.6` (dummy GitHub tag `v0.7.0`)
+- Admin `~> 2.0` (dummy GitHub tag `2.0.1`)
+- Attachable `~> 0.4` (dummy GitHub tag `0.4.0`)
+- FlatPack `~> 0.1.133` (dummy GitHub tag `v0.1.133`)
 - Public RubyGems and GitHub access for dependency installation
+
+## Host layout
+
+Authenticated screens should use `RecordingStudio::UsesDefaultLayout`. Core still puts `data-theme` on `<body>`. FlatPack themes belong on `<html>`. Hosts should add `app/views/recording_studio/_default_layout_head.html.erb` that renders `layouts/default_layout_head`, and `app/views/layouts/_default_layout_head.html.erb` that copies `data-theme="rounded"` onto `document.documentElement` with `javascript_tag nonce: true`. Do not put Sign out or a workspace switcher there.
 
 ## Verification
 

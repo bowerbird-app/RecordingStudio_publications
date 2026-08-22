@@ -1,16 +1,19 @@
-# GemTemplate
+# RecordingStudioPublications
 
-Internal template for building Rails engine addons on top of Recording Studio 4.x.
+Publication directory addon for Recording Studio 4.x hosts.
+
+This gem is the `recording_studio_publications` engine (`RecordingStudioPublications`). Version 0.1.0 is identity, family pins, and a bootable dummy host. It does not yet ship a publication directory, admin inventory, or public press pages.
 
 ## What's Included
 
 - **Recording Studio** 4.x gem pinned and configured
+- **Accessible**, **Admin**, and **Attachable** declared with family version constraints
 - **Devise** authentication with a pre-seeded admin user
-- **Workspace**, **Folder**, and **Page** recordables seeded into the dummy host app
+- **Workspace**, **Folder**, and **Page** types seeded into the dummy host app
 - **FlatPack** UI component library for all views
 - **Dummy app** (`test/dummy/`) with a FlatPack sign-in screen, a home page on Recording Studio's default layout, mounted Recording Studio routes, and FlatPack's built-in rounded theme
 
-Authenticated dummy pages use Recording Studio's shared default layout (`RecordingStudio::UsesDefaultLayout`) plus FlatPack CSS and JS. Devise keeps its own sign-in layout. Dummy `/docs/*` pages stay in the dummy app as a host-app sandbox; they are not the product README.
+Authenticated dummy pages use Recording Studio's shared default layout (`RecordingStudio::UsesDefaultLayout`) plus FlatPack CSS and JS. Recording Studio's default layout still puts `data-theme` on `<body>`. The dummy copies FlatPack's `rounded` theme onto `<html>` through `test/dummy/app/views/layouts/_default_layout_head.html.erb`, rendered from the core `recording_studio/default_layout_head` hook. Devise sign-in already sets `data-theme="rounded"` on the `<html>` element. Dummy `/docs/*` pages stay in the dummy app as a host-app sandbox; they are not the product README.
 
 ## Quick Start
 
@@ -50,17 +53,17 @@ The home page in `test/dummy/app/views/home/index.html.erb` is a starting point 
 
 ### Root Recording Pattern
 
-This template follows Recording Studio's root recording pattern:
+This addon follows Recording Studio's root recording pattern:
 
-- **Workspace** is the top-level recordable
-- **Folder** and **Page** demonstrate nested recordables under the workspace root
-- Each configured recordable declares `recording_studio_recordable(...)`; strict declaration validation stays enabled
+- **Workspace** is the top-level type
+- **Folder** and **Page** demonstrate nested types under the workspace root
+- Each configured type declares `recording_studio_recordable(...)`; strict declaration validation stays enabled
 - A root `RecordingStudio::Recording` wraps the Workspace
 - `Current.actor` is set from `current_user` (Devise) in `ApplicationController`
 
 ### Extending Recording Studio
 
-To add new recordable types:
+To add new types in a host app:
 
 1. Create your model (e.g., `Page`, `Comment`)
 2. Register it in `config/initializers/recording_studio.rb`:
@@ -88,7 +91,7 @@ To add new recordable types:
 
 ### Recordable Declarations
 
-Every configured ActiveRecord recordable type must declare its hierarchy rules. Declarations are required; they are not version-specific.
+Every configured ActiveRecord type must declare its hierarchy rules. Declarations are required; they are not version-specific.
 
 - `Workspace` declares `root: true`
 - `Folder` and `Page` declare `root: false, allowed_parent_types: ["Workspace", "Folder"]`
@@ -112,7 +115,7 @@ The dummy Workspace enables Accessible because that addon is bundled:
 RecordingStudio.enable_capability(:accessible, on: Workspace)
 ```
 
-The template also ships one example mixin that uses core 4.2.0's `include_for` factory:
+The engine also ships one example mixin that uses core 4.2.0's `include_for` factory:
 
 ```ruby
 include RecordingStudio::Capabilities::Example.to(label: "dummy workspace")
@@ -120,7 +123,7 @@ include RecordingStudio::Capabilities::Example.to(label: "dummy workspace")
 
 `.to` wraps `RecordingStudio::Capabilities.include_for`. It does not add a fourth verb and it does not call `enable_capability` / `set_capability_options` itself. Folder and Page stay without the example mixin.
 
-Use core `RecordingStudio::Hooks` and `RecordingStudio::Services::BaseService`. Do not copy those classes into a new addon.
+Use core `RecordingStudio::Hooks` and `RecordingStudio::Services::BaseService`. Do not copy those classes into this addon.
 
 ### FlatPack UI Components
 
@@ -147,13 +150,15 @@ See the [FlatPack README](https://github.com/bowerbird-app/flatpack) for full do
 | Rails           | 8.1+    |
 | PostgreSQL      | 16      |
 | TailwindCSS     | 4       |
-| RecordingStudio | 4.x (`~> 4.1` in the gemspec; dummy GitHub tag `v4.2.0`) |
-| Accessible      | dummy GitHub tag `v0.6.0` |
+| RecordingStudio | 4.x (`~> 4.2` in the gemspec; dummy GitHub tag `v4.2.0`) |
+| Accessible      | `~> 0.6` (dummy GitHub tag `v0.7.0`) |
+| Admin           | `~> 2.0` (dummy GitHub tag `2.0.1`) |
+| Attachable      | `~> 0.4` (dummy GitHub tag `0.4.0`) |
 | Root Switchable | dummy GitHub tag `v0.5.0` |
-| FlatPack        | dummy GitHub tag `v0.1.133` |
+| FlatPack        | `~> 0.1.133` (dummy GitHub tag `v0.1.133`) |
 | Devise          | latest  |
 
-The dummy Gemfile keeps `github:` sources so Bundler can fetch those gems. The gemspec still pins `recording_studio` to `~> 4.1` so copied addons declare the core dependency even when GitHub is the fetch source.
+The dummy Gemfile keeps `github:` sources so Bundler can fetch those gems. The gemspec declares the family constraints even when GitHub is the fetch source.
 
 ## Documentation
 
