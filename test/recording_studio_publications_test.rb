@@ -4,7 +4,7 @@ require "test_helper"
 
 class RecordingStudioPublicationsTest < Minitest::Test
   def test_version_matches_release
-    assert_equal "0.1.0", ::RecordingStudioPublications::VERSION
+    assert_equal "0.2.0", ::RecordingStudioPublications::VERSION
   end
 
   def test_engine_exists
@@ -100,6 +100,7 @@ class RecordingStudioPublicationsTest < Minitest::Test
     assert_includes tailwind_source, "flatpack-*/app/components/**/*.{rb,erb}"
     assert_includes tailwind_source, "../../../vendor/bundle/**/recording_studio/app/views/**/*.erb"
     assert_includes tailwind_source, "recordingstudio-*/app/views/**/*.erb"
+    assert_includes tailwind_source, "recording_studio_admin/app/views/**/*.erb"
     refute_includes tailwind_source, "@theme"
     refute_includes tailwind_source, ":root {"
     refute_includes tailwind_source, "--color-fp-primary"
@@ -113,6 +114,9 @@ class RecordingStudioPublicationsTest < Minitest::Test
     assert_includes initializer_source, '"Workspace"'
     assert_includes initializer_source, '"Folder"'
     assert_includes initializer_source, '"Page"'
+    assert_includes initializer_source, '"AdminRoot"'
+    assert_includes initializer_source, '"RecordingStudioPublications::PublicationCatalogue"'
+    assert_includes initializer_source, '"RecordingStudioPublications::Publication"'
     assert_includes initializer_source, '"RecordingStudioAttachable::Attachment"'
     refute_includes initializer_source, "config.include_children"
     refute_includes initializer_source, "config.features."
@@ -123,7 +127,7 @@ class RecordingStudioPublicationsTest < Minitest::Test
     readme_path = File.expand_path("dummy/README.md", __dir__)
     readme_source = File.read(readme_path)
 
-    assert_includes readme_source, "This Rails app exists to validate the Recording Studio addon template"
+    assert_includes readme_source, "This Rails app exists to validate the Recording Studio publications gem"
     assert_includes readme_source, "/recording_studio"
     assert_includes readme_source, "redirects to `/`"
     refute_includes readme_source, "flat_pack_sidebar"
@@ -145,8 +149,8 @@ class RecordingStudioPublicationsTest < Minitest::Test
     view_path = File.expand_path("dummy/app/views/home/index.html.erb", __dir__)
     view_source = File.read(view_path)
 
-    assert_includes view_source, 'title: "Template Demo"'
-    assert_includes view_source, 'subtitle: "This dummy app is the browser-facing demo surface for the template."'
+    assert_includes view_source, 'title: "Publication directory"'
+    assert_includes view_source, "shared publications catalogue"
     assert_includes view_source, "FlatPack::Card::Component"
     assert_includes view_source, "dummy_page_nav"
     refute_includes view_source, 'title: "Demo"'

@@ -122,5 +122,22 @@ module RecordingStudioPublications
         end
       end
     end
+
+    initializer "recording_studio_publications.admin_definitions" do
+      config.to_prepare { RecordingStudioPublications::Admin.register! }
+    end
+
+    initializer "recording_studio_publications.admin_view_paths" do
+      config.to_prepare do
+        next unless defined?(ActionController::Base)
+        next unless defined?(RecordingStudioAdmin::Engine)
+
+        ActionController::Base.prepend_view_path(
+          RecordingStudioPublications::Engine.root.join("app/overrides")
+        )
+        ActionController::Base.append_view_path(RecordingStudioAdmin::Engine.root.join("app/views"))
+      end
+    end
   end
 end
+

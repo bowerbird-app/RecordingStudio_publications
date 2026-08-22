@@ -2,18 +2,17 @@
 
 Publication directory addon for Recording Studio 4.x hosts.
 
-This gem is the `recording_studio_publications` engine (`RecordingStudioPublications`). Version 0.1.0 is identity, family pins, and a bootable dummy host. It does not yet ship a publication directory, admin inventory, or public press pages.
+This gem is the `recording_studio_publications` engine (`RecordingStudioPublications`). Version 0.2.0 ships a grant-less shared catalogue and family-admin CRUD for titles. It does not ship public press pages, Featured In, or per-title access management.
 
 ## What's Included
 
-- **Recording Studio** 4.x gem pinned and configured
-- **Accessible**, **Admin**, and **Attachable** declared with family version constraints
-- **Devise** authentication with a pre-seeded admin user
-- **Workspace**, **Folder**, and **Page** types seeded into the dummy host app
-- **FlatPack** UI component library for all views
-- **Dummy app** (`test/dummy/`) with a FlatPack sign-in screen, a home page on Recording Studio's default layout, mounted Recording Studio routes, and FlatPack's built-in rounded theme
+- **PublicationCatalogue** — one shared Recording Studio root per host (`label: "Publications"`, `root: true`, `shared: true`). Same idea as `RecordingStudioUser::People`. Accessible and Attachable stay off this root.
+- **Publication** — nested titles under that catalogue only. Required name, required kind (`magazine`, `newspaper`, `journal`, `site`, `broadcast`), optional website, and a stable key.
+- **One Attachable logo** per title. Images only. Replacing a logo stays on Attachable (`replace_attachment_file`). There is no Replace capability.
+- **Family admin** — one `publications` section in RecordingStudioAdmin 2.0. Staff CRUD is gated by an owned host `AdminRoot` plus `RecordingStudioAdmin::Resource` `required_role: :admin`. Admin does not need a grant on each title.
+- **Dummy host** (`test/dummy/`) — thin Devise host, FlatPack Rounded on `<html>` via the PWA head workaround, seeded titles, and `/admin` as the catalogue.
 
-Authenticated dummy pages use Recording Studio's shared default layout (`RecordingStudio::UsesDefaultLayout`) plus FlatPack CSS and JS. Recording Studio's default layout still puts `data-theme` on `<body>`. The dummy copies FlatPack's `rounded` theme onto `<html>` through `test/dummy/app/views/layouts/_default_layout_head.html.erb`, rendered from the core `recording_studio/default_layout_head` hook. Devise sign-in already sets `data-theme="rounded"` on the `<html>` element. Dummy `/docs/*` pages stay in the dummy app as a host-app sandbox; they are not the product README.
+This is a directory gem, not a two-sided marketplace. Hosts stay thin: they register recordable types, own `AdminRoot`, seed first staff access, and mount the engines.
 
 ## Quick Start
 
@@ -27,9 +26,7 @@ Authenticated dummy pages use Recording Studio's shared default layout (`Recordi
    bin/rails db:setup
    bin/dev
    ```
-4. Open port 3000 — you'll land on the dummy app home page and can sign in at `/users/sign_in`
-
-The dummy app is intended as a host-app validation surface for authentication, FlatPack rendering, Tailwind source scanning, and Recording Studio route wiring.
+4. Open port 3000, sign in at `/users/sign_in`, then open `/admin`
 
 ### Login Credentials
 
@@ -38,109 +35,102 @@ The dummy app is intended as a host-app validation surface for authentication, F
 | Email    | admin@admin.com   |
 | Password | Password          |
 
-The login form is prefilled with these credentials for fast access.
+The login form is prefilled with these credentials for fast access. `member@admin.com` / `Password` is a signed-in user without AdminRoot access.
 
 ### Useful Routes
 
-- `/` — dummy app home page
-- `/users/sign_in` — Devise sign-in page
-- `/recording_studio` — redirect to `/` while the mounted Recording Studio engine remains data/API-focused
-- `/docs/install`, `/docs/config`, `/docs/recordable_types`, `/docs/recordings_tree`, `/docs/gem_views`, `/docs/methods` — dummy-only starter pages
-
-The home page in `test/dummy/app/views/home/index.html.erb` is a starting point for a minimal demo of the gem's primary behavior. Keep deeper explanations on the dummy docs pages, not in this README.
+- `/` — dummy host home
+- `/users/sign_in` — Devise sign-in
+- `/admin` — publications admin hub (family RecordingStudioAdmin)
+- `/admin/screens/publications` — inventory
+- `/recording_studio_publications/admin/publications/new` — new title
+- `/docs/install`, `/docs/config`, `/docs/recordable_types`, `/docs/recordings_tree`, `/docs/gem_views`, `/docs/methods` — dummy-only sandbox pages
 
 ## Architecture
 
-### Root Recording Pattern
+### Shared catalogue
 
-This addon follows Recording Studio's root recording pattern:
-
-- **Workspace** is the top-level type
-- **Folder** and **Page** demonstrate nested types under the workspace root
-- Each configured type declares `recording_studio_recordable(...)`; strict declaration validation stays enabled
-- A root `RecordingStudio::Recording` wraps the Workspace
-- `Current.actor` is set from `current_user` (Devise) in `ApplicationController`
-
-### Extending Recording Studio
-
-To add new types in a host app:
-
-1. Create your model (e.g., `Page`, `Comment`)
-2. Register it in `config/initializers/recording_studio.rb`:
-   ```ruby
-   RecordingStudio.configure do |config|
-     config.recordable_types = ["Workspace", "YourNewType"]
-   end
-   ```
-3. Declare whether the model can be a root and which parents may contain it:
-   ```ruby
-   class YourNewType < ApplicationRecord
-     recording_studio_recordable label: "Your new type",
-                                 root: false,
-                                 allowed_parent_types: ["Workspace", "Folder"]
-   end
-   ```
-4. Validate declarations and create recordings under the root:
-   ```ruby
-   RecordingStudio.validate_recordable_declarations!
-   root_recording = RecordingStudio.root_recording_for(workspace)
-   root_recording.record(YourNewType) do |record|
-     record.title = "Example"
-   end
-   ```
-
-### Recordable Declarations
-
-Every configured ActiveRecord type must declare its hierarchy rules. Declarations are required; they are not version-specific.
-
-- `Workspace` declares `root: true`
-- `Folder` and `Page` declare `root: false, allowed_parent_types: ["Workspace", "Folder"]`
-- `config.require_recordable_declarations = true` remains enabled in the dummy app initializer
-
-Useful console checks:
+`RecordingStudioPublications::PublicationCatalogue` is the forest root. There is one per host. Nobody owns the forest through that node.
 
 ```ruby
-RecordingStudio.validate_recordable_declarations!
-RecordingStudio.root_recordable_types
-RecordingStudio.allowed_parent_types_for("Page")
+RecordingStudioPublications.catalogue_root.record(RecordingStudioPublications::Publication) do |publication|
+  publication.name = "The Atlantic"
+  publication.kind = "magazine"
+  publication.website = "https://www.theatlantic.com"
+end
 ```
+
+`Publication` may enable Accessible so later per-title grants can work. v1 does not ship a Manage-access UI. Admin CRUD authorizes against the host AdminRoot, not against a grant on the title.
+
+Do not enable `:accessible` or Attachable on the shared catalogue. Accessible 0.7.0 rejects grants on shared roots. Attachable 0.4.0 is for domain children under that root.
+
+### Host AdminRoot
+
+The host owns a separate admin root (`shared: false`) and opts the publications section in:
+
+```ruby
+class AdminRoot < ApplicationRecord
+  include RecordingStudioAdmin::AllowsAdminSections
+
+  recording_studio_recordable label: "Admin", root: true, shared: false
+  RecordingStudio.enable_capability(:accessible, on: self)
+
+  recording_studio_admin_sections do
+    section :publications
+  end
+end
+```
+
+Seed first staff with `RecordingStudioAccessible.bootstrap_owner_access!` on that admin recording. Do not use `user.admin?`, Pundit, or a custom ACL.
+
+### Family admin
+
+The gem registers a Section, Screen, Resource, and count widget with `blast_radius :site`:
+
+| Surface | Path |
+| --- | --- |
+| Hub | `/admin` or `/admin/sections/publications` |
+| Inventory | `/admin/screens/publications` |
+| New / show / edit | `/recording_studio_publications/admin/publications/...` |
+
+The hub widget is the total number of current titles. Inventory is a family Screen table. New is a standalone FlatPack Button (not a ButtonGroup). New/edit forms are Name, Key, Kind, Website, and logo — one field per row. Cancel and Save are separate Buttons.
 
 ### Capabilities
 
-Capability mixins are opt-in. Installing this gem does not enable mixins on host types.
+| Recordable | Accessible | Attachable |
+| --- | --- | --- |
+| `PublicationCatalogue` | No | No |
+| `Publication` | Yes (no Manage-access UI) | Yes, images only, one logo |
+| Host `AdminRoot` | Yes | No |
+| Host `Workspace` | Dummy only | No |
 
-The dummy Workspace enables Accessible because that addon is bundled:
+Logo upload from admin is authorized through AdminRoot (see `LogoAuthorization`). Later per-title Accessible grants can still allow non-admin actors.
 
-```ruby
-RecordingStudio.enable_capability(:accessible, on: Workspace)
-```
+### FlatPack UI
 
-The engine also ships one example mixin that uses core 4.2.0's `include_for` factory:
+All views use FlatPack ViewComponents. The live reference is [flatpack.bowerbird.io](https://flatpack.bowerbird.io/). Theme `rounded` is monochrome charcoal. Use family admin screens, widgets, and resources — do not invent a second admin stack.
 
-```ruby
-include RecordingStudio::Capabilities::Example.to(label: "dummy workspace")
-```
+## Installing in a host
 
-`.to` wraps `RecordingStudio::Capabilities.include_for`. It does not add a fourth verb and it does not call `enable_capability` / `set_capability_options` itself. Folder and Page stay without the example mixin.
+1. Add the gem and the family pins from the gemspec / dummy Gemfile.
+2. Run `rails generate recording_studio_publications:install`.
+3. Run `rails generate recording_studio_publications:migrations`.
+4. Install Accessible, Admin, and Attachable migrations if the host does not already have them. Attachable also needs Active Storage.
+5. Register `AdminRoot`, `RecordingStudioPublications::PublicationCatalogue`, `RecordingStudioPublications::Publication`, and `RecordingStudioAttachable::Attachment` in `RecordingStudio.configure`.
+6. Create an owned `AdminRoot`, enable Accessible on it, and `section :publications`.
+7. Point `RecordingStudioAdmin` `access_recording_resolver` and `site_admin_recording_resolver` at that admin recording.
+8. Mount `recording_studio_admin_for :admin, at: "/admin", root_section: :publications`.
+9. Bootstrap first-owner admin access on the AdminRoot recording.
 
-Use core `RecordingStudio::Hooks` and `RecordingStudio::Services::BaseService`. Do not copy those classes into this addon.
+Authenticated screens should keep `RecordingStudio::UsesDefaultLayout`. If core puts `data-theme` on `<body>`, render `layouts/_default_layout_head` from the `recording_studio/default_layout_head` hook so `<html>` gets `data-theme="rounded"`. Do not put Sign out or a workspace switcher in that slot.
 
-### FlatPack UI Components
+## Out of scope
 
-All views use FlatPack ViewComponents. Available components include:
-
-- `FlatPack::Button::Component` — Buttons (`:primary`, `:secondary`, `:ghost`)
-- `FlatPack::Card::Component` — Cards (`:default`, `:elevated`, `:outlined`)
-- `FlatPack::Alert::Component` — Alerts (`:success`, `:error`, `:warning`, `:info`)
-- `FlatPack::Badge::Component` — Status badges
-- `FlatPack::Table::Component` — Data tables
-- `FlatPack::TextInput::Component`, `EmailInput`, `PasswordInput` — Form inputs
-- `FlatPack::PageNav::Component` — Default-layout page navigation
-- `FlatPack::PageTitle::Component` — Page titles
-
-Use the live FlatPack demo app at [flatpack.bowerbird.io](https://flatpack.bowerbird.io/) as the approved UI reference for current shared patterns. Its component table is the fastest way to discover available FlatPack components before introducing new custom UI.
-
-See the [FlatPack README](https://github.com/bowerbird-app/flatpack) for full documentation.
+- Public Publishable pages
+- Featured In / press-kit foreign keys
+- Moveable, Sitemaps, journalist or submission flows
+- ISSN / country
+- A second admin app, host Tailwind themes, or CSS forks
 
 ## Tech Stack
 
@@ -158,8 +148,6 @@ See the [FlatPack README](https://github.com/bowerbird-app/flatpack) for full do
 | FlatPack        | `~> 0.1.133` (dummy GitHub tag `v0.1.133`) |
 | Devise          | latest  |
 
-The dummy Gemfile keeps `github:` sources so Bundler can fetch those gems. The gemspec declares the family constraints even when GitHub is the fetch source.
-
 ## Documentation
 
-The original gem template documentation is preserved in `docs/gem_template/` as architectural reference material. Use it as background on the engine conventions; this README and the dummy app are the source of truth for the Recording Studio addon workflow.
+The original gem template documentation is preserved in `docs/gem_template/` as architectural reference material. This README, `CHANGELOG.md`, and the dummy app are the source of truth for the publications directory.

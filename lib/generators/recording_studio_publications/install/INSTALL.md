@@ -8,7 +8,8 @@ If you use Tailwind CSS:
 1. Run 'bin/rails tailwindcss:build' to rebuild your CSS with RecordingStudioPublications styles
 
 To use the engine:
-1. Start your Rails server
-2. Visit http://localhost:3000/recording_studio_publications
+1. Create the owned AdminRoot, register catalogue types, and bootstrap first staff access
+2. Start your Rails server
+3. Visit the family admin publications section (dummy: http://localhost:3000/admin)
 
 ===============================================================================

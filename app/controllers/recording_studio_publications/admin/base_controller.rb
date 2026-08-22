@@ -1,0 +1,88 @@
+# frozen_string_literal: true
+
+module RecordingStudioPublications
+  module Admin
+    class BaseController < ApplicationController
+      include RecordingStudioAdmin::AdminActionAuditing if defined?(RecordingStudioAdmin::AdminActionAuditing)
+
+      before_action :authenticate_user!
+      before_action :set_current_actor
+
+      helper_method :recording_studio_admin_context, :page_nav_anchor_url, :preserve_anchor_url, :inventory_path
+
+      private
+
+      def set_current_actor
+        return unless defined?(Current) && Current.respond_to?(:actor=)
+
+        Current.actor = current_user
+      end
+
+      def recording_studio_admin_context
+        @recording_studio_admin_context ||= RecordingStudioAdmin::Context.new(
+          params: params.to_unsafe_h,
+          current_actor: current_user,
+          controller: self,
+          routes: (respond_to?(:main_app) ? main_app : self),
+          view_context: view_context
+        )
+      end
+
+      def page_nav_anchor_url(default: RecordingStudioAdmin.configuration.default_mount_path)
+        safe_url = RecordingStudioAdmin::UrlSafety.safe_href(params[:anchor_url], allow_external: true)
+        return default if safe_url.blank? || safe_url == "#"
+
+        safe_url
+      end
+
+      def preserve_anchor_url(url)
+        safe_url = RecordingStudioAdmin::UrlSafety.safe_href(url)
+        anchor_url = page_nav_anchor_url
+
+        return safe_url if safe_url.blank? || anchor_url.blank? || anchor_url == "#"
+        return safe_url unless safe_url.start_with?("/")
+
+        uri = URI.parse(safe_url)
+        uri.query = Rack::Utils.parse_nested_query(uri.query).reverse_merge("anchor_url" => anchor_url).to_query.presence
+        uri.to_s
+      rescue URI::InvalidURIError
+        safe_url
+      end
+
+      def authorize_publications_admin_action!(record = nil)
+        resource_action = case action_name
+                          when "create" then :create
+                          when "update" then :update
+                          when "index" then :show
+                          else action_name
+                          end
+
+        RecordingStudioAdmin.authorize_resource!(
+          key: RecordingStudioPublications::Admin::RESOURCE_KEY,
+          action: resource_action,
+          context: recording_studio_admin_context,
+          record: record,
+          audit: true,
+          audit_action: action_name
+        )
+      rescue RecordingStudioAdmin::AuthorizationFailed, RecordingStudioAdmin::DefinitionNotFound
+        head :forbidden
+      end
+
+      def resolve_publications_admin_action(action, record)
+        RecordingStudioAdmin.authorize_resource!(
+          key: RecordingStudioPublications::Admin::RESOURCE_KEY,
+          action: action,
+          context: recording_studio_admin_context,
+          record: record
+        ).resolve(record, recording_studio_admin_context)
+      rescue RecordingStudioAdmin::AuthorizationFailed, RecordingStudioAdmin::DefinitionNotFound
+        nil
+      end
+
+      def inventory_path
+        recording_studio_admin_context.admin_screen_path(RecordingStudioPublications::Admin::SCREEN_KEY)
+      end
+    end
+  end
+end

@@ -12,7 +12,9 @@ class RecordingStudioTemplateTest < ActiveSupport::TestCase
 
   test "dummy app validates recordable declarations" do
     assert RecordingStudio.validate_recordable_declarations!
-    assert_equal [ "Workspace" ], RecordingStudio.root_recordable_types
+    assert_includes RecordingStudio.root_recordable_types, "Workspace"
+    assert_includes RecordingStudio.root_recordable_types, "AdminRoot"
+    assert_includes RecordingStudio.root_recordable_types, "RecordingStudioPublications::PublicationCatalogue"
     assert_equal [ "Workspace", "Folder" ], RecordingStudio.allowed_parent_types_for("Page")
   end
 
@@ -50,6 +52,8 @@ class RecordingStudioTemplateTest < ActiveSupport::TestCase
     assert_equal folder_recording, page_recording.parent_recording
     assert_equal root_recording, page_recording.root_recording
     assert_equal 3, Workspace.count
+    assert AdminRoot.find_by(name: "Admin")
+    assert_operator RecordingStudioPublications.publications.count, :>=, 5
 
     assert_no_difference -> { User.count } do
       assert_no_difference -> { RecordingStudio::Recording.count } do

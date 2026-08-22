@@ -1,0 +1,69 @@
+<%= render FlatPack::Grid::Component.new(cols: 2, gap: :md) do %>
+  <div class="space-y-4">
+    <% if publication.errors.any? %>
+      <%= render FlatPack::Alert::Component.new(
+        title: "This title could not be saved",
+        description: publication.errors.full_messages.to_sentence,
+        style: :danger
+      ) %>
+    <% end %>
+
+    <%= render FlatPack::TextInput::Component.new(
+      name: "publication[name]",
+      id: "publication_name",
+      label: "Name",
+      value: publication.name,
+      required: true,
+      error: publication.errors[:name].to_sentence.presence
+    ) %>
+
+    <%= render FlatPack::TextInput::Component.new(
+      name: "publication[key]",
+      id: "publication_key",
+      label: "Key",
+      value: publication.key,
+      help_text: "Stable identifier used in links. Leave blank to generate one from the name.",
+      error: publication.errors[:key].to_sentence.presence
+    ) %>
+
+    <%= render FlatPack::Select::Component.new(
+      name: "publication[kind]",
+      id: "publication_kind",
+      label: "Kind",
+      value: publication.kind,
+      options: RecordingStudioPublications::Publication::KINDS.map { |kind| [kind.titleize, kind] },
+      placeholder: "Select a kind",
+      required: true,
+      error: publication.errors[:kind].to_sentence.presence
+    ) %>
+
+    <%= render FlatPack::UrlInput::Component.new(
+      name: "publication[website]",
+      id: "publication_website",
+      label: "Website",
+      value: publication.website,
+      placeholder: "https://",
+      error: publication.errors[:website].to_sentence.presence
+    ) %>
+
+    <div class="space-y-2">
+      <label for="publication_logo" class="text-sm font-medium text-(--surface-content-color)">Logo</label>
+      <% if local_assigns[:logo_recording]&.recordable&.file&.attached? %>
+        <div class="flex items-center gap-3">
+          <%= image_tag logo_recording.recordable.file, alt: "#{publication.name} logo", class: "h-16 w-16 object-contain" %>
+          <p class="text-sm text-(--surface-muted-content-color)">Choose a new image to replace this logo.</p>
+        </div>
+      <% end %>
+      <input id="publication_logo"
+             name="publication[logo]"
+             type="file"
+             accept="image/*"
+             class="flat-pack-input w-full text-sm">
+    </div>
+
+    <div class="flex items-center gap-2 pt-2">
+      <%= render FlatPack::Button::Component.new(text: "Cancel", href: cancel_url, style: :secondary) %>
+      <%= render FlatPack::Button::Component.new(text: "Save", type: :submit, style: :primary) %>
+    </div>
+  </div>
+<% end %>

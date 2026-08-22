@@ -7,6 +7,30 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.2.0] - 2026-08-22
+
+Shared publication catalogue and family-admin CRUD. Stacked on 0.1.0 identity/pins. No public Publishable pages.
+
+### Added
+- `RecordingStudioPublications::PublicationCatalogue` shared root (`label: "Publications"`, `root: true`, `shared: true`). One per host. Accessible and Attachable are not enabled on this root
+- `RecordingStudioPublications::Publication` nested only under that catalogue: required name, required kind (`magazine`, `newspaper`, `journal`, `site`, `broadcast`), optional website, stable key
+- One Attachable logo per publication (images only). Replace uses Attachable `replace_attachment_file`
+- Accessible enabled on Publication for later per-title grants. No Manage-access UI
+- Family admin section `publications`: hub count widget, inventory Screen, Resource `required_role: :admin` for writes, new/show/edit forms
+- Dummy `AdminRoot` (`shared: false`) with `AllowsAdminSections`, Accessible, and `section :publications`
+- Dummy seeds for The Atlantic, The Guardian, Nature, BBC News, and The Verge
+
+### Upgrade notes
+- Bump to `0.2.0` and install engine migrations (`create_recording_studio_publications_catalogue`)
+- Register `RecordingStudioPublications::PublicationCatalogue` and `RecordingStudioPublications::Publication` in host `recordable_types`
+- Add an owned host `AdminRoot` (`shared: false`), enable Accessible on it, and `section :publications`
+- Configure `RecordingStudioAdmin` access and site-admin resolvers to that AdminRoot recording
+- Mount `recording_studio_admin_for` and `RecordingStudioPublications::Engine`
+- Install Attachable migrations and Active Storage if the host does not already have them
+- Bootstrap first-owner admin access on the AdminRoot recording. Do not grant Accessible on the shared catalogue
+- Keep `UsesDefaultLayout` plus the html `data-theme="rounded"` head workaround from 0.1.0
+- No public Publishable page ships in this version
+
 ## [0.1.0] - 2026-08-22
 
 First `recording_studio_publications` identity. This release is rename, dependency pins, and dummy host theme only. It does not ship a publication directory.
@@ -28,5 +52,6 @@ First `recording_studio_publications` identity. This release is rename, dependen
 - Keep `RecordingStudio::UsesDefaultLayout` for authenticated screens. If core puts theme on `body`, render `layouts/_default_layout_head` from the `recording_studio/default_layout_head` hook so `html` gets `data-theme="rounded"`
 - Do not put Sign out or a workspace switcher in the default-layout slot or that head partial
 
-[Unreleased]: https://github.com/bowerbird-app/RecordingStudio_publications/compare/v0.1.0...HEAD
+[Unreleased]: https://github.com/bowerbird-app/RecordingStudio_publications/compare/v0.2.0...HEAD
+[0.2.0]: https://github.com/bowerbird-app/RecordingStudio_publications/releases/tag/v0.2.0
 [0.1.0]: https://github.com/bowerbird-app/RecordingStudio_publications/releases/tag/v0.1.0

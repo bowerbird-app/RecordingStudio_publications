@@ -1,0 +1,21 @@
+<%= render layout: "recording_studio_admin/shared/page_shell" do %>
+  <% recording_studio_page_nav(
+    title: "Edit publication",
+    page_nav_anchor_url: page_nav_anchor_url(default: inventory_path)
+  ) %>
+
+  <%= render FlatPack::PageTitle::Component.new(
+    title: "Edit publication",
+    subtitle: @publication.name
+  ) %>
+
+  <%= form_with model: @publication,
+                url: admin_publication_path(@recording),
+                method: :patch,
+                multipart: true do %>
+    <%= render "form",
+               publication: @publication,
+               cancel_url: admin_publication_path(@recording),
+               logo_recording: @logo_recording %>
+  <% end %>
+<% end %>
