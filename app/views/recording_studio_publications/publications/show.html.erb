@@ -27,12 +27,9 @@
       </div>
     <% end %>
 
-    <% if (logo_url = publication_logo_url(@logo_recording)) %>
-      <div class="space-y-2">
-        <p class="text-sm font-medium text-(--surface-content-color)">Logo</p>
-        <%= image_tag logo_url, alt: "#{@publication.name} logo", class: "h-24 w-24 object-contain" %>
-      </div>
-    <% end %>
+    <%= render "logo",
+               logo_recording: @logo_recording,
+               return_to: admin_publication_path(@recording) %>
 
     <%= render FlatPack::Table::Component.new(data: attribute_rows, class: "text-sm") do |table| %>
       <% table.column(title: "Attribute") { |attribute_row| attribute_row.fetch(:attribute) } %>

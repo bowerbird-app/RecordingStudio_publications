@@ -10,6 +10,6 @@ Next steps:
 6. Register `RecordingStudioPublications::PublicationCatalogue`, `RecordingStudioPublications::Publication`, host `AdminRoot`, and `RecordingStudioAttachable::Attachment` in `RecordingStudio.configure`.
 7. Create an owned `AdminRoot` (`shared: false`), enable Accessible on it, and `section :publications`. Point RecordingStudioAdmin resolvers at that recording and bootstrap first-owner admin access.
 8. Run `bin/rails tailwindcss:build` if you use Tailwind CSS. Scan RecordingStudioAdmin views as well as this engine.
-9. Mount routes are added at the configured mount path. Also mount `recording_studio_admin_for`. Adjust auth, layout, and current actor integration to match your host app.
+9. Mount routes are added at the configured mount path. Also mount `recording_studio_admin_for` and `RecordingStudioAttachable::Engine` so logo add/change uses Attachable’s screens. Adjust auth, layout, and current actor integration to match your host app.
 10. Keep strict recordable declarations enabled and add `recording_studio_recordable(...)` to every configured recordable before running `RecordingStudio.validate_recordable_declarations!`.
 11. Do not enable Accessible or Attachable on the shared Publications catalogue.

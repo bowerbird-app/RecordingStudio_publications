@@ -16,6 +16,11 @@
 @source "../../../../../../usr/local/bundle/ruby/**/bundler/gems/recordingstudioadmin-*/app/views/**/*.erb";
 @source "../../../../../../usr/local/bundle/ruby/**/bundler/gems/RecordingStudio_admin-*/app/views/**/*.erb";
 
+/* Include Attachable engine views used by add/replace logo */
+@source "../../../vendor/bundle/**/recording_studio_attachable/app/views/**/*.erb";
+@source "../../../../../../usr/local/bundle/ruby/**/bundler/gems/recordingstudioattachable-*/app/views/**/*.erb";
+@source "../../../../../../usr/local/bundle/ruby/**/bundler/gems/RecordingStudio_attachable-*/app/views/**/*.erb";
+
 /* Include the engine's views in the Tailwind build */
 @source "../../../../../app/views/**/*.erb";
 @source "../../../../../app/overrides/**/*.erb";

@@ -82,14 +82,25 @@ class PublicationCatalogueEngineTest < ActiveSupport::TestCase
       { name: "Logo Title", kind: "newspaper" },
       actor: actor
     )
-    logo = attach_png_logo!(recording.recordable, actor:, filename: "masthead.png")
+    logo = recording.import_attachment(
+      io: StringIO.new(ONE_PIXEL_PNG),
+      filename: "masthead.png",
+      content_type: "image/png",
+      name: "Logo",
+      actor: actor
+    )
 
     assert_equal "RecordingStudioAttachable::Attachment", logo.recordable_type
     assert_equal "image", logo.recordable.attachment_kind
     assert_equal recording, logo.parent_recording
     assert logo.recordable.file.attached?
 
-    replaced = attach_png_logo!(recording.recordable, actor:, filename: "replacement.png")
+    blob = ActiveStorage::Blob.create_and_upload!(
+      io: StringIO.new(ONE_PIXEL_PNG),
+      filename: "replacement.png",
+      content_type: "image/png"
+    )
+    replaced = logo.replace_attachment_file(signed_blob_id: blob.signed_id, name: "Logo", actor: actor)
     assert_equal logo.id, replaced.id
   end
 
@@ -118,15 +129,5 @@ class PublicationCatalogueEngineTest < ActiveSupport::TestCase
     )
     bootstrap_owner_access!(actor, admin_root_recording_for_test)
     actor
-  end
-
-  def attach_png_logo!(publication, actor:, filename:)
-    RecordingStudioPublications.attach_or_replace_logo!(
-      publication,
-      io: StringIO.new(ONE_PIXEL_PNG),
-      filename: filename,
-      content_type: "image/png",
-      actor: actor
-    )
   end
 end

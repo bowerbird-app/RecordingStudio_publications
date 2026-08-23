@@ -45,9 +45,5 @@ module RecordingStudioPublications
     def revise_publication!(...)
       Catalogue.revise_publication!(...)
     end
-
-    def attach_or_replace_logo!(...)
-      Catalogue.attach_or_replace_logo!(...)
-    end
   end
 end

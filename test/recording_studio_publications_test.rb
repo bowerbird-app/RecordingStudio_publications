@@ -54,6 +54,18 @@ class RecordingStudioPublicationsTest < Minitest::Test
     assert_empty RecordingStudio.configuration.enabled_recordable_types_for(:example)
   end
 
+  def test_dummy_host_mounts_attachable_and_wires_turbo
+    routes = File.read(File.expand_path("dummy/config/routes.rb", __dir__))
+    importmap = File.read(File.expand_path("dummy/config/importmap.rb", __dir__))
+    application_js = File.read(File.expand_path("dummy/app/javascript/application.js", __dir__))
+
+    assert_includes routes, 'mount RecordingStudioAttachable::Engine, at: "/recording_studio_attachable"'
+    assert_includes importmap, 'pin "@hotwired/turbo-rails"'
+    assert_includes importmap, 'pin "@rails/activestorage"'
+    assert_includes application_js, 'import "@hotwired/turbo-rails"'
+    assert_includes application_js, "ActiveStorage.start()"
+  end
+
   def test_dummy_app_uses_recording_studio_default_layout
     application_controller_path = File.expand_path("dummy/app/controllers/application_controller.rb", __dir__)
     controller_source = File.read(application_controller_path)
@@ -101,6 +113,7 @@ class RecordingStudioPublicationsTest < Minitest::Test
     assert_includes tailwind_source, "../../../vendor/bundle/**/recording_studio/app/views/**/*.erb"
     assert_includes tailwind_source, "recordingstudio-*/app/views/**/*.erb"
     assert_includes tailwind_source, "recording_studio_admin/app/views/**/*.erb"
+    assert_includes tailwind_source, "recording_studio_attachable/app/views/**/*.erb"
     refute_includes tailwind_source, "@theme"
     refute_includes tailwind_source, ":root {"
     refute_includes tailwind_source, "--color-fp-primary"
@@ -130,6 +143,7 @@ class RecordingStudioPublicationsTest < Minitest::Test
     assert_includes readme_source, "This Rails app exists to validate the Recording Studio publications gem"
     assert_includes readme_source, "/recording_studio"
     assert_includes readme_source, "redirects to `/`"
+    assert_includes readme_source, "/recording_studio_attachable"
     refute_includes readme_source, "flat_pack_sidebar"
   end
 

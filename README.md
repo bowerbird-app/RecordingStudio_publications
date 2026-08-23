@@ -8,7 +8,7 @@ This gem is the `recording_studio_publications` engine (`RecordingStudioPublicat
 
 - **PublicationCatalogue** — one shared Recording Studio root per host (`label: "Publications"`, `root: true`, `shared: true`). Same idea as `RecordingStudioUser::People`. Accessible and Attachable stay off this root.
 - **Publication** — nested titles under that catalogue only. Required name, required kind (`magazine`, `newspaper`, `journal`, `site`, `broadcast`), optional website, and a stable key.
-- **One Attachable logo** per title. Images only. Replacing a logo stays on Attachable (`replace_attachment_file`). There is no Replace capability.
+- **One Attachable logo** per title. Images only. Create the title first, then add or change the logo on Attachable’s own upload and attachment screens. Persist stays on `import_attachment` / `replace_attachment_file`. There is no FileInput on New or Edit, and no Publications upload wrapper.
 - **Family admin** — one `publications` section in RecordingStudioAdmin 2.0. Staff CRUD is gated by an owned host `AdminRoot` plus `RecordingStudioAdmin::Resource` `required_role: :admin`. Admin does not need a grant on each title.
 - **Dummy host** (`test/dummy/`) — thin Devise host, FlatPack Rounded on `<html>` via the PWA head workaround, seeded titles, and `/admin` as the catalogue.
 
@@ -43,7 +43,9 @@ The login form is prefilled with these credentials for fast access. `member@admi
 - `/users/sign_in` — Devise sign-in
 - `/admin` — publications admin hub (family RecordingStudioAdmin)
 - `/admin/screens/publications` — inventory
-- `/recording_studio_publications/admin/publications/new` — new title
+- `/recording_studio_publications/admin/publications/new` — new title (no logo field)
+- `/recording_studio_attachable/recordings/:id/attachments/upload` — Attachable add-logo screen
+- `/recording_studio_attachable/attachments/:id` — Attachable change-logo screen
 - `/docs/install`, `/docs/config`, `/docs/recordable_types`, `/docs/recordings_tree`, `/docs/gem_views`, `/docs/methods` — dummy-only sandbox pages
 
 ## Architecture
@@ -93,7 +95,7 @@ The gem registers a Section, Screen, Resource, and count widget with `blast_radi
 | Inventory | `/admin/screens/publications` |
 | New / show / edit | `/recording_studio_publications/admin/publications/...` |
 
-The hub widget is the total number of current titles. Inventory is a family Screen table. New is a standalone FlatPack Button (not a ButtonGroup). New/edit forms are Name, Key, Kind, Website, and logo — one field per row. Cancel and Save are separate Buttons.
+The hub widget is the total number of current titles. Inventory is a family Screen table with no placeholder “Table data” heading. New is a standalone FlatPack Button (not a ButtonGroup). New/edit forms are Name, Key, Kind, and Website — one field per row. Cancel and Save are separate Buttons. Show (and Edit) display the current logo when one exists, plus a FlatPack Button to Attachable’s add or change screens. New has no logo field.
 
 ### Capabilities
 
@@ -104,7 +106,7 @@ The hub widget is the total number of current titles. Inventory is a family Scre
 | Host `AdminRoot` | Yes | No |
 | Host `Workspace` | Dummy only | No |
 
-Logo upload from admin is authorized through AdminRoot (see `LogoAuthorization`). Later per-title Accessible grants can still allow non-admin actors.
+Logo add/replace is Attachable’s own UI. Authorization still goes through AdminRoot (see `LogoAuthorization`) so catalogue staff can attach without a per-title grant. Later per-title Accessible grants can still allow non-admin actors. Mount `RecordingStudioAttachable::Engine` in the host.
 
 ### FlatPack UI
 
@@ -120,7 +122,8 @@ All views use FlatPack ViewComponents. The live reference is [flatpack.bowerbird
 6. Create an owned `AdminRoot`, enable Accessible on it, and `section :publications`.
 7. Point `RecordingStudioAdmin` `access_recording_resolver` and `site_admin_recording_resolver` at that admin recording.
 8. Mount `recording_studio_admin_for :admin, at: "/admin", root_section: :publications`.
-9. Bootstrap first-owner admin access on the AdminRoot recording.
+9. Mount `RecordingStudioAttachable::Engine` (dummy: `/recording_studio_attachable`) so add/change logo can use Attachable’s screens.
+10. Bootstrap first-owner admin access on the AdminRoot recording.
 
 Authenticated screens should keep `RecordingStudio::UsesDefaultLayout`. If core puts `data-theme` on `<body>`, render `layouts/_default_layout_head` from the `recording_studio/default_layout_head` hook so `<html>` gets `data-theme="rounded"`. Do not put Sign out or a workspace switcher in that slot.
 

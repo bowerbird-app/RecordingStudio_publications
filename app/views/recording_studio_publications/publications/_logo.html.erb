@@ -1,0 +1,23 @@
+<% logo_recording = local_assigns[:logo_recording] %>
+<% return_to = local_assigns.fetch(:return_to) %>
+<% preview_path = publication_logo_preview_path(logo_recording) %>
+
+<div class="flex flex-wrap items-center gap-4">
+  <% if preview_path.present? %>
+    <%= image_tag preview_path, alt: "#{@publication.name} logo", class: "h-24 w-24 object-contain" %>
+  <% end %>
+
+  <% if logo_recording.present? %>
+    <%= render FlatPack::Button::Component.new(
+      text: "Change logo",
+      href: publication_logo_replace_path(logo_recording, return_to: return_to),
+      style: :secondary
+    ) %>
+  <% else %>
+    <%= render FlatPack::Button::Component.new(
+      text: "Add logo",
+      href: publication_logo_upload_path(@recording, return_to: return_to),
+      style: :secondary
+    ) %>
+  <% end %>
+</div>

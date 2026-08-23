@@ -8,7 +8,7 @@ module RecordingStudioPublications
     before_action :set_current_actor
 
     helper_method :recording_studio_admin_context, :page_nav_anchor_url, :preserve_anchor_url,
-                  :inventory_path, :publication_logo_url
+                  :inventory_path
 
     private
 
@@ -88,13 +88,6 @@ module RecordingStudioPublications
       when "index" then :show
       else action_name
       end
-    end
-
-    def publication_logo_url(logo_recording)
-      file = logo_recording&.recordable&.file
-      return unless file&.attached?
-
-      Rails.application.routes.url_helpers.rails_blob_path(file, only_path: true)
     end
 
     def resolve_publications_admin_action(action, record)

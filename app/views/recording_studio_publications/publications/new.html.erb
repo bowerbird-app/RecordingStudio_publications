@@ -11,8 +11,7 @@
 
   <%= form_with model: @publication,
                 url: admin_publications_path,
-                method: :post,
-                multipart: true do %>
+                method: :post do %>
     <%= render "form", publication: @publication, cancel_url: inventory_path %>
   <% end %>
 <% end %>

@@ -9,13 +9,17 @@
     subtitle: @publication.name
   ) %>
 
-  <%= form_with model: @publication,
-                url: admin_publication_path(@recording),
-                method: :patch,
-                multipart: true do %>
-    <%= render "form",
-               publication: @publication,
-               cancel_url: admin_publication_path(@recording),
-               logo_recording: @logo_recording %>
-  <% end %>
+  <div class="space-y-6">
+    <%= render "logo",
+               logo_recording: @logo_recording,
+               return_to: edit_admin_publication_path(@recording) %>
+
+    <%= form_with model: @publication,
+                  url: admin_publication_path(@recording),
+                  method: :patch do %>
+      <%= render "form",
+                 publication: @publication,
+                 cancel_url: admin_publication_path(@recording) %>
+    <% end %>
+  </div>
 <% end %>

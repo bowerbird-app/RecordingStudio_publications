@@ -82,34 +82,46 @@ class PublicationsAdminTest < ActionDispatch::IntegrationTest
     assert_includes response.body, "Key"
     assert_includes response.body, "Kind"
     assert_includes response.body, "Website"
-    assert_includes response.body, "Logo"
     assert_includes response.body, "Cancel"
     assert_includes response.body, "Save"
     refute_includes response.body, "ButtonGroup"
+    refute_includes response.body, "publication[logo]"
+    refute_includes response.body, "FileInput"
+    refute_includes response.body, "Add logo"
+    refute_includes response.body, "Change logo"
+    refute_includes response.body, "multipart/form-data"
 
     post recording_studio_publications.admin_publications_path, params: {
       publication: {
         name: "Admin Created Journal",
         key: "admin-created-journal",
         kind: "journal",
-        website: "https://journal.example",
-        logo: Rack::Test::UploadedFile.new(logo_tempfile.path, "image/png")
+        website: "https://journal.example"
       }
     }
 
     publication = RecordingStudioPublications.publications.find_by!(key: "admin-created-journal")
     recording = RecordingStudioPublications.recording_for(publication)
     assert_redirected_to recording_studio_publications.admin_publication_path(recording)
+    assert_nil RecordingStudioPublications.logo_recording_for(publication)
 
     follow_redirect!
     assert_response :success
     assert_includes response.body, "Admin Created Journal"
     assert_includes response.body, "Journal"
-    assert RecordingStudioPublications.logo_recording_for(publication).present?
+    assert_includes response.body, "Add logo"
+    refute_includes response.body, "Change logo"
+    refute_includes response.body, "publication[logo]"
+    refute_includes response.body, "FileInput"
+    assert_includes response.body, recording_studio_attachable.recording_attachment_upload_path(recording)
 
     get recording_studio_publications.edit_admin_publication_path(recording)
     assert_response :success
     assert_includes response.body, "Edit publication"
+    assert_includes response.body, "Add logo"
+    refute_includes response.body, "publication[logo]"
+    refute_includes response.body, "FileInput"
+    refute_includes response.body, "multipart/form-data"
 
     patch recording_studio_publications.admin_publication_path(recording), params: {
       publication: {
@@ -123,6 +135,50 @@ class PublicationsAdminTest < ActionDispatch::IntegrationTest
     recording.reload
     assert_equal "Admin Revised Journal", recording.recordable.name
     assert_redirected_to recording_studio_publications.admin_publication_path(recording)
+  end
+
+  test "show and edit link to Attachable add and replace screens" do
+    bootstrap_owner_access!(@admin, @admin_recording)
+    sign_in @admin
+    recording = RecordingStudioPublications.record_publication!(
+      { name: "Masthead Daily", kind: "newspaper" },
+      actor: @admin
+    )
+    logo = attach_png_logo!(recording)
+
+    get recording_studio_publications.admin_publication_path(recording)
+    assert_response :success
+    assert_includes response.body, "Change logo"
+    refute_includes response.body, "Add logo"
+    refute_includes response.body, "publication[logo]"
+    refute_includes response.body, "FileInput"
+    assert_includes response.body, recording_studio_attachable.attachment_path(logo)
+    refute_includes response.body, recording_studio_attachable.recording_attachments_path(recording)
+
+    get recording_studio_publications.edit_admin_publication_path(recording)
+    assert_response :success
+    assert_includes response.body, "Change logo"
+    refute_includes response.body, "publication[logo]"
+    refute_includes response.body, "FileInput"
+    assert_includes response.body, recording_studio_attachable.attachment_path(logo)
+
+    get recording_studio_attachable.recording_attachment_upload_path(
+      recording,
+      redirect_mode: "return_to",
+      return_to: recording_studio_publications.admin_publication_path(recording)
+    )
+    assert_response :success
+    assert_includes response.body, "Upload"
+    assert_includes response.body, "Choose files"
+
+    get recording_studio_attachable.attachment_path(
+      logo,
+      redirect_mode: "return_to",
+      return_to: recording_studio_publications.admin_publication_path(recording)
+    )
+    assert_response :success
+    assert_includes response.body, "Save"
+    assert_includes response.body, logo.recordable.original_filename
   end
 
   test "view-only users cannot open new or edit" do
@@ -178,15 +234,28 @@ class PublicationsAdminTest < ActionDispatch::IntegrationTest
     refute_includes admin_source, "Manage access"
   end
 
+  test "publications persist helpers do not wrap Attachable uploads" do
+    catalogue = File.read(RecordingStudioPublications::Engine.root.join("lib/recording_studio_publications/catalogue/logos.rb"))
+    controller = File.read(RecordingStudioPublications::Engine.root.join("app/controllers/recording_studio_publications/publications_controller.rb"))
+    gem_api = File.read(RecordingStudioPublications::Engine.root.join("lib/recording_studio_publications.rb"))
+
+    refute_includes catalogue, "attach_or_replace_logo!"
+    refute_includes catalogue, "import_logo!"
+    refute_includes catalogue, "replace_logo!"
+    refute_includes controller, "attach_uploaded_logo!"
+    refute_includes controller, "publication[:logo]"
+    refute_includes gem_api, "attach_or_replace_logo!"
+  end
+
   private
 
-  def logo_tempfile
-    @logo_tempfile ||= begin
-      file = Tempfile.new(["logo", ".png"])
-      file.binmode
-      file.write(ONE_PIXEL_PNG)
-      file.rewind
-      file
-    end
+  def attach_png_logo!(recording)
+    recording.import_attachment(
+      io: StringIO.new(ONE_PIXEL_PNG),
+      filename: "masthead.png",
+      content_type: "image/png",
+      name: "Logo",
+      actor: @admin
+    )
   end
 end

@@ -8,8 +8,9 @@ This Rails app exists to validate the Recording Studio publications gem in a rea
 - `Current.actor` wiring for Recording Studio events
 - Host-owned Workspace roots plus a separate owned `AdminRoot`
 - Shared `PublicationCatalogue` root (no Accessible, no Attachable) and Publication children
-- Attachable enabled on Publication only, for one image logo
+- Attachable enabled on Publication only, for one image logo added after the title is saved
 - Family admin at `/admin` (`recording_studio_admin_for`, section `:publications`)
+- Attachable mounted at `/recording_studio_attachable` for add/change logo
 - Recording Studio default layout, FlatPack assets, and Tailwind source scanning
 - Dummy-only `/docs/*` pages for gem-specific onboarding
 
@@ -36,7 +37,9 @@ Then open the app and sign in with:
 - `/` - dummy app home and a short link into publications admin
 - `/admin` - publications hub (family RecordingStudioAdmin)
 - `/admin/screens/publications` - inventory
-- `/recording_studio_publications/admin/publications/new` - new title
+- `/recording_studio_publications/admin/publications/new` - new title (no logo field)
+- `/recording_studio_attachable/recordings/:id/attachments/upload` - add a logo after the title exists
+- `/recording_studio_attachable/attachments/:id` - change an existing logo
 - `/recording_studio` - redirects to `/` while the mounted Recording Studio engine stays available under that prefix
 - `/users/sign_in` - Devise sign-in page
 - `/docs/install`, `/docs/config`, `/docs/recordable_types`, `/docs/recordings_tree`, `/docs/gem_views`, `/docs/methods` - dummy-only starter pages
@@ -48,4 +51,4 @@ Use this app to verify the publications directory before copying host wiring int
 
 Authenticated pages use Recording Studio's shared default layout. The dummy copies FlatPack `rounded` onto `<html>` through `app/views/layouts/_default_layout_head.html.erb`, rendered from `app/views/recording_studio/_default_layout_head.html.erb`. Those partials do not put Sign out or a workspace switcher in the default-layout slot. Devise sign-in keeps `layouts/application`.
 
-The home page stays a minimal demo surface. Open `/admin` for hub, inventory, new, show, and edit.
+The home page stays a minimal demo surface. Open `/admin` for hub, inventory, new, show, and edit. Add or change a logo from the saved title — Attachable owns those screens.

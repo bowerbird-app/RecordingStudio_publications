@@ -14,7 +14,8 @@ Shared publication catalogue and family-admin CRUD. Stacked on 0.1.0 identity/pi
 ### Added
 - `RecordingStudioPublications::PublicationCatalogue` shared root (`label: "Publications"`, `root: true`, `shared: true`). One per host. Accessible and Attachable are not enabled on this root
 - `RecordingStudioPublications::Publication` nested only under that catalogue: required name, required kind (`magazine`, `newspaper`, `journal`, `site`, `broadcast`), optional website, stable key
-- One Attachable logo per publication (images only). Replace uses Attachable `replace_attachment_file`
+- One Attachable logo per publication (images only). New has no logo field. Show and edit link to Attachable’s add (`/recording_studio_attachable/recordings/:id/attachments/upload`) and change (`/recording_studio_attachable/attachments/:id`) screens. Persist stays on `import_attachment` / `replace_attachment_file`
+- Inventory Screen has no placeholder “Table data” heading
 - Accessible enabled on Publication for later per-title grants. No Manage-access UI
 - Family admin section `publications`: hub count widget, inventory Screen, Resource `required_role: :admin` for writes, new/show/edit forms
 - Dummy `AdminRoot` (`shared: false`) with `AllowsAdminSections`, Accessible, and `section :publications`
@@ -27,6 +28,7 @@ Shared publication catalogue and family-admin CRUD. Stacked on 0.1.0 identity/pi
 - Configure `RecordingStudioAdmin` access and site-admin resolvers to that AdminRoot recording
 - Mount `recording_studio_admin_for` and `RecordingStudioPublications::Engine`
 - Install Attachable migrations and Active Storage if the host does not already have them
+- Mount `RecordingStudioAttachable::Engine` and keep logo add/replace on those screens. Do not post `publication[logo]` from New/Edit
 - Bootstrap first-owner admin access on the AdminRoot recording. Do not grant Accessible on the shared catalogue
 - Keep `UsesDefaultLayout` plus the html `data-theme="rounded"` head workaround from 0.1.0
 - No public Publishable page ships in this version

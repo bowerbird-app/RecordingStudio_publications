@@ -33,11 +33,11 @@ seed_publication = lambda do |name:, key:, kind:, website:, actor:|
     { name: name, key: key, kind: kind, website: website },
     actor: actor
   )
-  RecordingStudioPublications.attach_or_replace_logo!(
-    recording.recordable,
+  recording.import_attachment(
     io: StringIO.new(ONE_PIXEL_PNG),
     filename: "#{key}.png",
     content_type: "image/png",
+    name: "Logo",
     actor: actor
   )
   recording.recordable

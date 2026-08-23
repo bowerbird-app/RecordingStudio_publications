@@ -22,7 +22,6 @@ module RecordingStudioPublications
       recording = persist_new_publication!
       return render_new_invalid unless recording
 
-      attach_uploaded_logo!(recording.recordable)
       redirect_to admin_publication_path(recording)
     rescue ActiveRecord::RecordInvalid => e
       @publication = e.record
@@ -37,7 +36,6 @@ module RecordingStudioPublications
       recording = persist_revised_publication!
       return render :edit, status: :unprocessable_entity unless recording
 
-      attach_uploaded_logo!(recording.recordable)
       redirect_to admin_publication_path(recording)
     rescue ActiveRecord::RecordInvalid => e
       @publication = e.record
@@ -85,19 +83,6 @@ module RecordingStudioPublications
 
     def write_publication!
       RecordingStudioPublications.record_publication!(publication_params, actor: current_user)
-    end
-
-    def attach_uploaded_logo!(publication)
-      upload = params.dig(:publication, :logo)
-      return if upload.blank?
-
-      RecordingStudioPublications.attach_or_replace_logo!(
-        publication,
-        io: upload.tempfile,
-        filename: upload.original_filename,
-        content_type: upload.content_type,
-        actor: current_user
-      )
     end
 
     def publication_params
