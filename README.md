@@ -153,4 +153,6 @@ Authenticated screens should keep `RecordingStudio::UsesDefaultLayout`. If core 
 
 ## Documentation
 
+Dummy admin viewports live in `docs/ui-shots/` (`publications-admin-hub.png`, inventory, new, show, edit, plus Attachable add/change). Recapture those from the dummy host with `html data-theme="rounded"` and seeded titles.
+
 The original gem template documentation is preserved in `docs/gem_template/` as architectural reference material. This README, `CHANGELOG.md`, and the dummy app are the source of truth for the publications directory.
