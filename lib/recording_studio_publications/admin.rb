@@ -46,6 +46,8 @@ module RecordingStudioPublications
         admin_action "#{RESOURCE_KEY}.edit", as: :edit_publication
         paginate per_page: 25
       end
+      # Family TableDefinition defaults to "Table data". Nic does not want that label.
+      table&.instance_variable_set(:@title_value, nil)
       widget WIDGET_TOTAL
     end
 

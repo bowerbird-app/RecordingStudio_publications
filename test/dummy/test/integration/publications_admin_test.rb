@@ -65,6 +65,11 @@ class PublicationsAdminTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_includes response.body, "New"
     refute_includes response.body, "flat-pack-button-group"
+    refute_includes response.body, "Table data"
+
+    get "/admin/screens/publications/table"
+    assert_response :success
+    refute_includes response.body, "Table data"
   end
 
   test "admin can CRUD a publication through Resource required_role admin" do
