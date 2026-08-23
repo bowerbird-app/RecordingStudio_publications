@@ -25,14 +25,18 @@ bootstrap_owner_access = lambda do |actor, recording|
   raise result.error if result.failure?
 end
 
-seed_publication = lambda do |name:, key:, kind:, website:, actor:|
+seed_publication = lambda do |name:, key:, kind:, website:, actor:, created_at:|
   existing = RecordingStudioPublications.publications.find_by(key: key)
-  return existing if existing
+  if existing
+    existing.update_column(:created_at, created_at)
+    return existing
+  end
 
   recording = RecordingStudioPublications.record_publication!(
     { name: name, key: key, kind: kind, website: website },
     actor: actor
   )
+  recording.recordable.update_column(:created_at, created_at)
   recording.import_attachment(
     io: StringIO.new(ONE_PIXEL_PNG),
     filename: "#{key}.png",
@@ -83,35 +87,40 @@ begin
     key: "the-atlantic",
     kind: "magazine",
     website: "https://www.theatlantic.com",
-    actor: user
+    actor: user,
+    created_at: 8.weeks.ago
   )
   seed_publication.call(
     name: "The Guardian",
     key: "the-guardian",
     kind: "newspaper",
     website: "https://www.theguardian.com",
-    actor: user
+    actor: user,
+    created_at: 6.weeks.ago
   )
   seed_publication.call(
     name: "Nature",
     key: "nature",
     kind: "journal",
     website: "https://www.nature.com",
-    actor: user
+    actor: user,
+    created_at: 4.weeks.ago
   )
   seed_publication.call(
     name: "BBC News",
     key: "bbc-news",
     kind: "broadcast",
     website: "https://www.bbc.com/news",
-    actor: user
+    actor: user,
+    created_at: 2.weeks.ago
   )
   seed_publication.call(
     name: "The Verge",
     key: "the-verge",
     kind: "site",
     website: "https://www.theverge.com",
-    actor: user
+    actor: user,
+    created_at: 3.days.ago
   )
 ensure
   Current.actor = previous_actor

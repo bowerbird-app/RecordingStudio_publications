@@ -9,6 +9,7 @@ module RecordingStudioPublications
     RESOURCE_KEY = "publications"
     WIDGET_TOTAL = "widgets.publications.total"
     WIDGET_BY_KIND = "widgets.publications.by_kind"
+    WIDGET_OVER_TIME = "widgets.publications.over_time"
 
     class PublicationsSection < RecordingStudioAdmin::Section
       key SECTION_KEY
@@ -46,7 +47,6 @@ module RecordingStudioPublications
 
       table do
         column :name, title: "Name"
-        column :key, title: "Key"
         column :kind,
                title: "Kind",
                value: ->(publication, _context) { publication.kind_label }
@@ -55,7 +55,12 @@ module RecordingStudioPublications
         admin_action "#{RESOURCE_KEY}.edit", as: :edit_publication
         paginate per_page: 25
       end
-      widget WIDGET_TOTAL
+      widget WIDGET_OVER_TIME
+      chart do
+        title "Titles over time"
+        type :area
+        series { |_context| RecordingStudioPublications::Admin.titles_over_time_series }
+      end
     end
 
     class PublicationsResource < RecordingStudioAdmin::Resource
@@ -112,6 +117,17 @@ module RecordingStudioPublications
       chart_options { { height: 220 } }
     end
 
+    TitlesOverTimeWidget = RecordingStudioAdmin::Widget.new(WIDGET_OVER_TIME, blast_radius: :site) do
+      type :chart
+      title "Titles over time"
+      chart_type :area
+      hide_change
+      hide_period
+      hide_metric
+      series { |_context| RecordingStudioPublications::Admin.titles_over_time_series }
+      chart_options { { height: 220 } }
+    end
+
     class << self
       def register!
         return unless defined?(::RecordingStudioAdmin)
@@ -121,6 +137,7 @@ module RecordingStudioPublications
         RecordingStudioAdmin.register_resource(PublicationsResource)
         RecordingStudioAdmin.register_widget(TotalPublicationsWidget)
         RecordingStudioAdmin.register_widget(TitlesByKindWidget)
+        RecordingStudioAdmin.register_widget(TitlesOverTimeWidget)
       end
 
       def apply_publication_search(relation, value)
@@ -139,6 +156,23 @@ module RecordingStudioPublications
         [{
           name: "Titles",
           data: Publication::KINDS.map { |kind| { x: kind.titleize, y: counts[kind].to_i } }
+        }]
+      end
+
+      def titles_over_time_series
+        points = RecordingStudioAdmin::AdminActivityLogsSupport.date_series(
+          RecordingStudioPublications.publications.reorder(nil),
+          field: :created_at,
+          bucket: :week
+        )
+        running = 0
+
+        [{
+          name: "Titles",
+          data: points.map do |point|
+            running += point[:y].to_i
+            { x: point[:x], y: running }
+          end
         }]
       end
 

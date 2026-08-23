@@ -38,7 +38,7 @@ Then open the app and sign in with:
 - `/` - dummy app home and a short link into publications admin
 - `/admin` - publications hub (family RecordingStudioAdmin: count widget, kind chart, Access)
 - `/admin/access` - family Access UI for the owned AdminRoot
-- `/admin/screens/publications` - inventory with family search
+- `/admin/screens/publications` - inventory with family search, titles-over-time chart, and Name / Kind / Website columns
 - `/recording_studio_publications/admin/publications/new` - new title (no logo field)
 - `/recording_studio_attachable/recordings/:id/attachments/upload` - add a logo after the title exists
 - `/recording_studio_attachable/attachments/:id` - change an existing logo
