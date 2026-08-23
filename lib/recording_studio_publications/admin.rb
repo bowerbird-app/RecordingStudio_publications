@@ -9,7 +9,6 @@ module RecordingStudioPublications
     RESOURCE_KEY = "publications"
     WIDGET_TOTAL = "widgets.publications.total"
     WIDGET_BY_KIND = "widgets.publications.by_kind"
-    WIDGET_OVER_TIME = "widgets.publications.over_time"
 
     class PublicationsSection < RecordingStudioAdmin::Section
       key SECTION_KEY
@@ -55,7 +54,6 @@ module RecordingStudioPublications
         admin_action "#{RESOURCE_KEY}.edit", as: :edit_publication
         paginate per_page: 25
       end
-      widget WIDGET_OVER_TIME
       chart do
         title "Titles over time"
         type :area
@@ -117,17 +115,6 @@ module RecordingStudioPublications
       chart_options { { height: 220 } }
     end
 
-    TitlesOverTimeWidget = RecordingStudioAdmin::Widget.new(WIDGET_OVER_TIME, blast_radius: :site) do
-      type :chart
-      title "Titles over time"
-      chart_type :area
-      hide_change
-      hide_period
-      hide_metric
-      series { |_context| RecordingStudioPublications::Admin.titles_over_time_series }
-      chart_options { { height: 220 } }
-    end
-
     class << self
       def register!
         return unless defined?(::RecordingStudioAdmin)
@@ -137,7 +124,6 @@ module RecordingStudioPublications
         RecordingStudioAdmin.register_resource(PublicationsResource)
         RecordingStudioAdmin.register_widget(TotalPublicationsWidget)
         RecordingStudioAdmin.register_widget(TitlesByKindWidget)
-        RecordingStudioAdmin.register_widget(TitlesOverTimeWidget)
       end
 
       def apply_publication_search(relation, value)

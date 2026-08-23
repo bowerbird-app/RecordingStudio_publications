@@ -32,18 +32,18 @@ class PublicationsAdminTest < ActionDispatch::IntegrationTest
                  RecordingStudioAdmin.resource_for("publications")
     total = RecordingStudioAdmin.widget_for("widgets.publications.total")
     by_kind = RecordingStudioAdmin.widget_for("widgets.publications.by_kind")
-    over_time = RecordingStudioAdmin.widget_for("widgets.publications.over_time")
     assert_equal :number, total.type
     assert_equal :chart, by_kind.type
     assert_equal :bar, by_kind.chart_type
-    assert_equal :chart, over_time.type
-    assert_equal :area, over_time.chart_type
+    assert_nil RecordingStudioAdmin.widget_for("widgets.publications.over_time")
     section_widget_keys = RecordingStudioPublications::Admin::PublicationsSection.widget_keys
     screen_widget_keys = RecordingStudioPublications::Admin::PublicationsScreen.widget_keys
     assert_includes section_widget_keys, "widgets.publications.total"
     refute_includes screen_widget_keys, "widgets.publications.total"
-    assert_includes screen_widget_keys, "widgets.publications.over_time"
+    refute_includes screen_widget_keys, "widgets.publications.over_time"
+    assert_empty screen_widget_keys
     assert RecordingStudioPublications::Admin::PublicationsScreen.chart_value
+    assert_equal :area, RecordingStudioPublications::Admin::PublicationsScreen.chart_value.type_value
     assert_equal :site, RecordingStudioPublications::Admin::PublicationsSection.blast_radius
     assert_equal :site, RecordingStudioPublications::Admin::PublicationsScreen.blast_radius
     assert_equal :site, RecordingStudioPublications::Admin::PublicationsResource.blast_radius
@@ -94,9 +94,14 @@ class PublicationsAdminTest < ActionDispatch::IntegrationTest
     assert_includes response.body, "New"
     assert_includes response.body, 'name="search"'
     assert_includes response.body, 'href="/recording_studio_publications/admin/publications/new"'
+    assert_includes response.body, "screen-chart"
+    refute_includes response.body, "widgets.publications.over_time"
+    refute_includes response.body, ">Publications</h3>"
+
+    get "/admin/screens/publications/chart"
+    assert_response :success
     assert_includes response.body, "Titles over time"
     assert_includes response.body, "screen-chart"
-    refute_includes response.body, ">Publications</h3>"
 
     get "/admin/screens/publications/table"
     assert_response :success

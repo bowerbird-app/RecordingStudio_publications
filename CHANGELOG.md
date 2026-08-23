@@ -17,7 +17,7 @@ Shared publication catalogue and family-admin CRUD. Stacked on 0.1.0 identity/pi
 - One Attachable logo per publication (images only). New has no logo field. Show and edit link to Attachable’s add (`/recording_studio_attachable/recordings/:id/attachments/upload`) and change (`/recording_studio_attachable/attachments/:id`) screens. Persist stays on `import_attachment` / `replace_attachment_file`
 - Inventory uses the family Admin Screen template. New is a registered Screen `button` to this gem’s New page. Family table heading stays “Table data” (Admin `title` has no public hide API)
 - Accessible enabled on Publication for later per-title grants. No Manage-access UI
-- Family admin section `publications`: hub count widget (`type :number`), titles-by-kind bar chart (`type :chart`, `chart_type :bar`), inventory titles-over-time chart (`type :chart`, `chart_type :area`), Screen `filter :search`, Resource `required_role: :admin` for writes, new/show/edit forms. Inventory table is Name, Kind, Website, Actions
+- Family admin section `publications`: hub count widget (`type :number`), titles-by-kind bar chart (`type :chart`, `chart_type :bar`), inventory family Screen chart (`type :area`, no compact over-time widget), Screen `filter :search`, Resource `required_role: :admin` for writes, new/show/edit forms. Inventory table is Name, Kind, Website, Actions
 - Section Access avatars on the owned AdminRoot via `recording_studio_accessible_avatars` and dummy mount `RecordingStudioAccessible::Engine` at `/admin/access`
 - Dummy `AdminRoot` (`shared: false`) with `AllowsAdminSections`, Accessible, and `section :publications`
 - Dummy seeds for The Atlantic, The Guardian, Nature, BBC News, and The Verge
