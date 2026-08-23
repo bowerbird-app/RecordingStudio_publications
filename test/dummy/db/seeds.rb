@@ -26,9 +26,9 @@ bootstrap_owner_access = lambda do |actor, recording|
 end
 
 seed_publication = lambda do |name:, key:, kind:, website:, actor:, created_at:|
-  existing = RecordingStudioPublications.publications.find_by(key: key)
+  existing = RecordingStudioPublications::Publication.find_by(key: key)
   if existing
-    existing.update_column(:created_at, created_at)
+    RecordingStudioPublications::Publication.where(id: existing.id).update_all(created_at: created_at)
     return existing
   end
 
@@ -36,7 +36,8 @@ seed_publication = lambda do |name:, key:, kind:, website:, actor:, created_at:|
     { name: name, key: key, kind: kind, website: website },
     actor: actor
   )
-  recording.recordable.update_column(:created_at, created_at)
+  publication = recording.recordable
+  RecordingStudioPublications::Publication.where(id: publication.id).update_all(created_at: created_at)
   recording.import_attachment(
     io: StringIO.new(ONE_PIXEL_PNG),
     filename: "#{key}.png",
@@ -44,7 +45,7 @@ seed_publication = lambda do |name:, key:, kind:, website:, actor:, created_at:|
     name: "Logo",
     actor: actor
   )
-  recording.recordable
+  publication
 end
 
 # Create the admin user
