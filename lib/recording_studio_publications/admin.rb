@@ -39,6 +39,10 @@ module RecordingStudioPublications
       filter :search, apply: lambda { |relation, value, _context|
         RecordingStudioPublications::Admin.apply_publication_search(relation, value)
       }
+      button :new_publication,
+             text: "New",
+             url: ->(context) { RecordingStudioPublications::Admin.new_publication_url(context) },
+             style: :primary
 
       table do
         column :name, title: "Name"
@@ -51,8 +55,6 @@ module RecordingStudioPublications
         admin_action "#{RESOURCE_KEY}.edit", as: :edit_publication
         paginate per_page: 25
       end
-      # Family TableDefinition defaults to "Table data". Nic does not want that label.
-      table&.instance_variable_set(:@title_value, nil)
       widget WIDGET_TOTAL
     end
 

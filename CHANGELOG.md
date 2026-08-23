@@ -15,7 +15,7 @@ Shared publication catalogue and family-admin CRUD. Stacked on 0.1.0 identity/pi
 - `RecordingStudioPublications::PublicationCatalogue` shared root (`label: "Publications"`, `root: true`, `shared: true`). One per host. Accessible and Attachable are not enabled on this root
 - `RecordingStudioPublications::Publication` nested only under that catalogue: required name, required kind (`magazine`, `newspaper`, `journal`, `site`, `broadcast`), optional website, stable key
 - One Attachable logo per publication (images only). New has no logo field. Show and edit link to Attachable’s add (`/recording_studio_attachable/recordings/:id/attachments/upload`) and change (`/recording_studio_attachable/attachments/:id`) screens. Persist stays on `import_attachment` / `replace_attachment_file`
-- Inventory Screen has no placeholder “Table data” heading
+- Inventory uses the family Admin Screen template. New is a registered Screen `button` to this gem’s New page. Family table heading stays “Table data” (Admin `title` has no public hide API)
 - Accessible enabled on Publication for later per-title grants. No Manage-access UI
 - Family admin section `publications`: hub count widget (`type :number`), titles-by-kind bar chart (`type :chart`, `chart_type :bar`), inventory Screen `filter :search`, Resource `required_role: :admin` for writes, new/show/edit forms
 - Section Access avatars on the owned AdminRoot via `recording_studio_accessible_avatars` and dummy mount `RecordingStudioAccessible::Engine` at `/admin/access`

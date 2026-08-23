@@ -42,6 +42,14 @@ class PublicationsAdminTest < ActionDispatch::IntegrationTest
     assert_equal :admin, RecordingStudioPublications::Admin::PublicationsResource.action_for(:new).required_access_role
     search_filter = RecordingStudioPublications::Admin::PublicationsScreen.filters.find { |filter| filter.key == :search }
     assert search_filter
+    new_button = RecordingStudioPublications::Admin::PublicationsScreen.buttons_value.find do |button|
+      button.name == :new_publication
+    end
+    assert new_button
+    assert_equal "New", new_button.text
+    refute File.exist?(RecordingStudioPublications::Engine.root.join("app/overrides/recording_studio_admin/screens/show.html.erb"))
+    refute_includes File.read(RecordingStudioPublications::Engine.root.join("lib/recording_studio_publications/admin.rb")),
+                    "instance_variable_set"
     assert_equal RecordingStudioPublications::Publication::KINDS.map(&:titleize),
                  RecordingStudioPublications::Admin.titles_by_kind_series.first[:data].map { |point| point[:x] }
   end
@@ -76,12 +84,12 @@ class PublicationsAdminTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_includes response.body, "New"
     assert_includes response.body, 'name="search"'
-    refute_includes response.body, "flat-pack-button-group"
-    refute_includes response.body, "Table data"
+    assert_includes response.body, 'href="/recording_studio_publications/admin/publications/new"'
+    assert_includes response.body, "Table data"
 
     get "/admin/screens/publications/table"
     assert_response :success
-    refute_includes response.body, "Table data"
+    assert_includes response.body, "Table data"
   end
 
   test "admin can CRUD a publication through Resource required_role admin" do
