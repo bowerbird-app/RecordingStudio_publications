@@ -22,7 +22,9 @@ Hosts need the engine catalogue migration plus, if missing:
 
 Register `PublicationCatalogue`, `Publication`, `AdminRoot`, and `RecordingStudioAttachable::Attachment` before `RecordingStudio.validate_recordable_declarations!`.
 
-Mount `RecordingStudioAttachable::Engine` so staff add or change a logo on Attachable’s screens after the title exists. Do not post `publication[logo]` from New/Edit.
+Mount `RecordingStudioAccessible::Engine` at `/admin/access` so the publications section can open family Access on the owned AdminRoot. Do not enable Accessible on the shared catalogue.
+
+Mount `RecordingStudioAttachable::Engine` so staff add or change a logo on Attachable’s screens after the title exists. Do not post `publication[logo]` from New/Edit. Keep Attachable on its blank layout so core `default_layout` does not add a second back.
 
 Do not enable Accessible or Attachable on the shared catalogue root.
 

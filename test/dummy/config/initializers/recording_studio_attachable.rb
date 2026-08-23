@@ -8,8 +8,10 @@ RecordingStudioAttachable.configure do |config|
   config.default_listing_scope = :direct
   config.default_kind_filter = :images
 
-  # Product pages use core default_layout so body data-theme stays rounded.
-  config.layout = "recording_studio/default_layout"
+  # Attachable views already render one FlatPack PageNav. Core
+  # default_layout always adds another back, so keep Attachable on its
+  # blank layout. That layout already sets html data-theme="rounded".
+  config.layout = :blank
   config.auth_roles = {
     view: :view,
     upload: :edit,

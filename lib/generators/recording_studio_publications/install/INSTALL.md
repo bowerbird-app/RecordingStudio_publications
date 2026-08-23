@@ -9,7 +9,7 @@ If you use Tailwind CSS:
 
 To use the engine:
 1. Create the owned AdminRoot, register catalogue types, and bootstrap first staff access
-2. Mount RecordingStudioAttachable so logo add/change uses its screens
+2. Mount RecordingStudioAccessible at `/admin/access` for AdminRoot Access, and RecordingStudioAttachable so logo add/change uses its screens
 3. Start your Rails server
 4. Visit the family admin publications section (dummy: http://localhost:3000/admin)
 

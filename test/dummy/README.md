@@ -10,7 +10,8 @@ This Rails app exists to validate the Recording Studio publications gem in a rea
 - Shared `PublicationCatalogue` root (no Accessible, no Attachable) and Publication children
 - Attachable enabled on Publication only, for one image logo added after the title is saved
 - Family admin at `/admin` (`recording_studio_admin_for`, section `:publications`)
-- Attachable mounted at `/recording_studio_attachable` for add/change logo
+- Accessible mounted at `/admin/access` so the publications hub can manage AdminRoot grants
+- Attachable mounted at `/recording_studio_attachable` for add/change logo, using Attachable’s blank layout so those screens have one PageNav (not a second back from default_layout)
 - Recording Studio default layout, FlatPack assets, and Tailwind source scanning
 - Dummy-only `/docs/*` pages for gem-specific onboarding
 
@@ -35,8 +36,9 @@ Then open the app and sign in with:
 ## Useful Routes
 
 - `/` - dummy app home and a short link into publications admin
-- `/admin` - publications hub (family RecordingStudioAdmin)
-- `/admin/screens/publications` - inventory
+- `/admin` - publications hub (family RecordingStudioAdmin: count widget, kind chart, Access)
+- `/admin/access` - family Access UI for the owned AdminRoot
+- `/admin/screens/publications` - inventory with family search
 - `/recording_studio_publications/admin/publications/new` - new title (no logo field)
 - `/recording_studio_attachable/recordings/:id/attachments/upload` - add a logo after the title exists
 - `/recording_studio_attachable/attachments/:id` - change an existing logo
@@ -49,6 +51,6 @@ Then open the app and sign in with:
 
 Use this app to verify the publications directory before copying host wiring into another app. The host stays thin: AdminRoot, resolvers, seeds, and mounts. Catalogue models and admin definitions live in the gem.
 
-Authenticated pages use Recording Studio's shared default layout. The dummy copies FlatPack `rounded` onto `<html>` through `app/views/layouts/_default_layout_head.html.erb`, rendered from `app/views/recording_studio/_default_layout_head.html.erb`. Those partials do not put Sign out or a workspace switcher in the default-layout slot. Devise sign-in keeps `layouts/application`.
+Authenticated pages use Recording Studio's shared default layout. The dummy copies FlatPack `rounded` onto `<html>` through `app/views/layouts/_default_layout_head.html.erb`, rendered from `app/views/recording_studio/_default_layout_head.html.erb`. Those partials do not put Sign out or a workspace switcher in the default-layout slot. Devise sign-in keeps `layouts/application`. Attachable add/change use Attachable’s blank layout so they keep one PageNav.
 
 The home page stays a minimal demo surface. Open `/admin` for hub, inventory, new, show, and edit. Add or change a logo from the saved title — Attachable owns those screens.

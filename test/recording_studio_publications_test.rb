@@ -60,10 +60,17 @@ class RecordingStudioPublicationsTest < Minitest::Test
     application_js = File.read(File.expand_path("dummy/app/javascript/application.js", __dir__))
 
     assert_includes routes, 'mount RecordingStudioAttachable::Engine, at: "/recording_studio_attachable"'
+    assert_includes routes, 'mount RecordingStudioAccessible::Engine, at: "/admin/access"'
     assert_includes importmap, 'pin "@hotwired/turbo-rails"'
     assert_includes importmap, 'pin "@rails/activestorage"'
     assert_includes application_js, 'import "@hotwired/turbo-rails"'
     assert_includes application_js, "ActiveStorage.start()"
+
+    attachable_initializer = File.read(
+      File.expand_path("dummy/config/initializers/recording_studio_attachable.rb", __dir__)
+    )
+    assert_includes attachable_initializer, "config.layout = :blank"
+    refute_includes attachable_initializer, 'config.layout = "recording_studio/default_layout"'
   end
 
   def test_dummy_app_uses_recording_studio_default_layout

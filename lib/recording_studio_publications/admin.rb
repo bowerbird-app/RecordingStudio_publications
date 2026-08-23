@@ -8,6 +8,7 @@ module RecordingStudioPublications
     SECTION_KEY = "publications"
     RESOURCE_KEY = "publications"
     WIDGET_TOTAL = "widgets.publications.total"
+    WIDGET_BY_KIND = "widgets.publications.by_kind"
 
     class PublicationsSection < RecordingStudioAdmin::Section
       key SECTION_KEY
@@ -25,6 +26,7 @@ module RecordingStudioPublications
            url: ->(context) { context.admin_screen_path(SCREEN_KEY) },
            style: :secondary
       widget WIDGET_TOTAL, view_variant: :compact
+      widget WIDGET_BY_KIND
     end
 
     class PublicationsScreen < RecordingStudioAdmin::Screen
@@ -34,6 +36,9 @@ module RecordingStudioPublications
       subtitle "Titles in the publication directory"
       blast_radius :site
       query { |_context| RecordingStudioPublications.publications }
+      filter :search, apply: lambda { |relation, value, _context|
+        RecordingStudioPublications::Admin.apply_publication_search(relation, value)
+      }
 
       table do
         column :name, title: "Name"
@@ -94,6 +99,17 @@ module RecordingStudioPublications
       hide_period
     end
 
+    TitlesByKindWidget = RecordingStudioAdmin::Widget.new(WIDGET_BY_KIND, blast_radius: :site) do
+      type :chart
+      title "Titles by kind"
+      chart_type :bar
+      hide_change
+      hide_period
+      hide_metric
+      series { |_context| RecordingStudioPublications::Admin.titles_by_kind_series }
+      chart_options { { height: 220 } }
+    end
+
     class << self
       def register!
         return unless defined?(::RecordingStudioAdmin)
@@ -102,6 +118,30 @@ module RecordingStudioPublications
         RecordingStudioAdmin.register_screen(PublicationsScreen)
         RecordingStudioAdmin.register_resource(PublicationsResource)
         RecordingStudioAdmin.register_widget(TotalPublicationsWidget)
+        RecordingStudioAdmin.register_widget(TitlesByKindWidget)
+      end
+
+      def apply_publication_search(relation, value)
+        return relation if value.blank?
+
+        pattern = safe_like(value)
+        relation.where(
+          "name ILIKE :q OR key ILIKE :q OR kind ILIKE :q OR COALESCE(website, '') ILIKE :q",
+          q: pattern
+        )
+      end
+
+      def titles_by_kind_series
+        counts = RecordingStudioPublications.publications.reorder(nil).group(:kind).count
+
+        [{
+          name: "Titles",
+          data: Publication::KINDS.map { |kind| { x: kind.titleize, y: counts[kind].to_i } }
+        }]
+      end
+
+      def safe_like(value)
+        "%#{ActiveRecord::Base.sanitize_sql_like(value.to_s)}%"
       end
 
       def new_publication_url(context = nil)

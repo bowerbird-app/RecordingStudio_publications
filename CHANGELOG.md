@@ -17,7 +17,8 @@ Shared publication catalogue and family-admin CRUD. Stacked on 0.1.0 identity/pi
 - One Attachable logo per publication (images only). New has no logo field. Show and edit link to Attachable’s add (`/recording_studio_attachable/recordings/:id/attachments/upload`) and change (`/recording_studio_attachable/attachments/:id`) screens. Persist stays on `import_attachment` / `replace_attachment_file`
 - Inventory Screen has no placeholder “Table data” heading
 - Accessible enabled on Publication for later per-title grants. No Manage-access UI
-- Family admin section `publications`: hub count widget, inventory Screen, Resource `required_role: :admin` for writes, new/show/edit forms
+- Family admin section `publications`: hub count widget (`type :number`), titles-by-kind bar chart (`type :chart`, `chart_type :bar`), inventory Screen `filter :search`, Resource `required_role: :admin` for writes, new/show/edit forms
+- Section Access avatars on the owned AdminRoot via `recording_studio_accessible_avatars` and dummy mount `RecordingStudioAccessible::Engine` at `/admin/access`
 - Dummy `AdminRoot` (`shared: false`) with `AllowsAdminSections`, Accessible, and `section :publications`
 - Dummy seeds for The Atlantic, The Guardian, Nature, BBC News, and The Verge
 
@@ -27,8 +28,10 @@ Shared publication catalogue and family-admin CRUD. Stacked on 0.1.0 identity/pi
 - Add an owned host `AdminRoot` (`shared: false`), enable Accessible on it, and `section :publications`
 - Configure `RecordingStudioAdmin` access and site-admin resolvers to that AdminRoot recording
 - Mount `recording_studio_admin_for` and `RecordingStudioPublications::Engine`
+- Mount `RecordingStudioAccessible::Engine` at `/admin/access` so the publications section can open family Access on the AdminRoot
 - Install Attachable migrations and Active Storage if the host does not already have them
 - Mount `RecordingStudioAttachable::Engine` and keep logo add/replace on those screens. Do not post `publication[logo]` from New/Edit
+- Keep Attachable on its blank layout. Core `default_layout` always renders a back; wrapping Attachable in that layout stacks a second PageNav on add/change
 - Bootstrap first-owner admin access on the AdminRoot recording. Do not grant Accessible on the shared catalogue
 - Keep `UsesDefaultLayout` plus the html `data-theme="rounded"` head workaround from 0.1.0
 - No public Publishable page ships in this version

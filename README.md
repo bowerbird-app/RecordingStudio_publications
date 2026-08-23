@@ -9,7 +9,7 @@ This gem is the `recording_studio_publications` engine (`RecordingStudioPublicat
 - **PublicationCatalogue** — one shared Recording Studio root per host (`label: "Publications"`, `root: true`, `shared: true`). Same idea as `RecordingStudioUser::People`. Accessible and Attachable stay off this root.
 - **Publication** — nested titles under that catalogue only. Required name, required kind (`magazine`, `newspaper`, `journal`, `site`, `broadcast`), optional website, and a stable key.
 - **One Attachable logo** per title. Images only. Create the title first, then add or change the logo on Attachable’s own upload and attachment screens. Persist stays on `import_attachment` / `replace_attachment_file`. There is no FileInput on New or Edit, and no Publications upload wrapper.
-- **Family admin** — one `publications` section in RecordingStudioAdmin 2.0. Staff CRUD is gated by an owned host `AdminRoot` plus `RecordingStudioAdmin::Resource` `required_role: :admin`. Admin does not need a grant on each title.
+- **Family admin** — one `publications` section in RecordingStudioAdmin 2.0. Staff CRUD is gated by an owned host `AdminRoot` plus `RecordingStudioAdmin::Resource` `required_role: :admin`. The hub exposes family Access on that AdminRoot (`recording_studio_accessible_avatars`), a total-count widget (`type :number`), and a titles-by-kind bar chart (`type :chart`, `chart_type :bar`). Inventory search is a Screen `filter :search`. Admin does not need a grant on each title.
 - **Dummy host** (`test/dummy/`) — thin Devise host, FlatPack Rounded on `<html>` via the PWA head workaround, seeded titles, and `/admin` as the catalogue.
 
 This is a directory gem, not a two-sided marketplace. Hosts stay thin: they register recordable types, own `AdminRoot`, seed first staff access, and mount the engines.
@@ -42,7 +42,8 @@ The login form is prefilled with these credentials for fast access. `member@admi
 - `/` — dummy host home
 - `/users/sign_in` — Devise sign-in
 - `/admin` — publications admin hub (family RecordingStudioAdmin)
-- `/admin/screens/publications` — inventory
+- `/admin/access` — Accessible engine for AdminRoot grants
+- `/admin/screens/publications` — inventory (family search filter)
 - `/recording_studio_publications/admin/publications/new` — new title (no logo field)
 - `/recording_studio_attachable/recordings/:id/attachments/upload` — Attachable add-logo screen
 - `/recording_studio_attachable/attachments/:id` — Attachable change-logo screen
@@ -87,15 +88,18 @@ Seed first staff with `RecordingStudioAccessible.bootstrap_owner_access!` on tha
 
 ### Family admin
 
-The gem registers a Section, Screen, Resource, and count widget with `blast_radius :site`:
+The gem registers a Section, Screen, Resource, and widgets with `blast_radius :site`:
 
 | Surface | Path |
 | --- | --- |
 | Hub | `/admin` or `/admin/sections/publications` |
+| Access | `/admin/access/recordings/:admin_root_id/accesses` |
 | Inventory | `/admin/screens/publications` |
 | New / show / edit | `/recording_studio_publications/admin/publications/...` |
 
-The hub widget is the total number of current titles. Inventory is a family Screen table with no placeholder “Table data” heading. New is a standalone FlatPack Button (not a ButtonGroup). New/edit forms are Name, Key, Kind, and Website — one field per row. Cancel and Save are separate Buttons. Show (and Edit) display the current logo when one exists, plus a FlatPack Button to Attachable’s add or change screens. New has no logo field.
+The hub keeps the compact total-count widget (`type :number`) and adds a full `type :chart` / `chart_type :bar` widget of title counts per Publication `KINDS` (`magazine`, `newspaper`, `journal`, `site`, `broadcast`). FlatPack `Chart::Component` is rendered by family Admin — this gem does not add a chart library. Inventory is a family Screen table with `filter :search` (name, key, kind, website) and no placeholder “Table data” heading. Access grants live on the owned AdminRoot (`required_role :admin`), via the section PageNav avatars and the Accessible mount at `/admin/access`. Do not put Accessible on the shared catalogue.
+
+New is a standalone FlatPack Button (not a ButtonGroup). New/edit forms are Name, Key, Kind, and Website — one field per row. Kind is the Publication enum, not a second recordable. Cancel and Save are separate Buttons. Show (and Edit) display the current logo when one exists, plus a FlatPack Button to Attachable’s add or change screens. New has no logo field.
 
 ### Capabilities
 
@@ -122,8 +126,9 @@ All views use FlatPack ViewComponents. The live reference is [flatpack.bowerbird
 6. Create an owned `AdminRoot`, enable Accessible on it, and `section :publications`.
 7. Point `RecordingStudioAdmin` `access_recording_resolver` and `site_admin_recording_resolver` at that admin recording.
 8. Mount `recording_studio_admin_for :admin, at: "/admin", root_section: :publications`.
-9. Mount `RecordingStudioAttachable::Engine` (dummy: `/recording_studio_attachable`) so add/change logo can use Attachable’s screens.
-10. Bootstrap first-owner admin access on the AdminRoot recording.
+9. Mount `RecordingStudioAccessible::Engine` at `/admin/access` so the section Access avatars open the family Access UI on the AdminRoot.
+10. Mount `RecordingStudioAttachable::Engine` (dummy: `/recording_studio_attachable`) so add/change logo can use Attachable’s screens. Keep Attachable on its blank layout so core `default_layout` does not add a second back.
+11. Bootstrap first-owner admin access on the AdminRoot recording.
 
 Authenticated screens should keep `RecordingStudio::UsesDefaultLayout`. If core puts `data-theme` on `<body>`, render `layouts/_default_layout_head` from the `recording_studio/default_layout_head` hook so `<html>` gets `data-theme="rounded"`. Do not put Sign out or a workspace switcher in that slot.
 

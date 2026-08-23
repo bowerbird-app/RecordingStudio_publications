@@ -23,19 +23,27 @@ class PublicationsAdminTest < ActionDispatch::IntegrationTest
     Current.actor = nil
   end
 
-  test "registers the publications section, screen, resource, and count widget" do
+  test "registers the publications section, screen, resource, and widgets" do
     assert_equal RecordingStudioPublications::Admin::PublicationsSection,
                  RecordingStudioAdmin.section_for("publications")
     assert_equal RecordingStudioPublications::Admin::PublicationsScreen,
                  RecordingStudioAdmin.screen_for("publications")
     assert_equal RecordingStudioPublications::Admin::PublicationsResource,
                  RecordingStudioAdmin.resource_for("publications")
-    assert RecordingStudioAdmin.widget_for("widgets.publications.total")
+    total = RecordingStudioAdmin.widget_for("widgets.publications.total")
+    by_kind = RecordingStudioAdmin.widget_for("widgets.publications.by_kind")
+    assert_equal :number, total.type
+    assert_equal :chart, by_kind.type
+    assert_equal :bar, by_kind.chart_type
     assert_equal :site, RecordingStudioPublications::Admin::PublicationsSection.blast_radius
     assert_equal :site, RecordingStudioPublications::Admin::PublicationsScreen.blast_radius
     assert_equal :site, RecordingStudioPublications::Admin::PublicationsResource.blast_radius
     assert_equal :admin, RecordingStudioPublications::Admin::PublicationsResource.action_for(:edit).required_access_role
     assert_equal :admin, RecordingStudioPublications::Admin::PublicationsResource.action_for(:new).required_access_role
+    search_filter = RecordingStudioPublications::Admin::PublicationsScreen.filters.find { |filter| filter.key == :search }
+    assert search_filter
+    assert_equal RecordingStudioPublications::Publication::KINDS.map(&:titleize),
+                 RecordingStudioPublications::Admin.titles_by_kind_series.first[:data].map { |point| point[:x] }
   end
 
   test "rejects an actor without AdminRoot access and permits the site admin" do
@@ -56,14 +64,18 @@ class PublicationsAdminTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_includes response.body, "Publications"
     assert_includes response.body, "New"
-    refute_includes response.body, "Manage access"
-    refute_includes response.body, "Manage-access"
-    refute_includes response.body, "+ Access"
+    assert_includes response.body, "Titles by kind"
+    assert_includes response.body, "/admin/access/recordings/#{@admin_recording.id}/accesses"
+    assert(
+      response.body.include?("Manage access") || response.body.include?("+ Access"),
+      "expected family Access UI on the AdminRoot publications section"
+    )
     assert_includes response.body, 'href="/recording_studio_publications/admin/publications/new"'
 
     get "/admin/screens/publications"
     assert_response :success
     assert_includes response.body, "New"
+    assert_includes response.body, 'name="search"'
     refute_includes response.body, "flat-pack-button-group"
     refute_includes response.body, "Table data"
 
@@ -170,6 +182,8 @@ class PublicationsAdminTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_includes response.body, "Upload"
     assert_includes response.body, "Choose files"
+    assert_equal 1, response.body.scan("flat-pack-page-nav").size
+    refute_includes response.body, 'data-recording-studio-default-layout="true"'
 
     get recording_studio_attachable.attachment_path(
       logo,
@@ -179,6 +193,8 @@ class PublicationsAdminTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_includes response.body, "Save"
     assert_includes response.body, logo.recordable.original_filename
+    assert_equal 1, response.body.scan("flat-pack-page-nav").size
+    refute_includes response.body, 'data-recording-studio-default-layout="true"'
   end
 
   test "view-only users cannot open new or edit" do
@@ -207,7 +223,25 @@ class PublicationsAdminTest < ActionDispatch::IntegrationTest
     assert_response :forbidden
   end
 
-  test "admin screens and forms do not ship a Manage-access UI" do
+  test "inventory search uses the family Admin filter" do
+    bootstrap_owner_access!(@admin, @admin_recording)
+    sign_in @admin
+    RecordingStudioPublications.record_publication!(
+      { name: "Searchable Atlantic", key: "searchable-atlantic", kind: "magazine" },
+      actor: @admin
+    )
+    RecordingStudioPublications.record_publication!(
+      { name: "Other Gazette", key: "other-gazette", kind: "newspaper" },
+      actor: @admin
+    )
+
+    get "/admin/screens/publications/table", params: { search: "Atlantic" }
+    assert_response :success
+    assert_includes response.body, "Searchable Atlantic"
+    refute_includes response.body, "Other Gazette"
+  end
+
+  test "publication CRUD pages do not ship a per-title Manage-access UI" do
     bootstrap_owner_access!(@admin, @admin_recording)
     sign_in @admin
     recording = RecordingStudioPublications.record_publication!(
@@ -216,7 +250,6 @@ class PublicationsAdminTest < ActionDispatch::IntegrationTest
     )
 
     [
-      "/admin/sections/publications",
       "/admin/screens/publications",
       recording_studio_publications.admin_publication_path(recording),
       recording_studio_publications.edit_admin_publication_path(recording),
