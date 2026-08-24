@@ -11,6 +11,23 @@
 - FlatPack `~> 0.1.133` (dummy GitHub tag `v0.1.133`)
 - Public RubyGems and GitHub access for dependency installation
 
+## Publications 0.2.0
+
+Hosts need the engine catalogue migration plus, if missing:
+
+- Host `admin_roots` table for the owned AdminRoot
+- RecordingStudioAccessible tables (already required by 0.1.0 dummy)
+- Active Storage tables
+- RecordingStudioAttachable attachments table and indexes
+
+Register `PublicationCatalogue`, `Publication`, `AdminRoot`, and `RecordingStudioAttachable::Attachment` before `RecordingStudio.validate_recordable_declarations!`.
+
+Mount `RecordingStudioAccessible::Engine` at `/admin/access` so the publications section can open family Access on the owned AdminRoot. Do not enable Accessible on the shared catalogue.
+
+Mount `RecordingStudioAttachable::Engine` so staff add or change a logo on Attachable’s screens after the title exists. Do not post `publication[logo]` from New/Edit. Keep Attachable on its blank layout so core `default_layout` does not add a second back.
+
+Do not enable Accessible or Attachable on the shared catalogue root.
+
 ## Host layout
 
 Authenticated screens should use `RecordingStudio::UsesDefaultLayout`. Core still puts `data-theme` on `<body>`. FlatPack themes belong on `<html>`. Hosts should add `app/views/recording_studio/_default_layout_head.html.erb` that renders `layouts/default_layout_head`, and `app/views/layouts/_default_layout_head.html.erb` that copies `data-theme="rounded"` onto `document.documentElement` with `javascript_tag nonce: true`. Do not put Sign out or a workspace switcher there.

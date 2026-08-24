@@ -12,7 +12,9 @@ class RecordingStudioTemplateTest < ActiveSupport::TestCase
 
   test "dummy app validates recordable declarations" do
     assert RecordingStudio.validate_recordable_declarations!
-    assert_equal [ "Workspace" ], RecordingStudio.root_recordable_types
+    assert_includes RecordingStudio.root_recordable_types, "Workspace"
+    assert_includes RecordingStudio.root_recordable_types, "AdminRoot"
+    assert_includes RecordingStudio.root_recordable_types, "RecordingStudioPublications::PublicationCatalogue"
     assert_equal [ "Workspace", "Folder" ], RecordingStudio.allowed_parent_types_for("Page")
   end
 
@@ -50,6 +52,13 @@ class RecordingStudioTemplateTest < ActiveSupport::TestCase
     assert_equal folder_recording, page_recording.parent_recording
     assert_equal root_recording, page_recording.root_recording
     assert_equal 3, Workspace.count
+    assert AdminRoot.find_by(name: "Admin")
+    assert_operator RecordingStudioPublications.publications.count, :>=, 5
+    created_ats = RecordingStudioPublications.publications.where(
+      key: %w[the-atlantic the-guardian nature bbc-news the-verge]
+    ).pluck(:created_at)
+    assert_operator created_ats.map { |time| time.to_date }.uniq.size, :>=, 4,
+                    "seeded titles should stagger created_at so the inventory chart is not a single spike"
 
     assert_no_difference -> { User.count } do
       assert_no_difference -> { RecordingStudio::Recording.count } do

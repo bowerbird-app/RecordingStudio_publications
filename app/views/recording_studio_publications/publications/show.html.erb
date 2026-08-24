@@ -1,0 +1,39 @@
+<%= render layout: "recording_studio_admin/shared/page_shell" do %>
+  <% recording_studio_page_nav(
+    title: @publication.name,
+    page_nav_anchor_url: page_nav_anchor_url(default: inventory_path)
+  ) %>
+
+  <%= render FlatPack::PageTitle::Component.new(
+    title: @publication.name,
+    subtitle: @publication.kind_label
+  ) %>
+
+  <% attribute_rows = [
+       { attribute: "Name", value: @publication.name },
+       { attribute: "Key", value: @publication.key },
+       { attribute: "Kind", value: @publication.kind_label },
+       { attribute: "Website", value: @publication.website.presence || "—" }
+     ] %>
+
+  <div class="space-y-4">
+    <% if @edit_publication_action %>
+      <div class="flex items-center gap-2 pt-2">
+        <%= render FlatPack::Button::Component.new(
+          text: "Edit",
+          href: preserve_anchor_url(@edit_publication_action.url),
+          style: :primary
+        ) %>
+      </div>
+    <% end %>
+
+    <%= render "logo",
+               logo_recording: @logo_recording,
+               return_to: admin_publication_path(@recording) %>
+
+    <%= render FlatPack::Table::Component.new(data: attribute_rows, class: "text-sm") do |table| %>
+      <% table.column(title: "Attribute") { |attribute_row| attribute_row.fetch(:attribute) } %>
+      <% table.column(title: "Value") { |attribute_row| attribute_row.fetch(:value) } %>
+    <% end %>
+  </div>
+<% end %>

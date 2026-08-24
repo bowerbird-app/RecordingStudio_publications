@@ -1,9 +1,13 @@
-# Recording Studio Publications 0.1.0
+# Recording Studio Publications 0.2.0
 
-`recording_studio_publications` is the publication-directory addon identity. This release is rename, pins, and dummy theme only.
+`recording_studio_publications` is a grant-less publication directory for Recording Studio 4.x hosts.
 
-- Gemspec: `recording_studio ~> 4.2`, `recording_studio_accessible ~> 0.6`, `recording_studio_admin ~> 2.0`, `recording_studio_attachable ~> 0.4`, `flat_pack ~> 0.1.133`
-- Dummy GitHub tags: Recording Studio `v4.2.0`, Accessible `v0.7.0`, Attachable `0.4.0`, Admin `2.0.1`, Root Switchable `v0.5.0`, FlatPack `v0.1.133`
-- Authenticated dummy layout: `RecordingStudio::UsesDefaultLayout` plus FlatPack CSS/JS
-- Dummy copies `data-theme="rounded"` onto `<html>` through `layouts/_default_layout_head`, rendered from the core `recording_studio/default_layout_head` hook
-- Hooks and BaseService come from core; do not copy them into this addon
+- Shared `PublicationCatalogue` root (`label: "Publications"`). Accessible and Attachable stay off that root
+- `Publication` children: name, key, kind, website, one Attachable image logo added after the title exists
+- Logo add/change uses Attachable screens, not a FileInput on New/Edit
+- Family admin section `publications` gated by host-owned `AdminRoot` + Resource `required_role: :admin`
+- Hub Access avatars on that AdminRoot (`/admin/access`), total count (`type :number`), and titles-by-kind bar chart (`type :chart` / `chart_type :bar`)
+- Inventory Screen `filter :search` (no homemade filter bar) and family Screen `chart` (`type :area`). No compact over-time widget — Screen widgets always render as compact cards
+- Dummy host stays thin: AdminRoot, resolvers, seeds, mounts. No public Publishable page
+- Pins unchanged from 0.1.0: Recording Studio `v4.2.0`, Accessible `v0.7.0`, Attachable `0.4.0`, Admin `2.0.1`, FlatPack `v0.1.133`
+- Authenticated dummy layout: `RecordingStudio::UsesDefaultLayout` plus html `data-theme="rounded"` head workaround

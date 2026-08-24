@@ -4,7 +4,7 @@ require "test_helper"
 
 class RecordingStudioPublicationsTest < Minitest::Test
   def test_version_matches_release
-    assert_equal "0.1.0", ::RecordingStudioPublications::VERSION
+    assert_equal "0.2.0", ::RecordingStudioPublications::VERSION
   end
 
   def test_engine_exists
@@ -54,6 +54,25 @@ class RecordingStudioPublicationsTest < Minitest::Test
     assert_empty RecordingStudio.configuration.enabled_recordable_types_for(:example)
   end
 
+  def test_dummy_host_mounts_attachable_and_wires_turbo
+    routes = File.read(File.expand_path("dummy/config/routes.rb", __dir__))
+    importmap = File.read(File.expand_path("dummy/config/importmap.rb", __dir__))
+    application_js = File.read(File.expand_path("dummy/app/javascript/application.js", __dir__))
+
+    assert_includes routes, 'mount RecordingStudioAttachable::Engine, at: "/recording_studio_attachable"'
+    assert_includes routes, 'mount RecordingStudioAccessible::Engine, at: "/admin/access"'
+    assert_includes importmap, 'pin "@hotwired/turbo-rails"'
+    assert_includes importmap, 'pin "@rails/activestorage"'
+    assert_includes application_js, 'import "@hotwired/turbo-rails"'
+    assert_includes application_js, "ActiveStorage.start()"
+
+    attachable_initializer = File.read(
+      File.expand_path("dummy/config/initializers/recording_studio_attachable.rb", __dir__)
+    )
+    assert_includes attachable_initializer, "config.layout = :blank"
+    refute_includes attachable_initializer, 'config.layout = "recording_studio/default_layout"'
+  end
+
   def test_dummy_app_uses_recording_studio_default_layout
     application_controller_path = File.expand_path("dummy/app/controllers/application_controller.rb", __dir__)
     controller_source = File.read(application_controller_path)
@@ -100,6 +119,8 @@ class RecordingStudioPublicationsTest < Minitest::Test
     assert_includes tailwind_source, "flatpack-*/app/components/**/*.{rb,erb}"
     assert_includes tailwind_source, "../../../vendor/bundle/**/recording_studio/app/views/**/*.erb"
     assert_includes tailwind_source, "recordingstudio-*/app/views/**/*.erb"
+    assert_includes tailwind_source, "recording_studio_admin/app/views/**/*.erb"
+    assert_includes tailwind_source, "recording_studio_attachable/app/views/**/*.erb"
     refute_includes tailwind_source, "@theme"
     refute_includes tailwind_source, ":root {"
     refute_includes tailwind_source, "--color-fp-primary"
@@ -113,6 +134,9 @@ class RecordingStudioPublicationsTest < Minitest::Test
     assert_includes initializer_source, '"Workspace"'
     assert_includes initializer_source, '"Folder"'
     assert_includes initializer_source, '"Page"'
+    assert_includes initializer_source, '"AdminRoot"'
+    assert_includes initializer_source, '"RecordingStudioPublications::PublicationCatalogue"'
+    assert_includes initializer_source, '"RecordingStudioPublications::Publication"'
     assert_includes initializer_source, '"RecordingStudioAttachable::Attachment"'
     refute_includes initializer_source, "config.include_children"
     refute_includes initializer_source, "config.features."
@@ -123,9 +147,10 @@ class RecordingStudioPublicationsTest < Minitest::Test
     readme_path = File.expand_path("dummy/README.md", __dir__)
     readme_source = File.read(readme_path)
 
-    assert_includes readme_source, "This Rails app exists to validate the Recording Studio addon template"
+    assert_includes readme_source, "This Rails app exists to validate the Recording Studio publications gem"
     assert_includes readme_source, "/recording_studio"
     assert_includes readme_source, "redirects to `/`"
+    assert_includes readme_source, "/recording_studio_attachable"
     refute_includes readme_source, "flat_pack_sidebar"
   end
 
@@ -145,8 +170,8 @@ class RecordingStudioPublicationsTest < Minitest::Test
     view_path = File.expand_path("dummy/app/views/home/index.html.erb", __dir__)
     view_source = File.read(view_path)
 
-    assert_includes view_source, 'title: "Template Demo"'
-    assert_includes view_source, 'subtitle: "This dummy app is the browser-facing demo surface for the template."'
+    assert_includes view_source, 'title: "Publication directory"'
+    assert_includes view_source, "shared publications catalogue"
     assert_includes view_source, "FlatPack::Card::Component"
     assert_includes view_source, "dummy_page_nav"
     refute_includes view_source, 'title: "Demo"'
