@@ -15,6 +15,10 @@ node_modules/
 log/*.log
 tmp/
 
+# Recording Studio Cursor skills/rules (fetched by .cursor/fetch-skills.sh)
+.cursor/skills/
+.cursor/rules/
+
 # Editor files
 .vscode/*
 !.vscode/extensions.json
