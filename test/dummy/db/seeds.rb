@@ -2,9 +2,7 @@
 # development, test). The code here should be idempotent so that it can be executed at any point in every environment.
 # The data can then be loaded with the bin/rails db:seed command (or created alongside the database with db:setup).
 
-ONE_PIXEL_PNG = Base64.decode64(
-  "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg=="
-).freeze
+SEED_LOGO_PATH = Rails.root.join("db/seed_assets/publication_logo.png") unless defined?(SEED_LOGO_PATH)
 
 find_or_record_child = lambda do |recordable, root_recording, parent_recording|
   RecordingStudio::Recording.find_by(
@@ -25,10 +23,30 @@ bootstrap_owner_access = lambda do |actor, recording|
   raise result.error if result.failure?
 end
 
+ensure_seed_logo = lambda do |recording, key:, actor:|
+  publication = recording.recordable
+  logo = RecordingStudioPublications.logo_recording_for(publication)
+  byte_size = logo&.recordable&.file&.byte_size.to_i
+  return if logo && byte_size >= 200
+
+  logo.remove_attachment(actor: actor) if logo.respond_to?(:remove_attachment)
+  File.open(SEED_LOGO_PATH, "rb") do |io|
+    recording.import_attachment(
+      io: io,
+      filename: "#{key}.png",
+      content_type: "image/png",
+      name: "Logo",
+      actor: actor
+    )
+  end
+end
+
 seed_publication = lambda do |name:, key:, kind:, website:, actor:, created_at:|
   existing = RecordingStudioPublications::Publication.find_by(key: key)
   if existing
     RecordingStudioPublications::Publication.where(id: existing.id).update_all(created_at: created_at)
+    recording = RecordingStudioPublications.recording_for(existing)
+    ensure_seed_logo.call(recording, key: key, actor: actor) if recording
     return existing
   end
 
@@ -38,13 +56,7 @@ seed_publication = lambda do |name:, key:, kind:, website:, actor:, created_at:|
   )
   publication = recording.recordable
   RecordingStudioPublications::Publication.where(id: publication.id).update_all(created_at: created_at)
-  recording.import_attachment(
-    io: StringIO.new(ONE_PIXEL_PNG),
-    filename: "#{key}.png",
-    content_type: "image/png",
-    name: "Logo",
-    actor: actor
-  )
+  ensure_seed_logo.call(recording, key: key, actor: actor)
   publication
 end
 

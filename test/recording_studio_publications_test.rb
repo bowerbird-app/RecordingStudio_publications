@@ -117,6 +117,8 @@ class RecordingStudioPublicationsTest < Minitest::Test
 
     assert_includes tailwind_source, "../../../vendor/bundle/**/flatpack/app/components/**/*.{rb,erb}"
     assert_includes tailwind_source, "flatpack-*/app/components/**/*.{rb,erb}"
+    assert_includes tailwind_source, "usr/local/lib/ruby/gems/**/bundler/gems/flatpack-*"
+    assert_includes tailwind_source, '"/usr/local/lib/ruby/gems/**/bundler/gems/flatpack-*'
     assert_includes tailwind_source, "../../../vendor/bundle/**/recording_studio/app/views/**/*.erb"
     assert_includes tailwind_source, "recordingstudio-*/app/views/**/*.erb"
     assert_includes tailwind_source, "recording_studio_admin/app/views/**/*.erb"
@@ -220,6 +222,14 @@ class RecordingStudioPublicationsTest < Minitest::Test
     assert_includes recording_tree_partial, "parent_builder.node"
     refute_includes recordings_tree_view, "Current structure"
     refute_includes recordings_tree_view, "This tree is generated from RecordingStudio::Recording records"
+  end
+
+  def test_dummy_seed_logo_is_a_real_png
+    path = File.expand_path("dummy/db/seed_assets/publication_logo.png", __dir__)
+    bytes = File.binread(path)
+
+    assert bytes.bytesize >= 200
+    assert_equal "\x89PNG".b, bytes.byteslice(0, 4)
   end
 
   def test_engine_does_not_ship_a_home_view

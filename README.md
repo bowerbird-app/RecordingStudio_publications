@@ -10,7 +10,7 @@ This gem is the `recording_studio_publications` engine (`RecordingStudioPublicat
 - **Publication** — nested titles under that catalogue only. Required name, required kind (`magazine`, `newspaper`, `journal`, `site`, `broadcast`), optional website, and a stable key.
 - **One Attachable logo** per title. Images only. Create the title first, then add or change the logo on Attachable’s own upload and attachment screens. Persist stays on `import_attachment` / `replace_attachment_file`. There is no FileInput on New or Edit, and no Publications upload wrapper.
 - **Family admin** — one `publications` section in RecordingStudioAdmin 2.0. Staff CRUD is gated by an owned host `AdminRoot` plus `RecordingStudioAdmin::Resource` `required_role: :admin`. The hub exposes family Access on that AdminRoot (`recording_studio_accessible_avatars`), a total-count widget (`type :number`), and a titles-by-kind bar chart (`type :chart`, `chart_type :bar`). Inventory search is a Screen `filter :search`. Admin does not need a grant on each title.
-- **Dummy host** (`test/dummy/`) — thin Devise host, FlatPack Rounded on `<html>` via the PWA head workaround, seeded titles, and `/admin` as the catalogue.
+- **Dummy host** (`test/dummy/`) — thin Devise host, FlatPack Rounded on `<html>` via the PWA head workaround, seeded titles with a real 128px logo PNG, and `/admin` as the catalogue. Dummy Tailwind `@source` scans Flatpack, Admin, and Attachable under `vendor/bundle`, `/usr/local/bundle`, and `/usr/local/lib/ruby/gems` so Cloud Agent images still emit Grid/Table classes.
 
 This is a directory gem, not a two-sided marketplace. Hosts stay thin: they register recordable types, own `AdminRoot`, seed first staff access, and mount the engines.
 

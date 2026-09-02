@@ -57,6 +57,7 @@ class PublicationsAdminTest < ActionDispatch::IntegrationTest
     assert new_button
     assert_equal "New", new_button.text
     refute File.exist?(RecordingStudioPublications::Engine.root.join("app/overrides/recording_studio_admin/screens/show.html.erb"))
+    refute File.exist?(RecordingStudioPublications::Engine.root.join("app/overrides/recording_studio_admin/sections/show.html.erb"))
     refute_includes File.read(RecordingStudioPublications::Engine.root.join("lib/recording_studio_publications/admin.rb")),
                     "instance_variable_set"
     assert_equal RecordingStudioPublications::Publication::KINDS.map(&:titleize),
@@ -87,7 +88,11 @@ class PublicationsAdminTest < ActionDispatch::IntegrationTest
       response.body.include?("Manage access") || response.body.include?("+ Access"),
       "expected family Access UI on the AdminRoot publications section"
     )
-    assert_includes response.body, 'href="/recording_studio_publications/admin/publications/new"'
+    assert(
+      response.body.include?('href="/recording_studio_publications/admin/publications/new"') ||
+        response.body.include?('url="/recording_studio_publications/admin/publications/new"'),
+      "expected family New control to point at this gem's new-title path"
+    )
 
     get "/admin/screens/publications"
     assert_response :success

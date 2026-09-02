@@ -9,13 +9,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [0.2.1] - 2026-09-02
 
-Pins only, plus dummy Admin recapture. Catalogue and CRUD stay as in 0.2.0.
+Pins, dummy Tailwind scan for system gem paths, real seed logos, and dummy Admin recapture. Catalogue and CRUD stay as in 0.2.0.
 
 ### Changed
 - Accessible gemspec `~> 0.9`, dummy GitHub tag `v0.9.0` (was `~> 0.6` / `v0.7.0`)
 - Attachable gemspec `~> 0.5`, dummy GitHub tag `v0.5.0` (was `~> 0.4` / `0.4.0`)
 - Flatpack gemspec `~> 0.1.143`, dummy GitHub tag `v0.1.143` (was `~> 0.1.133` / `v0.1.133`)
+- Dummy Tailwind `@source` now also scans `/usr/local/lib/ruby/gems/**/bundler/gems` so Flatpack Grid/Table classes generate on Cloud Agent images that do not use `vendor/bundle`
+- Dummy seed logos are a real 128px PNG (`test/dummy/db/seed_assets/publication_logo.png`), not a 1×1 pixel
+- Dropped the copied Admin `sections/show` override. Family Admin 2.0.1 already renders Access avatars on the section
 - Dummy Admin screens recaptured as public `doc/review/*.png` (hub, inventory, new, show, edit, Attachable add logo, Attachable change logo). Inventory shows the family Screen chart only. There is no compact titles-over-time card.
+
+Left with family Admin / Flatpack, not forked here. Hub New/All publications render as `<button url>` because Admin 2.0.1 `sections/show` passes `url:` and Flatpack Button only links on `href:`. Titles-by-kind integer counts still draw on a 0.0–1.0 axis. Inventory table heading stays “Table data” (Admin `title` has no public hide API). Full chart widgets sit in the first cell of a 3-column Grid.
 
 Recording Studio stays `~> 4.2` / dummy `v4.2.0`. Admin stays `~> 2.0` / dummy `2.0.1`. Root Switchable dummy stays `v0.5.0`. Do not pin unreleased Flatpack `0.1.144`.
 
