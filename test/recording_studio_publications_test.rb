@@ -4,7 +4,7 @@ require "test_helper"
 
 class RecordingStudioPublicationsTest < Minitest::Test
   def test_version_matches_release
-    assert_equal "0.2.0", ::RecordingStudioPublications::VERSION
+    assert_equal "0.2.1", ::RecordingStudioPublications::VERSION
   end
 
   def test_engine_exists
@@ -16,23 +16,23 @@ class RecordingStudioPublicationsTest < Minitest::Test
 
     assert_includes gemspec, 'spec.add_dependency "recording_studio", "~> 4.2"'
     assert_includes gemspec, 'spec.add_dependency "rails", "~> 8.1.0"'
-    assert_includes gemspec, 'spec.add_dependency "recording_studio_accessible", "~> 0.6"'
+    assert_includes gemspec, 'spec.add_dependency "recording_studio_accessible", "~> 0.9"'
     assert_includes gemspec, 'spec.add_dependency "recording_studio_admin", "~> 2.0"'
-    assert_includes gemspec, 'spec.add_dependency "recording_studio_attachable", "~> 0.4"'
-    assert_includes gemspec, 'spec.add_dependency "flat_pack", "~> 0.1.133"'
+    assert_includes gemspec, 'spec.add_dependency "recording_studio_attachable", "~> 0.5"'
+    assert_includes gemspec, 'spec.add_dependency "flat_pack", "~> 0.1.143"'
   end
 
   def test_dummy_gemfile_pins_verified_4x_github_tags
     gemfile = File.read(File.expand_path("dummy/Gemfile", __dir__))
 
     assert_includes gemfile, 'github: "bowerbird-app/RecordingStudio", tag: "v4.2.0"'
-    assert_includes gemfile, 'github: "bowerbird-app/RecordingStudio_accessible", tag: "v0.7.0"'
-    assert_includes gemfile, 'github: "bowerbird-app/RecordingStudio_attachable", tag: "0.4.0"'
+    assert_includes gemfile, 'github: "bowerbird-app/RecordingStudio_accessible", tag: "v0.9.0"'
+    assert_includes gemfile, 'github: "bowerbird-app/RecordingStudio_attachable", tag: "v0.5.0"'
     assert_includes gemfile, 'github: "bowerbird-app/RecordingStudio_admin", tag: "2.0.1"'
     assert_includes gemfile, 'github: "bowerbird-app/RecordingStudio_root_switchable", tag: "v0.5.0"'
-    assert_includes gemfile, 'github: "bowerbird-app/flatpack", tag: "v0.1.133"'
+    assert_includes gemfile, 'github: "bowerbird-app/flatpack", tag: "v0.1.143"'
     refute_includes gemfile, "recording_studio/v3.0.0"
-    refute_includes gemfile, 'tag: "v0.1.134"'
+    refute_includes gemfile, 'tag: "v0.1.144"'
     refute_includes gemfile, 'tag: "0.3.1"'
   end
 
@@ -159,7 +159,7 @@ class RecordingStudioPublicationsTest < Minitest::Test
 
     assert_includes readme, "RecordingStudio"
     assert_includes readme, "v4.2.0"
-    assert_includes readme, "v0.1.133"
+    assert_includes readme, "v0.1.143"
     refute_includes readme, "v3 declarations"
     refute_includes readme, "RecordingStudio v3"
     refute_includes readme, "ExampleService"

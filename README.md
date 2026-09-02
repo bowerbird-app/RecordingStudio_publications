@@ -2,7 +2,7 @@
 
 Publication directory addon for Recording Studio 4.x hosts.
 
-This gem is the `recording_studio_publications` engine (`RecordingStudioPublications`). Version 0.2.0 ships a grant-less shared catalogue and family-admin CRUD for titles. It does not ship public press pages, Featured In, or per-title access management.
+This gem is the `recording_studio_publications` engine (`RecordingStudioPublications`). Version 0.2.1 keeps the 0.2.0 grant-less shared catalogue and family-admin CRUD, and pins Accessible `~> 0.9`, Attachable `~> 0.5`, and Flatpack `~> 0.1.143`. It does not ship public press pages, Featured In, or per-title access management.
 
 ## What's Included
 
@@ -65,7 +65,7 @@ end
 
 `Publication` may enable Accessible so later per-title grants can work. v1 does not ship a Manage-access UI. Admin CRUD authorizes against the host AdminRoot, not against a grant on the title.
 
-Do not enable `:accessible` or Attachable on the shared catalogue. Accessible 0.7.0 rejects grants on shared roots. Attachable 0.4.0 is for domain children under that root.
+Do not enable `:accessible` or Attachable on the shared catalogue. Accessible 0.9 rejects grants on shared roots. Attachable 0.5 is for domain children under that root.
 
 ### Host AdminRoot
 
@@ -149,15 +149,15 @@ Authenticated screens should keep `RecordingStudio::UsesDefaultLayout`. If core 
 | PostgreSQL      | 16      |
 | TailwindCSS     | 4       |
 | RecordingStudio | 4.x (`~> 4.2` in the gemspec; dummy GitHub tag `v4.2.0`) |
-| Accessible      | `~> 0.6` (dummy GitHub tag `v0.7.0`) |
+| Accessible      | `~> 0.9` (dummy GitHub tag `v0.9.0`) |
 | Admin           | `~> 2.0` (dummy GitHub tag `2.0.1`) |
-| Attachable      | `~> 0.4` (dummy GitHub tag `0.4.0`) |
+| Attachable      | `~> 0.5` (dummy GitHub tag `v0.5.0`) |
 | Root Switchable | dummy GitHub tag `v0.5.0` |
-| FlatPack        | `~> 0.1.133` (dummy GitHub tag `v0.1.133`) |
+| FlatPack        | `~> 0.1.143` (dummy GitHub tag `v0.1.143`) |
 | Devise          | latest  |
 
 ## Documentation
 
-Dummy admin viewports live in `docs/ui-shots/` (`publications-admin-hub.png`, inventory, new, show, edit, plus Attachable add/change). Recapture those from the dummy host with `html data-theme="rounded"` and seeded titles.
+Dummy admin viewports live in `doc/review/` (`publications-admin-hub.png`, inventory, new, show, edit, plus Attachable add/change). Recapture those from the dummy host with `html data-theme="rounded"` and seeded titles. Inventory must show the family Screen chart only, not a compact titles-over-time card.
 
 The original gem template documentation is preserved in `docs/gem_template/` as architectural reference material. This README, `CHANGELOG.md`, and the dummy app are the source of truth for the publications directory.

@@ -7,6 +7,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.2.1] - 2026-09-02
+
+Pins only, plus dummy Admin recapture. Catalogue and CRUD stay as in 0.2.0.
+
+### Changed
+- Accessible gemspec `~> 0.9`, dummy GitHub tag `v0.9.0` (was `~> 0.6` / `v0.7.0`)
+- Attachable gemspec `~> 0.5`, dummy GitHub tag `v0.5.0` (was `~> 0.4` / `0.4.0`)
+- Flatpack gemspec `~> 0.1.143`, dummy GitHub tag `v0.1.143` (was `~> 0.1.133` / `v0.1.133`)
+- Dummy Admin screens recaptured as public `doc/review/*.png` (hub, inventory, new, show, edit, Attachable add logo, Attachable change logo). Inventory shows the family Screen chart only. There is no compact titles-over-time card.
+
+Recording Studio stays `~> 4.2` / dummy `v4.2.0`. Admin stays `~> 2.0` / dummy `2.0.1`. Root Switchable dummy stays `v0.5.0`. Do not pin unreleased Flatpack `0.1.144`.
+
+### Upgrade notes
+- Bump to `0.2.1`
+- Hosts bump Accessible to `~> 0.9`, Attachable to `~> 0.5`, and Flatpack to `~> 0.1.143`
+- Keep Recording Studio `~> 4.2` and Admin `~> 2.0`
+
 ## [0.2.0] - 2026-08-22
 
 Shared publication catalogue and family-admin CRUD. Stacked on 0.1.0 identity/pins. No public Publishable pages.
@@ -57,6 +74,7 @@ First `recording_studio_publications` identity. This release is rename, dependen
 - Keep `RecordingStudio::UsesDefaultLayout` for authenticated screens. If core puts theme on `body`, render `layouts/_default_layout_head` from the `recording_studio/default_layout_head` hook so `html` gets `data-theme="rounded"`
 - Do not put Sign out or a workspace switcher in the default-layout slot or that head partial
 
-[Unreleased]: https://github.com/bowerbird-app/RecordingStudio_publications/compare/v0.2.0...HEAD
+[Unreleased]: https://github.com/bowerbird-app/RecordingStudio_publications/compare/v0.2.1...HEAD
+[0.2.1]: https://github.com/bowerbird-app/RecordingStudio_publications/releases/tag/v0.2.1
 [0.2.0]: https://github.com/bowerbird-app/RecordingStudio_publications/releases/tag/v0.2.0
 [0.1.0]: https://github.com/bowerbird-app/RecordingStudio_publications/releases/tag/v0.1.0
