@@ -5,11 +5,15 @@
 - Ruby 3.3 or newer
 - Rails 8.1 or newer
 - Recording Studio 4.x (`~> 4.2` in the gemspec; dummy GitHub tag `v4.2.0`)
-- Accessible `~> 0.6` (dummy GitHub tag `v0.7.0`)
+- Accessible `~> 0.9` (dummy GitHub tag `v0.9.0`)
 - Admin `~> 2.0` (dummy GitHub tag `2.0.1`)
-- Attachable `~> 0.4` (dummy GitHub tag `0.4.0`)
-- FlatPack `~> 0.1.133` (dummy GitHub tag `v0.1.133`)
+- Attachable `~> 0.5` (dummy GitHub tag `v0.5.0`)
+- FlatPack `~> 0.1.143` (dummy GitHub tag `v0.1.143`)
 - Public RubyGems and GitHub access for dependency installation
+
+## Publications 0.2.1
+
+Hosts bump Accessible to `~> 0.9`, Attachable to `~> 0.5`, and Flatpack to `~> 0.1.143`. Catalogue migrations and AdminRoot wiring stay as in 0.2.0.
 
 ## Publications 0.2.0
 

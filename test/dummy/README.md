@@ -12,7 +12,7 @@ This Rails app exists to validate the Recording Studio publications gem in a rea
 - Family admin at `/admin` (`recording_studio_admin_for`, section `:publications`)
 - Accessible mounted at `/admin/access` so the publications hub can manage AdminRoot grants
 - Attachable mounted at `/recording_studio_attachable` for add/change logo, using Attachable’s blank layout so those screens have one PageNav (not a second back from default_layout)
-- Recording Studio default layout, FlatPack assets, and Tailwind source scanning
+- Recording Studio default layout, FlatPack assets, and Tailwind `@source` scanning for `vendor/bundle`, `/usr/local/bundle`, and `/usr/local/lib/ruby/gems` so Cloud Agent images still emit Grid/Table classes
 - Dummy-only `/docs/*` pages for gem-specific onboarding
 
 ## Quick Start

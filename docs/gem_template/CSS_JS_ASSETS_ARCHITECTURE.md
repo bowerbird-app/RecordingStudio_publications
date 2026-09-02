@@ -1,6 +1,6 @@
 > **Architecture Documentation**
 > *   **Canonical Source:** [bowerbird-app/gem_template](https://github.com/bowerbird-app/gem_template/tree/main/docs/gem_template)
-> *   **Last Updated:** December 11, 2025
+> *   **Last Updated:** September 2, 2026
 >
 > *Maintainers: Please update the date above when modifying this file.*
 
@@ -251,16 +251,19 @@ test/dummy/
 5.2 Tailwind Entry Point
 ------------------------------------------------------------
 
-The file `test/dummy/app/assets/tailwind/application.css` configures Tailwind:
+The file `test/dummy/app/assets/tailwind/application.css` configures Tailwind. It scans dummy views, this engine's views, and Flatpack / Admin / Attachable templates from every place Bundler might put those gems (`vendor/bundle`, `/usr/local/bundle`, `/usr/local/lib/ruby/gems`). Cloud Agent images often install gems under `/usr/local/lib/ruby/gems/**/bundler/gems`. If that path is missing from `@source`, Grid and Table classes never generate and Admin looks like unstyled HTML.
 
 ```css
 @import "tailwindcss";
 
-/* Include the engine's views in the Tailwind build */
+@source "../../views/**/*.erb";
 @source "../../../../../app/views/**/*.erb";
+@source "../../../vendor/bundle/**/flatpack/app/components/**/*.{rb,erb}";
+@source "/usr/local/bundle/ruby/**/bundler/gems/flatpack-*/app/components/**/*.{rb,erb}";
+@source "/usr/local/lib/ruby/gems/**/bundler/gems/flatpack-*/app/components/**/*.{rb,erb}";
 ```
 
-> **Note:** The relative path `../../../../../app/views/**/*.erb` points from the dummy app up to the engine's `app/views` folder so Tailwind can detect classes used in engine templates. Host applications will use the gem path instead.
+The same three-path pattern is used for Recording Studio, Admin, and Attachable views. Host apps should scan the path where *their* Bundler installs those gems, then run `bin/rails tailwindcss:build`.
 
 ------------------------------------------------------------
 5.3 Auto-Rebuild in Development
