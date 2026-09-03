@@ -55,4 +55,4 @@ Use this app to verify the publications directory before copying host wiring int
 
 Authenticated pages use Recording Studio's shared default layout. The dummy copies FlatPack `rounded` onto `<html>` through `app/views/layouts/_default_layout_head.html.erb`, rendered from `app/views/recording_studio/_default_layout_head.html.erb`. Those partials do not put Sign out or a workspace switcher in the default-layout slot. Devise sign-in keeps `layouts/application`. Attachable add/change use Attachable’s blank layout so they keep one PageNav.
 
-The home page stays a minimal demo surface. Open `/admin` for hub, inventory, new, show, and edit. Add or change a logo from the saved title — Attachable owns those screens. Publish from show/edit, then open the public URL without signing in.
+The home page stays a minimal demo surface. Open `/admin` for hub, inventory, new, show, and edit. Add or change a logo from the saved title — Attachable owns those screens. Open the public-page screen from show/edit, then open the public URL without signing in.
