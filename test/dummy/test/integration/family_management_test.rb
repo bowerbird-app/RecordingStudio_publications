@@ -32,8 +32,8 @@ class FamilyManagementTest < ActionDispatch::IntegrationTest
     first = RecordingStudioPublications::FamilyManagement.install!(config)
     second = RecordingStudioPublications::FamilyManagement.install!(config)
 
-    assert_equal false, first
-    assert_equal false, second
+    assert_nil first
+    assert_nil second
     assert RecordingStudioPublications::FamilyManagement.installed?(config)
   end
 
@@ -44,8 +44,8 @@ class FamilyManagementTest < ActionDispatch::IntegrationTest
       seen << [recording.recordable_type, actor&.id]
       recording.recordable_type == "Page"
     }
-    assert RecordingStudioPublications::FamilyManagement.install!(config)
-    refute RecordingStudioPublications::FamilyManagement.install!(config)
+    assert_same config, RecordingStudioPublications::FamilyManagement.install!(config)
+    assert_nil RecordingStudioPublications::FamilyManagement.install!(config)
 
     workspace = Workspace.create!(name: "Family Fallback #{SecureRandom.hex(4)}")
     root = RecordingStudio.root_recording_for(workspace)

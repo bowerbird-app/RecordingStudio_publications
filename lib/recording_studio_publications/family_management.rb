@@ -29,7 +29,7 @@ module RecordingStudioPublications
     module_function
 
     def install!(config = default_publishable_config)
-      return false if installed?(config)
+      return if installed?(config)
 
       Installed.remember(
         config: config,
@@ -37,7 +37,7 @@ module RecordingStudioPublications
         close_url: config.management_close_url_resolver
       )
       wrap_publishable_config(config)
-      true
+      config
     end
 
     def authorize(recording:, actor:, controller: nil)
