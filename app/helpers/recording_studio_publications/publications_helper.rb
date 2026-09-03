@@ -33,6 +33,14 @@ module RecordingStudioPublications
       publishable_routes.edit_recording_publishable_path(recording_id: recording.id)
     end
 
+    def publication_public_page_button_text(publishable)
+      return "Publish" if publishable.blank?
+      return "Change schedule" if publishable.try(:scheduled_for_future?)
+      return "Public page" if publishable.try(:published_state?)
+
+      "Publish"
+    end
+
     private
 
     def attachable_routes

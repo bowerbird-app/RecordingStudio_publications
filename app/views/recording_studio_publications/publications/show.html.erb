@@ -30,7 +30,7 @@
         ) %>
         <% if @publishable_edit_path.present? %>
           <%= render FlatPack::Button::Component.new(
-            text: "Publish",
+            text: publication_public_page_button_text(@current_publishable),
             href: preserve_anchor_url(@publishable_edit_path),
             style: :secondary
           ) %>

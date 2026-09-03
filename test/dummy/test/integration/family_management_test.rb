@@ -86,7 +86,32 @@ class FamilyManagementTest < ActionDispatch::IntegrationTest
     get recording_studio_publications.admin_publication_path(@publication_recording)
     assert_response :success
     assert_includes response.body, "Publish"
+    refute_includes response.body, "Public page"
     assert_includes response.body, "/recordings/#{@publication_recording.id}/publishable/edit"
     assert_includes response.body, "Edit"
+  end
+
+  test "published show and edit offer Public page instead of Publish" do
+    bootstrap_owner_access!(@admin, @admin_recording)
+    sign_in @admin
+    result = RecordingStudioPublishable::Services::Publishables::Update.call(
+      parent_recording: @publication_recording,
+      actor: @admin,
+      attributes: { status: "published", slug: "family-mag" }
+    )
+    raise result.error if result.failure?
+
+    get recording_studio_publications.admin_publication_path(@publication_recording)
+    assert_response :success
+    assert_includes response.body, "Published"
+    assert_includes response.body, "Public page"
+    refute_match(/>Publish</, response.body)
+    assert_includes response.body, "/recordings/#{@publication_recording.id}/publishable/edit"
+
+    get recording_studio_publications.edit_admin_publication_path(@publication_recording)
+    assert_response :success
+    assert_includes response.body, "Published"
+    assert_includes response.body, "Public page"
+    refute_match(/>Publish</, response.body)
   end
 end
