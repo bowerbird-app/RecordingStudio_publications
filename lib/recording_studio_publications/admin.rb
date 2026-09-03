@@ -8,12 +8,13 @@ module RecordingStudioPublications
     SECTION_KEY = "publications"
     RESOURCE_KEY = "publications"
     WIDGET_TOTAL = "widgets.publications.total"
+    WIDGET_OVER_TIME = "widgets.publications.over_time"
     WIDGET_BY_KIND = "widgets.publications.by_kind"
 
     class PublicationsSection < RecordingStudioAdmin::Section
       key SECTION_KEY
       icon :newspaper
-      title "Publications"
+      title I18n.t("recording_studio_publications.admin.section_title", default: "Admin publications")
       subtitle "Titles in the publication directory"
       blast_radius :site
 
@@ -22,17 +23,18 @@ module RecordingStudioPublications
            url: ->(context) { RecordingStudioPublications::Admin.new_publication_url(context) },
            style: :primary
       link :inventory,
-           text: "All publications",
+           text: I18n.t("recording_studio_publications.admin.inventory_link", default: "All publications"),
            url: ->(context) { context.admin_screen_path(SCREEN_KEY) },
            style: :secondary
       widget WIDGET_TOTAL, view_variant: :compact
+      widget WIDGET_OVER_TIME
       widget WIDGET_BY_KIND
     end
 
     class PublicationsScreen < RecordingStudioAdmin::Screen
       key SCREEN_KEY
       icon :newspaper
-      title "Publications"
+      title I18n.t("recording_studio_publications.admin.screen_title", default: "Publications")
       subtitle "Titles in the publication directory"
       blast_radius :site
       query { |_context| RecordingStudioPublications.publications }
@@ -47,7 +49,7 @@ module RecordingStudioPublications
       table do
         column :name, title: "Name"
         column :kind,
-               title: "Kind",
+               title: I18n.t("recording_studio_publications.admin.column_type_title", default: "Publication type"),
                value: ->(publication, _context) { publication.kind_label }
         column :website, title: "Website"
         admin_action "#{RESOURCE_KEY}.show", as: :show_publication
@@ -97,16 +99,27 @@ module RecordingStudioPublications
 
     TotalPublicationsWidget = RecordingStudioAdmin::Widget.new(WIDGET_TOTAL, blast_radius: :site) do
       type :number
-      title "Publications"
+      title I18n.t("recording_studio_publications.admin.total_widget_title", default: "Publications")
       value { |_context| RecordingStudioPublications.publications.count }
       link_to { |context| context.admin_screen_path(SCREEN_KEY) }
       hide_change
       hide_period
     end
 
+    TitlesOverTimeWidget = RecordingStudioAdmin::Widget.new(WIDGET_OVER_TIME, blast_radius: :site) do
+      type :chart
+      title I18n.t("recording_studio_publications.admin.over_time_widget_title", default: "Publications over time")
+      chart_type :line
+      hide_change
+      hide_period
+      hide_metric
+      series { |_context| RecordingStudioPublications::Admin.titles_over_time_series }
+      chart_options { { height: 220 } }
+    end
+
     TitlesByKindWidget = RecordingStudioAdmin::Widget.new(WIDGET_BY_KIND, blast_radius: :site) do
       type :chart
-      title "Titles by kind"
+      title I18n.t("recording_studio_publications.admin.by_type_widget_title", default: "Publication types")
       chart_type :bar
       hide_change
       hide_period
@@ -123,6 +136,7 @@ module RecordingStudioPublications
         RecordingStudioAdmin.register_screen(PublicationsScreen)
         RecordingStudioAdmin.register_resource(PublicationsResource)
         RecordingStudioAdmin.register_widget(TotalPublicationsWidget)
+        RecordingStudioAdmin.register_widget(TitlesOverTimeWidget)
         RecordingStudioAdmin.register_widget(TitlesByKindWidget)
       end
 
@@ -141,7 +155,7 @@ module RecordingStudioPublications
 
         [{
           name: "Titles",
-          data: Publication::KINDS.map { |kind| { x: kind.titleize, y: counts[kind].to_i } }
+          data: PublicationType::TOKENS.map { |kind| { x: PublicationType.parse(kind).label, y: counts[kind].to_i } }
         }]
       end
 

@@ -4,7 +4,7 @@ require "test_helper"
 
 class RecordingStudioPublicationsTest < Minitest::Test
   def test_version_matches_release
-    assert_equal "0.2.1", ::RecordingStudioPublications::VERSION
+    assert_equal "0.3.0", ::RecordingStudioPublications::VERSION
   end
 
   def test_engine_exists
@@ -19,6 +19,7 @@ class RecordingStudioPublicationsTest < Minitest::Test
     assert_includes gemspec, 'spec.add_dependency "recording_studio_accessible", "~> 0.9"'
     assert_includes gemspec, 'spec.add_dependency "recording_studio_admin", "~> 2.0"'
     assert_includes gemspec, 'spec.add_dependency "recording_studio_attachable", "~> 0.5"'
+    assert_includes gemspec, 'spec.add_dependency "recording_studio_publishable", "~> 0.2"'
     assert_includes gemspec, 'spec.add_dependency "flat_pack", "~> 0.1.143"'
   end
 
@@ -28,6 +29,7 @@ class RecordingStudioPublicationsTest < Minitest::Test
     assert_includes gemfile, 'github: "bowerbird-app/RecordingStudio", tag: "v4.2.0"'
     assert_includes gemfile, 'github: "bowerbird-app/RecordingStudio_accessible", tag: "v0.9.0"'
     assert_includes gemfile, 'github: "bowerbird-app/RecordingStudio_attachable", tag: "v0.5.0"'
+    assert_includes gemfile, 'github: "bowerbird-app/RecordingStudio_publishable", tag: "v0.2.1"'
     assert_includes gemfile, 'github: "bowerbird-app/RecordingStudio_admin", tag: "2.0.1"'
     assert_includes gemfile, 'github: "bowerbird-app/RecordingStudio_root_switchable", tag: "v0.5.0"'
     assert_includes gemfile, 'github: "bowerbird-app/flatpack", tag: "v0.1.143"'
@@ -54,11 +56,37 @@ class RecordingStudioPublicationsTest < Minitest::Test
     assert_empty RecordingStudio.configuration.enabled_recordable_types_for(:example)
   end
 
+  def test_public_layout_loads_theme_css_without_staff_chrome
+    public_layout = File.read(
+      File.expand_path("../app/views/layouts/recording_studio_publications/public.html.erb", __dir__)
+    )
+
+    assert_includes public_layout, 'data-theme="rounded"'
+    assert_includes public_layout, 'stylesheet_link_tag "tailwind"'
+    assert_includes public_layout, 'stylesheet_link_tag "flat_pack/variables"'
+    assert_includes public_layout, 'stylesheet_link_tag "flat_pack/rich_text"'
+    refute_includes public_layout, "Go back"
+    refute_includes public_layout, "PageNav"
+  end
+
+  def test_show_and_edit_use_publishable_edit_button
+    show = File.read(File.expand_path("../app/views/recording_studio_publications/publications/show.html.erb", __dir__))
+    edit = File.read(File.expand_path("../app/views/recording_studio_publications/publications/edit.html.erb", __dir__))
+
+    [show, edit].each do |view|
+      assert_includes view, "RecordingStudioPublishable::EditButtonComponent"
+      refute_includes view, "StatusBadge"
+      refute_includes view, "Public page"
+      refute_includes view, "publication_public_page_button_text"
+    end
+  end
+
   def test_dummy_host_mounts_attachable_and_wires_turbo
     routes = File.read(File.expand_path("dummy/config/routes.rb", __dir__))
     importmap = File.read(File.expand_path("dummy/config/importmap.rb", __dir__))
     application_js = File.read(File.expand_path("dummy/app/javascript/application.js", __dir__))
 
+    assert_includes routes, 'mount RecordingStudioPublishable::Engine, at: "/"'
     assert_includes routes, 'mount RecordingStudioAttachable::Engine, at: "/recording_studio_attachable"'
     assert_includes routes, 'mount RecordingStudioAccessible::Engine, at: "/admin/access"'
     assert_includes importmap, 'pin "@hotwired/turbo-rails"'
@@ -123,6 +151,8 @@ class RecordingStudioPublicationsTest < Minitest::Test
     assert_includes tailwind_source, "recordingstudio-*/app/views/**/*.erb"
     assert_includes tailwind_source, "recording_studio_admin/app/views/**/*.erb"
     assert_includes tailwind_source, "recording_studio_attachable/app/views/**/*.erb"
+    assert_includes tailwind_source, "recording_studio_publishable/app/views/**/*.erb"
+    assert_includes tailwind_source, "recording_studio_publishable/app/components/**/*.{rb,erb}"
     refute_includes tailwind_source, "@theme"
     refute_includes tailwind_source, ":root {"
     refute_includes tailwind_source, "--color-fp-primary"
@@ -140,6 +170,10 @@ class RecordingStudioPublicationsTest < Minitest::Test
     assert_includes initializer_source, '"RecordingStudioPublications::PublicationCatalogue"'
     assert_includes initializer_source, '"RecordingStudioPublications::Publication"'
     assert_includes initializer_source, '"RecordingStudioAttachable::Attachment"'
+    assert_includes initializer_source, '"RecordingStudioPublishable::Publishable"'
+    engine_source = File.read(File.expand_path("../lib/recording_studio_publications/engine.rb", __dir__))
+    refute_includes engine_source, "management_authorizer ="
+    refute_includes engine_source, "FamilyManagement.install!"
     refute_includes initializer_source, "config.include_children"
     refute_includes initializer_source, "config.features."
     refute_includes initializer_source, "v3"

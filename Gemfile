@@ -11,6 +11,7 @@ gem "recording_studio", "~> 4.2", github: "bowerbird-app/RecordingStudio", tag: 
 gem "recording_studio_accessible", "~> 0.9", github: "bowerbird-app/RecordingStudio_accessible", tag: "v0.9.0"
 gem "recording_studio_admin", "~> 2.0", github: "bowerbird-app/RecordingStudio_admin", tag: "2.0.1"
 gem "recording_studio_attachable", "~> 0.5", github: "bowerbird-app/RecordingStudio_attachable", tag: "v0.5.0"
+gem "recording_studio_publishable", "~> 0.2", github: "bowerbird-app/RecordingStudio_publishable", tag: "v0.2.1"
 
 gem "devise"
 gem "puma"

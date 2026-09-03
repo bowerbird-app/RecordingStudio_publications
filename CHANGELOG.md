@@ -7,6 +7,34 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.3.0] - 2026-09-03
+
+Publishable on each title, a public press page, family-management composition, and publication-type copy.
+
+### Added
+- `recording_studio_publishable ~> 0.2` runtime dependency. Dummy pins GitHub tag `v0.2.1`
+- `RecordingStudio::Capabilities::Publishable.to` on `Publication` only, with public path `/publications/:uuid/:slug`
+- `PublicationType` closed token registry. `Publication::KINDS` derives from it. `#publication_type` is a reader
+- `FamilyAuthorization` replaces `LogoAuthorization` for logos and publish screens (AdminRoot first, then per-title Accessible)
+- `FamilyManagement.install!` wraps the current Publishable authorizer and close-URL resolver. Idempotent. The engine does not assign those globals on boot
+- `PublishedPublication` public page model and a callback-free `PublicPublicationsController#show`
+- Public layout `recording_studio_publications/public` with no PageNav and no competing Open Graph tags
+- Show and edit render Publishable’s `EditButtonComponent` (not a custom badge plus button) to open the public-page screen
+- Hub line chart **Publications over time** (`widgets.publications.over_time`) before the type chart
+
+### Changed
+- Admin section title is **Admin publications**. Screen, widget, catalogue label, and dummy `app_name` stay **Publications**. Keys stay `publications`
+- Visible copy says **Publication type**. The `kind` column, param, sort key, and `widgets.publications.by_kind` stay `kind`
+- Hub type chart title is **Publication types**
+
+### Upgrade notes
+- Bump to `0.3.0`
+- Add `recording_studio_publishable ~> 0.2`, install its migrations, register `RecordingStudioPublishable::Publishable`, and mount `RecordingStudioPublishable::Engine` at `/`
+- Call `RecordingStudioPublications::FamilyManagement.install!` after any host Publishable authorizer for other types
+- Rename `LogoAuthorization` callers to `FamilyAuthorization`. There is no alias
+- Scan Publishable views in Tailwind `@source`
+- Form posts stay `publication[kind]`. Only the visible label changed
+
 ## [0.2.1] - 2026-09-02
 
 Pins, dummy Tailwind scan for system gem paths, real seed logos, and dummy Admin recapture. Catalogue and CRUD stay as in 0.2.0.
@@ -79,7 +107,8 @@ First `recording_studio_publications` identity. This release is rename, dependen
 - Keep `RecordingStudio::UsesDefaultLayout` for authenticated screens. If core puts theme on `body`, render `layouts/_default_layout_head` from the `recording_studio/default_layout_head` hook so `html` gets `data-theme="rounded"`
 - Do not put Sign out or a workspace switcher in the default-layout slot or that head partial
 
-[Unreleased]: https://github.com/bowerbird-app/RecordingStudio_publications/compare/v0.2.1...HEAD
+[Unreleased]: https://github.com/bowerbird-app/RecordingStudio_publications/compare/v0.3.0...HEAD
+[0.3.0]: https://github.com/bowerbird-app/RecordingStudio_publications/releases/tag/v0.3.0
 [0.2.1]: https://github.com/bowerbird-app/RecordingStudio_publications/releases/tag/v0.2.1
 [0.2.0]: https://github.com/bowerbird-app/RecordingStudio_publications/releases/tag/v0.2.0
 [0.1.0]: https://github.com/bowerbird-app/RecordingStudio_publications/releases/tag/v0.1.0

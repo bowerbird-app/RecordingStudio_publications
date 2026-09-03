@@ -8,8 +8,15 @@
 - Accessible `~> 0.9` (dummy GitHub tag `v0.9.0`)
 - Admin `~> 2.0` (dummy GitHub tag `2.0.1`)
 - Attachable `~> 0.5` (dummy GitHub tag `v0.5.0`)
+- Publishable `~> 0.2` (dummy GitHub tag `v0.2.1`)
 - FlatPack `~> 0.1.143` (dummy GitHub tag `v0.1.143`)
 - Public RubyGems and GitHub access for dependency installation
+
+## Publications 0.3.0
+
+Bump to `0.3.0`. Add Publishable, mount it at `/`, install its migrations, register `RecordingStudioPublishable::Publishable`, and call `FamilyManagement.install!`. Rename `LogoAuthorization` to `FamilyAuthorization` with no alias. Visible copy says publication type; the `kind` column and param stay.
+
+Do not enable Publishable on the shared catalogue. Do not assign Publishable’s `management_authorizer` from this engine.
 
 ## Publications 0.2.1
 

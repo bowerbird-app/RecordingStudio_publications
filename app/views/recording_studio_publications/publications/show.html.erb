@@ -12,7 +12,7 @@
   <% attribute_rows = [
        { attribute: "Name", value: @publication.name },
        { attribute: "Key", value: @publication.key },
-       { attribute: "Kind", value: @publication.kind_label },
+       { attribute: RecordingStudioPublications::Publication.human_attribute_name(:kind), value: @publication.kind_label },
        { attribute: "Website", value: @publication.website.presence || "—" }
      ] %>
 
@@ -24,6 +24,13 @@
           href: preserve_anchor_url(@edit_publication_action.url),
           style: :primary
         ) %>
+        <% if defined?(RecordingStudioPublishable::EditButtonComponent) %>
+          <%= render RecordingStudioPublishable::EditButtonComponent.new(
+            recording: @recording,
+            label: "Publish",
+            show_tooltip: true
+          ) %>
+        <% end %>
       </div>
     <% end %>
 

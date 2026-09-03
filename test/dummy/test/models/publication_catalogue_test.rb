@@ -17,11 +17,13 @@ class PublicationCatalogueTest < ActiveSupport::TestCase
   test "Accessible and Attachable are not enabled on the shared catalogue root" do
     refute RecordingStudio.capability_enabled?(:accessible, for: RecordingStudioPublications::PublicationCatalogue)
     refute RecordingStudio.capability_enabled?(:attachable, for: RecordingStudioPublications::PublicationCatalogue)
+    refute RecordingStudio.capability_enabled?(:publishable, for: RecordingStudioPublications::PublicationCatalogue)
     catalogue_source = File.read(
       RecordingStudioPublications::Engine.root.join("app/models/recording_studio_publications/publication_catalogue.rb")
     )
     refute_includes catalogue_source, "enable_capability(:accessible"
     refute_includes catalogue_source, "Capabilities::Attachable"
+    refute_includes catalogue_source, "Capabilities::Publishable"
   end
 
   test "Publication only allows the shared catalogue as a parent" do
@@ -31,5 +33,6 @@ class PublicationCatalogueTest < ActiveSupport::TestCase
     refute declaration.root?
     assert RecordingStudio.capability_enabled?(:accessible, for: RecordingStudioPublications::Publication)
     assert RecordingStudio.capability_enabled?(:attachable, for: RecordingStudioPublications::Publication)
+    assert RecordingStudio.capability_enabled?(:publishable, for: RecordingStudioPublications::Publication)
   end
 end

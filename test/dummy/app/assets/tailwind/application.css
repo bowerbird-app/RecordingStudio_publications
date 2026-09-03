@@ -25,6 +25,16 @@
 @source "../../../../../../usr/local/bundle/ruby/**/bundler/gems/RecordingStudio_attachable-*/app/views/**/*.erb";
 @source "/usr/local/lib/ruby/gems/**/bundler/gems/RecordingStudio_attachable-*/app/views/**/*.erb";
 
+/* Include Publishable engine views and components used by publish screens */
+@source "../../../vendor/bundle/**/recording_studio_publishable/app/views/**/*.erb";
+@source "../../../vendor/bundle/**/recording_studio_publishable/app/components/**/*.{rb,erb}";
+@source "../../../../../../usr/local/bundle/ruby/**/bundler/gems/recordingstudiopublishable-*/app/views/**/*.erb";
+@source "../../../../../../usr/local/bundle/ruby/**/bundler/gems/RecordingStudio_publishable-*/app/views/**/*.erb";
+@source "../../../../../../usr/local/bundle/ruby/**/bundler/gems/recordingstudiopublishable-*/app/components/**/*.{rb,erb}";
+@source "../../../../../../usr/local/bundle/ruby/**/bundler/gems/RecordingStudio_publishable-*/app/components/**/*.{rb,erb}";
+@source "/usr/local/lib/ruby/gems/**/bundler/gems/RecordingStudio_publishable-*/app/views/**/*.erb";
+@source "/usr/local/lib/ruby/gems/**/bundler/gems/RecordingStudio_publishable-*/app/components/**/*.{rb,erb}";
+
 /* Include the engine's views in the Tailwind build */
 @source "../../../../../app/views/**/*.erb";
 @source "../../../../../app/overrides/**/*.erb";
