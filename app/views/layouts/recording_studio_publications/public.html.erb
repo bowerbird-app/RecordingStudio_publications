@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html data-theme="rounded">
+  <head>
+    <title><%= content_for(:title).presence || RecordingStudio.configuration.app_name %></title>
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <%= csrf_meta_tags %>
+    <%= csp_meta_tag %>
+    <%= yield :head %>
+    <%= stylesheet_link_tag "tailwind", "data-turbo-track": "reload" if respond_to?(:stylesheet_link_tag) %>
+    <%= stylesheet_link_tag "flat_pack/variables", "data-turbo-track": "reload" if respond_to?(:stylesheet_link_tag) %>
+    <%= stylesheet_link_tag "flat_pack/rich_text", "data-turbo-track": "reload" if respond_to?(:stylesheet_link_tag) %>
+    <%= javascript_importmap_tags if respond_to?(:javascript_importmap_tags) %>
+  </head>
+  <body class="bg-(--surface-page-background-color) text-(--surface-content-color)">
+    <main class="mx-auto min-h-screen w-full max-w-6xl p-6">
+      <%= yield %>
+    </main>
+  </body>
+</html>

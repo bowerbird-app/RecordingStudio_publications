@@ -1,0 +1,21 @@
+<% content_for :title, publishable_document_title(title: @page.name) %>
+<% content_for :head do %>
+  <%= publishable_head_tags(social_title: @page.name) %>
+<% end %>
+
+<%= render FlatPack::PageTitle::Component.new(
+      title: @page.name,
+      subtitle: @page.publication_type_label
+    ) %>
+
+<% if @page.logo_url.present? %>
+  <%= image_tag @page.logo_url, alt: @page.logo_alt, class: "h-24 w-24 object-contain" %>
+<% end %>
+
+<% if @page.website.present? %>
+  <%= render FlatPack::Button::Component.new(
+        text: "Visit website",
+        href: @page.website,
+        style: :primary
+      ) %>
+<% end %>

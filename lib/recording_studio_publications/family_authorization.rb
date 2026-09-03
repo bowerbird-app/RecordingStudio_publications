@@ -1,18 +1,27 @@
 # frozen_string_literal: true
 
 module RecordingStudioPublications
-  # Attachable asks Accessible for :edit on the Publication recording.
-  # Family admin writes through AdminRoot, not per-publication grants, so
-  # catalogue staff can attach a logo without a magazine grant.
-  module LogoAuthorization
+  module FamilyAuthorization
+    Request = Data.define(:actor, :recording, :role)
+
     module_function
 
-    def call(action:, actor:, recording:, role:) # rubocop:disable Lint/UnusedMethodArgument -- Attachable contract
-      return false if actor.blank?
-      return true if admin_catalogue_actor?(actor, role)
+    # Attachable authorize_with plus ignored extra keywords from other mixins.
+    def call(action:, actor:, recording:, role: :edit, **)
+      _ = action
+      allow?(Request.new(actor: actor, recording: recording, role: role))
+    end
+
+    def allow?(request)
+      return false if request.actor.blank?
+      return true if admin_catalogue_actor?(request.actor, request.role)
       return false unless defined?(RecordingStudioAccessible::Authorization)
 
-      RecordingStudioAccessible::Authorization.allowed?(actor: actor, recording: recording, role: role)
+      RecordingStudioAccessible::Authorization.allowed?(
+        actor: request.actor,
+        recording: request.recording,
+        role: request.role
+      )
     end
 
     def admin_catalogue_actor?(actor, role)

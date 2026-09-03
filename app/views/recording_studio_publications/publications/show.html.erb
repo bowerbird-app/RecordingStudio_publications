@@ -12,11 +12,15 @@
   <% attribute_rows = [
        { attribute: "Name", value: @publication.name },
        { attribute: "Key", value: @publication.key },
-       { attribute: "Kind", value: @publication.kind_label },
+       { attribute: RecordingStudioPublications::Publication.human_attribute_name(:kind), value: @publication.kind_label },
        { attribute: "Website", value: @publication.website.presence || "—" }
      ] %>
 
   <div class="space-y-4">
+    <% if @current_publishable && defined?(RecordingStudioPublishable::StatusBadge::Component) %>
+      <%= render RecordingStudioPublishable::StatusBadge::Component.new(publishable: @current_publishable) %>
+    <% end %>
+
     <% if @edit_publication_action %>
       <div class="flex items-center gap-2 pt-2">
         <%= render FlatPack::Button::Component.new(
@@ -24,6 +28,13 @@
           href: preserve_anchor_url(@edit_publication_action.url),
           style: :primary
         ) %>
+        <% if @publishable_edit_path.present? %>
+          <%= render FlatPack::Button::Component.new(
+            text: "Publish",
+            href: preserve_anchor_url(@publishable_edit_path),
+            style: :secondary
+          ) %>
+        <% end %>
       </div>
     <% end %>
 

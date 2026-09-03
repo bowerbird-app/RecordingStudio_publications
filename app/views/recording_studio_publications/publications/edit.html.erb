@@ -10,6 +10,20 @@
   ) %>
 
   <div class="space-y-6">
+    <% if @current_publishable && defined?(RecordingStudioPublishable::StatusBadge::Component) %>
+      <%= render RecordingStudioPublishable::StatusBadge::Component.new(publishable: @current_publishable) %>
+    <% end %>
+
+    <% if @publishable_edit_path %>
+      <div class="flex items-center gap-2">
+        <%= render FlatPack::Button::Component.new(
+          text: "Publish",
+          href: preserve_anchor_url(@publishable_edit_path),
+          style: :secondary
+        ) %>
+      </div>
+    <% end %>
+
     <%= render "logo",
                logo_recording: @logo_recording,
                return_to: edit_admin_publication_path(@recording) %>

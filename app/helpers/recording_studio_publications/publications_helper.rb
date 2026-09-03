@@ -29,12 +29,22 @@ module RecordingStudioPublications
       )
     end
 
+    def publication_publishable_edit_path(recording)
+      publishable_routes.edit_recording_publishable_path(recording_id: recording.id)
+    end
+
     private
 
     def attachable_routes
       return recording_studio_attachable if respond_to?(:recording_studio_attachable)
 
       main_app.recording_studio_attachable
+    end
+
+    def publishable_routes
+      return recording_studio_publishable if respond_to?(:recording_studio_publishable)
+
+      main_app.recording_studio_publishable
     end
   end
 end

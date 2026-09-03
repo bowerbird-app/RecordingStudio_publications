@@ -1,0 +1,15 @@
+en:
+  activerecord:
+    attributes:
+      recording_studio_publications/publication:
+        kind: "Publication type"
+  recording_studio_publications:
+    admin:
+      section_title: "Admin publications"
+      screen_title: "Publications"
+      total_widget_title: "Publications"
+      by_type_widget_title: "Titles by publication type"
+      column_type_title: "Publication type"
+      form_type_placeholder: "Select a publication type"
+      show_type_label: "Publication type"
+      inventory_link: "All publications"

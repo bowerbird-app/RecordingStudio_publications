@@ -54,6 +54,8 @@ class RecordingStudioTemplateTest < ActiveSupport::TestCase
     assert_equal 3, Workspace.count
     assert AdminRoot.find_by(name: "Admin")
     assert_operator RecordingStudioPublications.publications.count, :>=, 5
+    atlantic = RecordingStudioPublications::Publication.find_by!(key: "the-atlantic")
+    assert atlantic.published?, "seeded The Atlantic should be currently published"
     created_ats = RecordingStudioPublications.publications.where(
       key: %w[the-atlantic the-guardian nature bbc-news the-verge]
     ).pluck(:created_at)

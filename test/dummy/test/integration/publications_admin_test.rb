@@ -82,7 +82,8 @@ class PublicationsAdminTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_includes response.body, "Publications"
     assert_includes response.body, "New"
-    assert_includes response.body, "Titles by kind"
+    assert_includes response.body, "Titles by publication type"
+    assert_includes response.body, "Admin publications"
     assert_includes response.body, "/admin/access/recordings/#{@admin_recording.id}/accesses"
     assert(
       response.body.include?("Manage access") || response.body.include?("+ Access"),
@@ -112,7 +113,7 @@ class PublicationsAdminTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_includes response.body, "Table data"
     assert_includes response.body, "Name"
-    assert_includes response.body, "Kind"
+    assert_includes response.body, "Publication type"
     assert_includes response.body, "Website"
     refute_match(/<th[^>]*>Key<\/th>/i, response.body)
   end
@@ -125,7 +126,7 @@ class PublicationsAdminTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_includes response.body, "Name"
     assert_includes response.body, "Key"
-    assert_includes response.body, "Kind"
+    assert_includes response.body, "Publication type"
     assert_includes response.body, "Website"
     assert_includes response.body, "Cancel"
     assert_includes response.body, "Save"
