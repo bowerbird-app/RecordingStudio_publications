@@ -19,7 +19,7 @@ Publishable on each title, a public press page, family-management composition, a
 - `FamilyManagement.install!` wraps the current Publishable authorizer and close-URL resolver. Idempotent. The engine does not assign those globals on boot
 - `PublishedPublication` public page model and a callback-free `PublicPublicationsController#show`
 - Public layout `recording_studio_publications/public` with no PageNav and no competing Open Graph tags
-- Secondary button on show/edit opens the public-page screen. It says **Publish** for drafts and **Public page** when live, so it does not sit next to a Published badge
+- Show and edit render Publishable’s `EditButtonComponent` (not a custom badge plus button) to open the public-page screen
 - Hub line chart **Publications over time** (`widgets.publications.over_time`) before the type chart
 
 ### Changed

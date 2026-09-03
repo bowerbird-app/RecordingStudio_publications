@@ -79,7 +79,7 @@ class FamilyManagementTest < ActionDispatch::IntegrationTest
     assert_response :success
   end
 
-  test "show offers a secondary Publish button when edit is allowed" do
+  test "show offers Publishable's edit button when edit is allowed" do
     bootstrap_owner_access!(@admin, @admin_recording)
     sign_in @admin
 
@@ -91,7 +91,7 @@ class FamilyManagementTest < ActionDispatch::IntegrationTest
     assert_includes response.body, "Edit"
   end
 
-  test "published show and edit offer Public page instead of Publish" do
+  test "published show and edit use Publishable's Published control" do
     bootstrap_owner_access!(@admin, @admin_recording)
     sign_in @admin
     result = RecordingStudioPublishable::Services::Publishables::Update.call(
@@ -104,14 +104,14 @@ class FamilyManagementTest < ActionDispatch::IntegrationTest
     get recording_studio_publications.admin_publication_path(@publication_recording)
     assert_response :success
     assert_includes response.body, "Published"
-    assert_includes response.body, "Public page"
+    refute_includes response.body, "Public page"
     refute_match(/>Publish</, response.body)
     assert_includes response.body, "/recordings/#{@publication_recording.id}/publishable/edit"
 
     get recording_studio_publications.edit_admin_publication_path(@publication_recording)
     assert_response :success
     assert_includes response.body, "Published"
-    assert_includes response.body, "Public page"
+    refute_includes response.body, "Public page"
     refute_match(/>Publish</, response.body)
   end
 end

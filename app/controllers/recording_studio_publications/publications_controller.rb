@@ -12,7 +12,6 @@ module RecordingStudioPublications
     def show
       @edit_publication_action = resolve_publications_admin_action(:edit, @publication)
       @logo_recording = RecordingStudioPublications.logo_recording_for(@recording)
-      assign_publishable_entry
     end
 
     def new
@@ -31,7 +30,6 @@ module RecordingStudioPublications
 
     def edit
       @logo_recording = RecordingStudioPublications.logo_recording_for(@recording)
-      assign_publishable_entry
     end
 
     def update
@@ -89,17 +87,6 @@ module RecordingStudioPublications
 
     def publication_params
       params.fetch(:publication, {}).permit(:name, :key, :kind, :website)
-    end
-
-    def assign_publishable_entry
-      return unless @edit_publication_action || action_name == "edit"
-
-      @publishable_edit_path = publication_publishable_edit_path(@recording)
-      @current_publishable = @recording.try(:current_publishable)
-    end
-
-    def publication_publishable_edit_path(recording)
-      helpers.publication_publishable_edit_path(recording)
     end
   end
 end

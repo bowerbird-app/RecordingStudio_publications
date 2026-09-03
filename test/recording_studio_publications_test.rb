@@ -69,6 +69,18 @@ class RecordingStudioPublicationsTest < Minitest::Test
     refute_includes public_layout, "PageNav"
   end
 
+  def test_show_and_edit_use_publishable_edit_button
+    show = File.read(File.expand_path("../app/views/recording_studio_publications/publications/show.html.erb", __dir__))
+    edit = File.read(File.expand_path("../app/views/recording_studio_publications/publications/edit.html.erb", __dir__))
+
+    [show, edit].each do |view|
+      assert_includes view, "RecordingStudioPublishable::EditButtonComponent"
+      refute_includes view, "StatusBadge"
+      refute_includes view, "Public page"
+      refute_includes view, "publication_public_page_button_text"
+    end
+  end
+
   def test_dummy_host_mounts_attachable_and_wires_turbo
     routes = File.read(File.expand_path("dummy/config/routes.rb", __dir__))
     importmap = File.read(File.expand_path("dummy/config/importmap.rb", __dir__))

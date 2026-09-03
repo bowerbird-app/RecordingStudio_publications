@@ -29,16 +29,11 @@ module RecordingStudioPublications
       )
     end
 
-    def publication_publishable_edit_path(recording)
-      publishable_routes.edit_recording_publishable_path(recording_id: recording.id)
-    end
+    def recording_studio_publishable
+      return main_app.recording_studio_publishable if respond_to?(:main_app) &&
+                                                     main_app.respond_to?(:recording_studio_publishable)
 
-    def publication_public_page_button_text(publishable)
-      return "Publish" if publishable.blank?
-      return "Change schedule" if publishable.try(:scheduled_for_future?)
-      return "Public page" if publishable.try(:published_state?)
-
-      "Publish"
+      RecordingStudioPublishable::Engine.routes.url_helpers
     end
 
     private
@@ -47,12 +42,6 @@ module RecordingStudioPublications
       return recording_studio_attachable if respond_to?(:recording_studio_attachable)
 
       main_app.recording_studio_attachable
-    end
-
-    def publishable_routes
-      return recording_studio_publishable if respond_to?(:recording_studio_publishable)
-
-      main_app.recording_studio_publishable
     end
   end
 end
