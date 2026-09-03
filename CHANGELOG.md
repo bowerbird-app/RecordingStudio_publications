@@ -20,10 +20,12 @@ Publishable on each title, a public press page, family-management composition, a
 - `PublishedPublication` public page model and a callback-free `PublicPublicationsController#show`
 - Public layout `recording_studio_publications/public` with no PageNav and no competing Open Graph tags
 - Secondary **Publish** button on show/edit when Edit is allowed
+- Hub line chart **Publications over time** (`widgets.publications.over_time`) before the type chart
 
 ### Changed
 - Admin section title is **Admin publications**. Screen, widget, catalogue label, and dummy `app_name` stay **Publications**. Keys stay `publications`
 - Visible copy says **Publication type**. The `kind` column, param, sort key, and `widgets.publications.by_kind` stay `kind`
+- Hub type chart title is **Publication types**
 
 ### Upgrade notes
 - Bump to `0.3.0`

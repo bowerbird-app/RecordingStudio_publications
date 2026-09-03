@@ -8,6 +8,7 @@ module RecordingStudioPublications
     SECTION_KEY = "publications"
     RESOURCE_KEY = "publications"
     WIDGET_TOTAL = "widgets.publications.total"
+    WIDGET_OVER_TIME = "widgets.publications.over_time"
     WIDGET_BY_KIND = "widgets.publications.by_kind"
 
     class PublicationsSection < RecordingStudioAdmin::Section
@@ -26,6 +27,7 @@ module RecordingStudioPublications
            url: ->(context) { context.admin_screen_path(SCREEN_KEY) },
            style: :secondary
       widget WIDGET_TOTAL, view_variant: :compact
+      widget WIDGET_OVER_TIME
       widget WIDGET_BY_KIND
     end
 
@@ -104,9 +106,20 @@ module RecordingStudioPublications
       hide_period
     end
 
+    TitlesOverTimeWidget = RecordingStudioAdmin::Widget.new(WIDGET_OVER_TIME, blast_radius: :site) do
+      type :chart
+      title I18n.t("recording_studio_publications.admin.over_time_widget_title", default: "Publications over time")
+      chart_type :line
+      hide_change
+      hide_period
+      hide_metric
+      series { |_context| RecordingStudioPublications::Admin.titles_over_time_series }
+      chart_options { { height: 220 } }
+    end
+
     TitlesByKindWidget = RecordingStudioAdmin::Widget.new(WIDGET_BY_KIND, blast_radius: :site) do
       type :chart
-      title I18n.t("recording_studio_publications.admin.by_type_widget_title", default: "Titles by publication type")
+      title I18n.t("recording_studio_publications.admin.by_type_widget_title", default: "Publication types")
       chart_type :bar
       hide_change
       hide_period
@@ -123,6 +136,7 @@ module RecordingStudioPublications
         RecordingStudioAdmin.register_screen(PublicationsScreen)
         RecordingStudioAdmin.register_resource(PublicationsResource)
         RecordingStudioAdmin.register_widget(TotalPublicationsWidget)
+        RecordingStudioAdmin.register_widget(TitlesOverTimeWidget)
         RecordingStudioAdmin.register_widget(TitlesByKindWidget)
       end
 

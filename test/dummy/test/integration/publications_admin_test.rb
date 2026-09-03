@@ -31,14 +31,20 @@ class PublicationsAdminTest < ActionDispatch::IntegrationTest
     assert_equal RecordingStudioPublications::Admin::PublicationsResource,
                  RecordingStudioAdmin.resource_for("publications")
     total = RecordingStudioAdmin.widget_for("widgets.publications.total")
+    over_time = RecordingStudioAdmin.widget_for("widgets.publications.over_time")
     by_kind = RecordingStudioAdmin.widget_for("widgets.publications.by_kind")
     assert_equal :number, total.type
+    assert_equal :chart, over_time.type
+    assert_equal :line, over_time.chart_type
     assert_equal :chart, by_kind.type
     assert_equal :bar, by_kind.chart_type
-    assert_nil RecordingStudioAdmin.widget_for("widgets.publications.over_time")
     section_widget_keys = RecordingStudioPublications::Admin::PublicationsSection.widget_keys
     screen_widget_keys = RecordingStudioPublications::Admin::PublicationsScreen.widget_keys
-    assert_includes section_widget_keys, "widgets.publications.total"
+    assert_equal [
+      "widgets.publications.total",
+      "widgets.publications.over_time",
+      "widgets.publications.by_kind"
+    ], section_widget_keys
     refute_includes screen_widget_keys, "widgets.publications.total"
     refute_includes screen_widget_keys, "widgets.publications.over_time"
     assert_empty screen_widget_keys
@@ -82,7 +88,8 @@ class PublicationsAdminTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_includes response.body, "Publications"
     assert_includes response.body, "New"
-    assert_includes response.body, "Titles by publication type"
+    assert_includes response.body, "Publications over time"
+    assert_includes response.body, "Publication types"
     assert_includes response.body, "Admin publications"
     assert_includes response.body, "/admin/access/recordings/#{@admin_recording.id}/accesses"
     assert(

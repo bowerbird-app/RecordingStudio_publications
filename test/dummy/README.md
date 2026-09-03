@@ -37,7 +37,7 @@ Then open the app and sign in with:
 ## Useful Routes
 
 - `/` - dummy app home and a short link into publications admin
-- `/admin` - publications hub (family RecordingStudioAdmin: count widget, publication-type chart, Access). Section title is Admin publications
+- `/admin` - publications hub (family RecordingStudioAdmin: count widget, publications-over-time line chart, publication-types bar chart, Access). Section title is Admin publications
 - `/admin/access` - family Access UI for the owned AdminRoot
 - `/admin/screens/publications` - inventory with family search, the Screen titles-over-time chart, and Name / Publication type / Website columns
 - `/publications/:uuid/:slug` - public page for a currently published title
