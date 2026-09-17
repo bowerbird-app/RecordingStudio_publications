@@ -3,6 +3,8 @@
   <%= publishable_head_tags(social_title: @page.name) %>
 <% end %>
 
+<%= publishable_preview_badge if respond_to?(:publishable_preview_badge) %>
+
 <%= render FlatPack::PageTitle::Component.new(
       title: @page.name,
       subtitle: @page.publication_type_label

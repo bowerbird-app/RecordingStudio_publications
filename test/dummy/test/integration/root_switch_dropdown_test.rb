@@ -18,7 +18,7 @@ class RootSwitchDropdownTest < ActionDispatch::IntegrationTest
     refute_includes response.body, "fixed inset-0"
   end
 
-  test "home page uses default layout without root switch or sign out chrome" do
+  test "home page uses the dummy sidebar without default-layout chrome" do
     user = User.find_or_create_by!(email: "root-switch-test@example.com") do |record|
       record.password = "Password123!"
       record.password_confirmation = "Password123!"
@@ -32,12 +32,14 @@ class RootSwitchDropdownTest < ActionDispatch::IntegrationTest
     get root_path
 
     assert_response :success
-    assert_select "body[data-recording-studio-default-layout='true']", count: 1
-    refute_includes response.body, "Sign out"
-    refute_includes response.body, "recording-studio-root-switch"
+    assert_includes response.body, "flat-pack-sidebar-layout"
+    assert_includes response.body, "Sign out"
+    assert_includes response.body, "Publications admin"
+    refute_select "body[data-recording-studio-default-layout='true']"
+    refute_includes response.body, "data-recording-studio-default-layout"
   end
 
-  test "root switch page renders with the host default layout" do
+  test "root switch page renders with the host sidebar" do
     user = User.find_or_create_by!(email: "root-switch-page-test@example.com") do |record|
       record.password = "Password123!"
       record.password_confirmation = "Password123!"
@@ -51,8 +53,8 @@ class RootSwitchDropdownTest < ActionDispatch::IntegrationTest
     get "/recording_studio_root_switchable/v1/root_switch?scope=all_workspaces"
 
     assert_response :success
-    assert_select "body[data-recording-studio-default-layout='true']", count: 1
-    refute_includes response.body, "flat-pack-sidebar-layout"
+    assert_includes response.body, "flat-pack-sidebar-layout"
+    refute_select "body[data-recording-studio-default-layout='true']"
   end
 
   test "switching returns to the current page when it is a valid internal route" do

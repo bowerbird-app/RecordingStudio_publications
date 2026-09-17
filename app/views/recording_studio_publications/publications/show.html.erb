@@ -24,12 +24,8 @@
           href: preserve_anchor_url(@edit_publication_action.url),
           style: :primary
         ) %>
-        <% if defined?(RecordingStudioPublishable::EditButtonComponent) %>
-          <%= render RecordingStudioPublishable::EditButtonComponent.new(
-            recording: @recording,
-            label: "Publish",
-            show_tooltip: true
-          ) %>
+        <% if defined?(RecordingStudioPublishable::QuickActions::Component) %>
+          <%= render RecordingStudioPublishable::QuickActions::Component.new(recording: @recording) %>
         <% end %>
       </div>
     <% end %>

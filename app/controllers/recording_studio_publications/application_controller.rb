@@ -8,6 +8,7 @@ module RecordingStudioPublications
     layout "recording_studio/default_layout"
 
     helper RecordingStudio::LayoutHelper if defined?(RecordingStudio::LayoutHelper)
+    helper RecordingStudioPublishable::Engine.helpers if defined?(RecordingStudioPublishable::Engine)
 
     append_view_path RecordingStudioAdmin::Engine.root.join("app/views") if defined?(RecordingStudioAdmin::Engine)
   end
