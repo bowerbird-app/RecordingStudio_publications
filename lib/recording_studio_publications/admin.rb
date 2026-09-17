@@ -19,11 +19,11 @@ module RecordingStudioPublications
       blast_radius :site
 
       link :new_publication,
-           text: "New",
+           text: I18n.t("recording_studio_publications.admin.new_link", default: "Publication"),
            url: ->(context) { RecordingStudioPublications::Admin.new_publication_url(context) },
            style: :primary
       link :inventory,
-           text: I18n.t("recording_studio_publications.admin.inventory_link", default: "All publications"),
+           text: I18n.t("recording_studio_publications.admin.inventory_link", default: "View all"),
            url: ->(context) { context.admin_screen_path(SCREEN_KEY) },
            style: :secondary
       widget WIDGET_TOTAL, view_variant: :compact

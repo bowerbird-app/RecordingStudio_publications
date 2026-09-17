@@ -26,6 +26,7 @@ Publishable on each title, a public press page, family-management composition, a
 - Admin section title is **Admin publications**. Screen, widget, catalogue label, and dummy `app_name` stay **Publications**. Keys stay `publications`
 - Visible copy says **Publication type**. The `kind` column, param, sort key, and `widgets.publications.by_kind` stay `kind`
 - Hub type chart title is **Publication types**
+- Hub primary action is **Publication** with Flatpack’s plus heroicon. Secondary inventory action is **View all**. Admin 2.0.1 `Section#link` has no icon field and passes `url:` (Flatpack only links on `href:`), so this gem overrides `sections/show` for those two Button props. Inventory Screen still uses **New**
 
 ### Upgrade notes
 - Bump to `0.3.0`
