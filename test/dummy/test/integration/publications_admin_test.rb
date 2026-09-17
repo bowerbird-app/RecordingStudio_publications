@@ -146,6 +146,8 @@ class PublicationsAdminTest < ActionDispatch::IntegrationTest
 
     get recording_studio_publications.new_admin_publication_path
     assert_response :success
+    assert_select "body[data-recording-studio-default-layout='true']", count: 1
+    refute_includes response.body, "flat-pack-sidebar-layout"
     assert_includes response.body, "Name"
     assert_includes response.body, "Key"
     assert_includes response.body, "Publication type"
@@ -175,6 +177,8 @@ class PublicationsAdminTest < ActionDispatch::IntegrationTest
 
     follow_redirect!
     assert_response :success
+    assert_select "body[data-recording-studio-default-layout='true']", count: 1
+    refute_includes response.body, "flat-pack-sidebar-layout"
     assert_includes response.body, "Admin Created Journal"
     assert_includes response.body, "Journal"
     assert_includes response.body, "Add logo"

@@ -13,7 +13,7 @@ This Rails app exists to validate the Recording Studio publications gem in a rea
 - Family admin at `/admin` (`recording_studio_admin_for`, section `:publications`, title Admin publications)
 - Accessible mounted at `/admin/access` so the publications hub can manage AdminRoot grants
 - Attachable mounted at `/recording_studio_attachable` for add/change logo, using Attachable’s blank layout so those screens have one PageNav (not a second back from default_layout)
-- Recording Studio default layout, FlatPack assets, and Tailwind `@source` scanning for `vendor/bundle`, `/usr/local/bundle`, and `/usr/local/lib/ruby/gems` so Cloud Agent images still emit Grid/Table classes
+- Flatpack sidebar (`flat_pack_sidebar`) for authenticated home and docs. Recording Studio default layout only on gem title new/show/edit. FlatPack assets and Tailwind `@source` scanning for `vendor/bundle`, `/usr/local/bundle`, and `/usr/local/lib/ruby/gems` so Cloud Agent images still emit Grid/Table classes
 - Dummy-only `/docs/*` pages for gem-specific onboarding
 
 ## Quick Start
@@ -53,6 +53,6 @@ Then open the app and sign in with:
 
 Use this app to verify the publications directory before copying host wiring into another app. The host stays thin: AdminRoot, resolvers, seeds, and mounts. Catalogue models and admin definitions live in the gem.
 
-Authenticated pages use Recording Studio's shared default layout. The dummy copies FlatPack `rounded` onto `<html>` through `app/views/layouts/_default_layout_head.html.erb`, rendered from `app/views/recording_studio/_default_layout_head.html.erb`. Those partials do not put Sign out or a workspace switcher in the default-layout slot. Devise sign-in keeps `layouts/application`. Attachable add/change use Attachable’s blank layout so they keep one PageNav.
+Authenticated dummy home and docs use the Flatpack sidebar (`flat_pack_sidebar`), like other Recording Studio gems. Title new/show/edit stay on Recording Studio's shared default layout. The dummy copies FlatPack `rounded` onto `<html>` through `app/views/layouts/_default_layout_head.html.erb`, rendered from `app/views/recording_studio/_default_layout_head.html.erb`. Sign out and the workspace switcher live on the sidebar and top nav, not in the default-layout slot. Devise sign-in keeps `layouts/application`. Attachable add/change use Attachable’s blank layout so they keep one PageNav.
 
 The home page stays a minimal demo surface. Open `/admin` for hub, inventory, new, show, and edit. Add or change a logo from the saved title — Attachable owns those screens. Change publish state from show/edit with the status dropdown. Draft and scheduled titles use **Preview** on that menu (staff-only public page with a Preview badge). Currently published titles use **View** for the live `/publications/:uuid/:slug` URL, which readers can open without signing in.

@@ -1,5 +1,3 @@
-<% dummy_page_nav(title: "Publication directory", back_url: root_path) %>
-
 <div class="flex w-full flex-col gap-6">
   <%= render FlatPack::PageTitle::Component.new(
     title: "Publication directory",
@@ -23,7 +21,7 @@
           <li>A shared Publications catalogue holds titles for this host.</li>
           <li>Family admin at <code>/admin</code> lists, adds, and edits titles.</li>
           <li>Each title can have one image logo. Add it after the title exists, on Attachable’s screens.</li>
-          <li>Authenticated pages stay on Recording Studio's default layout with FlatPack Rounded.</li>
+          <li>This dummy host uses a Flatpack sidebar. Title new, show, and edit stay on Recording Studio’s default layout.</li>
         </ul>
       <% end %>
     <% end %>

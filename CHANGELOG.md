@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+- Dummy authenticated home and docs use Flatpack `flat_pack_sidebar`. Recording Studio default layout stays on gem clear-action screens (title new/show/edit). Attachable stays blank so that layout does not add a second back.
+
 ## [0.3.0] - 2026-09-03
 
 Publishable on each title, a public press page, family-management composition, and publication-type copy.

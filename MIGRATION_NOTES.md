@@ -41,7 +41,7 @@ Do not enable Accessible or Attachable on the shared catalogue root.
 
 ## Host layout
 
-Authenticated screens should use `RecordingStudio::UsesDefaultLayout`. Core still puts `data-theme` on `<body>`. FlatPack themes belong on `<html>`. Hosts should add `app/views/recording_studio/_default_layout_head.html.erb` that renders `layouts/default_layout_head`, and `app/views/layouts/_default_layout_head.html.erb` that copies `data-theme="rounded"` onto `document.documentElement` with `javascript_tag nonce: true`. Do not put Sign out or a workspace switcher there.
+Authenticated dummy home and docs use the host Flatpack sidebar. Title new/show/edit should use `RecordingStudio::UsesDefaultLayout`. Core still puts `data-theme` on `<body>`. FlatPack themes belong on `<html>`. Hosts should add `app/views/recording_studio/_default_layout_head.html.erb` that renders `layouts/default_layout_head`, and `app/views/layouts/_default_layout_head.html.erb` that copies `data-theme="rounded"` onto `document.documentElement` with `javascript_tag nonce: true`. Do not put Sign out or a workspace switcher there.
 
 ## Verification
 

@@ -107,16 +107,26 @@ class RecordingStudioPublicationsTest < Minitest::Test
     refute_includes attachable_initializer, 'config.layout = "recording_studio/default_layout"'
   end
 
-  def test_dummy_app_uses_recording_studio_default_layout
+  def test_dummy_app_uses_flatpack_sidebar_for_host_pages
     application_controller_path = File.expand_path("dummy/app/controllers/application_controller.rb", __dir__)
     controller_source = File.read(application_controller_path)
+    gem_controller_source = File.read(
+      File.expand_path("../app/controllers/recording_studio_publications/application_controller.rb", __dir__)
+    )
+    default_layout_initializer = File.read(
+      File.expand_path("dummy/config/initializers/recording_studio_default_layout.rb", __dir__)
+    )
 
-    assert_includes controller_source, "include RecordingStudio::UsesDefaultLayout"
-    assert_includes controller_source, '"recording_studio/default_layout"'
+    assert_includes controller_source, "include RecordingStudio::RootSwitchable::ControllerSupport"
+    assert_includes controller_source, '"flat_pack_sidebar"'
     assert_includes controller_source, "devise_controller? ? \"application\""
-    refute_includes controller_source, "flat_pack_sidebar"
-    refute File.exist?(File.expand_path("dummy/app/views/layouts/flat_pack_sidebar.html.erb", __dir__))
-    refute File.exist?(File.expand_path("dummy/app/views/layouts/flat_pack/_sidebar.html.erb", __dir__))
+    refute_includes controller_source, "include RecordingStudio::UsesDefaultLayout"
+    refute_includes controller_source, '"recording_studio/default_layout"'
+    assert File.exist?(File.expand_path("dummy/app/views/layouts/flat_pack_sidebar.html.erb", __dir__))
+    assert File.exist?(File.expand_path("dummy/app/views/layouts/flat_pack/_sidebar.html.erb", __dir__))
+    assert File.exist?(File.expand_path("dummy/app/views/layouts/flat_pack/_top_nav.html.erb", __dir__))
+    assert_includes gem_controller_source, "layout \"recording_studio/default_layout\""
+    assert_includes default_layout_initializer, "RecordingStudio::ApplicationController.include(RecordingStudio::UsesDefaultLayout)"
   end
 
   def test_dummy_login_layout_keeps_flatpack_assets_without_tight_main_offset
@@ -142,6 +152,7 @@ class RecordingStudioPublicationsTest < Minitest::Test
     refute_includes layout_head, "recording_studio_page_nav_right"
     refute_includes layout_head, "Sign out"
     refute_includes layout_head, "destroy_user_session_path"
+    refute_includes helper_source, "dummy_page_nav"
     refute_includes helper_source, "Sign out"
     refute_includes helper_source, "recording_studio_root_switch_dropdown"
   end
@@ -197,7 +208,7 @@ class RecordingStudioPublicationsTest < Minitest::Test
     assert_includes readme_source, "/recording_studio"
     assert_includes readme_source, "redirects to `/`"
     assert_includes readme_source, "/recording_studio_attachable"
-    refute_includes readme_source, "flat_pack_sidebar"
+    assert_includes readme_source, "flat_pack_sidebar"
   end
 
   def test_product_readme_is_the_template_guide
@@ -219,7 +230,7 @@ class RecordingStudioPublicationsTest < Minitest::Test
     assert_includes view_source, 'title: "Publication directory"'
     assert_includes view_source, "shared publications catalogue"
     assert_includes view_source, "FlatPack::Card::Component"
-    assert_includes view_source, "dummy_page_nav"
+    refute_includes view_source, "dummy_page_nav"
     refute_includes view_source, 'title: "Demo"'
     refute_includes view_source, "FlatPack::Breadcrumb::Component"
   end
@@ -233,7 +244,7 @@ class RecordingStudioPublicationsTest < Minitest::Test
     docs_view_paths.each do |view_path|
       view_source = File.read(view_path)
 
-      assert_includes view_source, "dummy_page_nav"
+      refute_includes view_source, "dummy_page_nav"
       assert_includes view_source, "FlatPack::PageTitle::Component"
       refute_includes view_source, "FlatPack::Card::Component"
       refute_includes view_source, "FlatPack::Breadcrumb::Component"

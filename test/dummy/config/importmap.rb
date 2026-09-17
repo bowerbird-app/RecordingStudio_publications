@@ -10,6 +10,10 @@ pin_all_from "app/javascript/controllers", under: "controllers"
 pin_all_from FlatPack::Engine.root.join("app/javascript/flat_pack/controllers"), under: "controllers/flat_pack", to: "flat_pack/controllers", preload: false
 pin "flat_pack/heroicons", to: "flat_pack/heroicons.js", preload: false
 
+pin_all_from RecordingStudioRootSwitchable::Engine.root.join("app/javascript/recording_studio_root_switchable/controllers"),
+             under: "controllers/recording_studio_root_switchable",
+             to: "recording_studio_root_switchable/controllers"
+
 # Pin RecordingStudioAdmin controllers
 pin_all_from RecordingStudioAdmin::Engine.root.join("app/javascript/recording_studio_admin/controllers"), under: "controllers/recording_studio_admin", to: "recording_studio_admin/controllers", preload: false
 
