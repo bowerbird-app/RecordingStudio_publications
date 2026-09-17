@@ -7,6 +7,37 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.3.0] - 2026-09-17
+
+Publishable on each title, a public press page, family-management composition, and publication-type copy.
+
+### Added
+- `recording_studio_publishable ~> 0.3` runtime dependency. Dummy pins GitHub tag `v0.3.0`
+- `RecordingStudio::Capabilities::Publishable.to` on `Publication` only, with public path `/publications/:uuid/:slug`
+- `PublicationType` closed token registry. `Publication::KINDS` derives from it. `#publication_type` is a reader
+- `FamilyAuthorization` replaces `LogoAuthorization` for logos and publish screens (AdminRoot first, then per-title Accessible)
+- `FamilyManagement.install!` wraps the current Publishable authorizer, close-URL resolver, and Preview authorization (`FamilyAuthorization` `:view`). Idempotent. The engine does not assign those globals on boot. Draft Preview also ensures a publishable child so QuickActions Preview does not 404
+- `PublishedPublication` public page model and a callback-free `PublicPublicationsController#show`
+- Public layout `recording_studio_publications/public` with no PageNav and no competing Open Graph tags
+- Show and edit render Publishable’s `QuickActions` dropdown (not `EditButtonComponent`). Closed labels are Draft, a scheduled date, or Published. Inline publish and unpublish stay on the title page
+- Hub line chart **Publications over time** (`widgets.publications.over_time`) before the type chart
+
+### Changed
+- Admin section title is **Admin publications**. Screen, widget, catalogue label, and dummy `app_name` stay **Publications**. Keys stay `publications`
+- Visible copy says **Publication type**. The `kind` column, param, sort key, and `widgets.publications.by_kind` stay `kind`
+- Hub type chart title is **Publication types**
+- Hub primary action is **Publication** with Flatpack’s plus heroicon. Secondary inventory action is **View all**. Admin 2.0.1 `Section#link` has no icon field and passes `url:` (Flatpack only links on `href:`), so this gem overrides `sections/show` for those two Button props. Inventory Screen still uses **New**
+- Dummy authenticated home and docs use Flatpack `flat_pack_sidebar`. Recording Studio default layout stays on gem clear-action screens (title new/show/edit). Attachable stays blank so that layout does not add a second back
+
+### Upgrade notes
+- Bump to `0.3.0`
+- Add `recording_studio_publishable ~> 0.3`, install its migrations, register `RecordingStudioPublishable::Publishable`, and mount `RecordingStudioPublishable::Engine` at `/`. Replace `EditButtonComponent` with `QuickActions::Component` on host title pages
+- Call `RecordingStudioPublications::FamilyManagement.install!` after any host Publishable authorizer for other types. Preview for titles uses family `:view` (AdminRoot first), not a per-title Accessible grant alone
+- Rename `LogoAuthorization` callers to `FamilyAuthorization`. There is no alias
+- Scan Publishable views and components in Tailwind `@source`
+- Form posts stay `publication[kind]`. Only the visible label changed
+- Dummy hosts that put home/docs on Recording Studio default layout should switch those pages to a host sidebar. Title new/show/edit stay on `UsesDefaultLayout`
+
 ## [0.2.1] - 2026-09-02
 
 Pins, dummy Tailwind scan for system gem paths, real seed logos, and dummy Admin recapture. Catalogue and CRUD stay as in 0.2.0.
@@ -79,7 +110,8 @@ First `recording_studio_publications` identity. This release is rename, dependen
 - Keep `RecordingStudio::UsesDefaultLayout` for authenticated screens. If core puts theme on `body`, render `layouts/_default_layout_head` from the `recording_studio/default_layout_head` hook so `html` gets `data-theme="rounded"`
 - Do not put Sign out or a workspace switcher in the default-layout slot or that head partial
 
-[Unreleased]: https://github.com/bowerbird-app/RecordingStudio_publications/compare/v0.2.1...HEAD
+[Unreleased]: https://github.com/bowerbird-app/RecordingStudio_publications/compare/v0.3.0...HEAD
+[0.3.0]: https://github.com/bowerbird-app/RecordingStudio_publications/releases/tag/v0.3.0
 [0.2.1]: https://github.com/bowerbird-app/RecordingStudio_publications/releases/tag/v0.2.1
 [0.2.0]: https://github.com/bowerbird-app/RecordingStudio_publications/releases/tag/v0.2.0
 [0.1.0]: https://github.com/bowerbird-app/RecordingStudio_publications/releases/tag/v0.1.0

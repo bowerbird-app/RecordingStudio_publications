@@ -2,6 +2,7 @@
 
 require "test_helper"
 require "devise/test/integration_helpers"
+require "nokogiri"
 
 class PublicationsAdminTest < ActionDispatch::IntegrationTest
   include Devise::Test::IntegrationHelpers
@@ -31,14 +32,20 @@ class PublicationsAdminTest < ActionDispatch::IntegrationTest
     assert_equal RecordingStudioPublications::Admin::PublicationsResource,
                  RecordingStudioAdmin.resource_for("publications")
     total = RecordingStudioAdmin.widget_for("widgets.publications.total")
+    over_time = RecordingStudioAdmin.widget_for("widgets.publications.over_time")
     by_kind = RecordingStudioAdmin.widget_for("widgets.publications.by_kind")
     assert_equal :number, total.type
+    assert_equal :chart, over_time.type
+    assert_equal :line, over_time.chart_type
     assert_equal :chart, by_kind.type
     assert_equal :bar, by_kind.chart_type
-    assert_nil RecordingStudioAdmin.widget_for("widgets.publications.over_time")
     section_widget_keys = RecordingStudioPublications::Admin::PublicationsSection.widget_keys
     screen_widget_keys = RecordingStudioPublications::Admin::PublicationsScreen.widget_keys
-    assert_includes section_widget_keys, "widgets.publications.total"
+    assert_equal [
+      "widgets.publications.total",
+      "widgets.publications.over_time",
+      "widgets.publications.by_kind"
+    ], section_widget_keys
     refute_includes screen_widget_keys, "widgets.publications.total"
     refute_includes screen_widget_keys, "widgets.publications.over_time"
     assert_empty screen_widget_keys
@@ -56,8 +63,16 @@ class PublicationsAdminTest < ActionDispatch::IntegrationTest
     end
     assert new_button
     assert_equal "New", new_button.text
+    new_link = RecordingStudioPublications::Admin::PublicationsSection.links.find do |link|
+      link.name == :new_publication
+    end
+    inventory_link = RecordingStudioPublications::Admin::PublicationsSection.links.find do |link|
+      link.name == :inventory
+    end
+    assert_equal "Publication", new_link.text
+    assert_equal "View all", inventory_link.text
     refute File.exist?(RecordingStudioPublications::Engine.root.join("app/overrides/recording_studio_admin/screens/show.html.erb"))
-    refute File.exist?(RecordingStudioPublications::Engine.root.join("app/overrides/recording_studio_admin/sections/show.html.erb"))
+    assert File.exist?(RecordingStudioPublications::Engine.root.join("app/overrides/recording_studio_admin/sections/show.html.erb"))
     refute_includes File.read(RecordingStudioPublications::Engine.root.join("lib/recording_studio_publications/admin.rb")),
                     "instance_variable_set"
     assert_equal RecordingStudioPublications::Publication::KINDS.map(&:titleize),
@@ -81,18 +96,26 @@ class PublicationsAdminTest < ActionDispatch::IntegrationTest
     get "/admin/sections/publications"
     assert_response :success
     assert_includes response.body, "Publications"
-    assert_includes response.body, "New"
-    assert_includes response.body, "Titles by kind"
+    assert_includes response.body, "View all"
+    assert_includes response.body, "Publications over time"
+    assert_includes response.body, "Publication types"
+    assert_includes response.body, "Admin publications"
     assert_includes response.body, "/admin/access/recordings/#{@admin_recording.id}/accesses"
+    refute_includes response.body, "All publications"
     assert(
       response.body.include?("Manage access") || response.body.include?("+ Access"),
       "expected family Access UI on the AdminRoot publications section"
     )
-    assert(
-      response.body.include?('href="/recording_studio_publications/admin/publications/new"') ||
-        response.body.include?('url="/recording_studio_publications/admin/publications/new"'),
-      "expected family New control to point at this gem's new-title path"
-    )
+    hub = Nokogiri::HTML(response.body)
+    new_control = hub.at_css('a[href="/recording_studio_publications/admin/publications/new"]')
+    assert new_control, "expected family Publication control to point at this gem's new-title path"
+    assert_includes new_control.text, "Publication"
+    refute_includes new_control.text, "New"
+    assert new_control.at_css('[data-flat-pack--icon-name-value="plus"]'),
+           "expected the Publication hub action to use the plus heroicon"
+    view_all = hub.css("a").find { |anchor| anchor.text.include?("View all") }
+    assert view_all, "expected a View all hub action"
+    assert_includes view_all["href"], "/admin/screens/publications"
 
     get "/admin/screens/publications"
     assert_response :success
@@ -112,7 +135,7 @@ class PublicationsAdminTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_includes response.body, "Table data"
     assert_includes response.body, "Name"
-    assert_includes response.body, "Kind"
+    assert_includes response.body, "Publication type"
     assert_includes response.body, "Website"
     refute_match(/<th[^>]*>Key<\/th>/i, response.body)
   end
@@ -123,9 +146,11 @@ class PublicationsAdminTest < ActionDispatch::IntegrationTest
 
     get recording_studio_publications.new_admin_publication_path
     assert_response :success
+    assert_select "body[data-recording-studio-default-layout='true']", count: 1
+    refute_includes response.body, "flat-pack-sidebar-layout"
     assert_includes response.body, "Name"
     assert_includes response.body, "Key"
-    assert_includes response.body, "Kind"
+    assert_includes response.body, "Publication type"
     assert_includes response.body, "Website"
     assert_includes response.body, "Cancel"
     assert_includes response.body, "Save"
@@ -152,6 +177,8 @@ class PublicationsAdminTest < ActionDispatch::IntegrationTest
 
     follow_redirect!
     assert_response :success
+    assert_select "body[data-recording-studio-default-layout='true']", count: 1
+    refute_includes response.body, "flat-pack-sidebar-layout"
     assert_includes response.body, "Admin Created Journal"
     assert_includes response.body, "Journal"
     assert_includes response.body, "Add logo"

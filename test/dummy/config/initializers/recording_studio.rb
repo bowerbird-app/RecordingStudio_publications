@@ -9,7 +9,8 @@ RecordingStudio.configure do |config|
     "AdminRoot",
     "RecordingStudioPublications::PublicationCatalogue",
     "RecordingStudioPublications::Publication",
-    "RecordingStudioAttachable::Attachment"
+    "RecordingStudioAttachable::Attachment",
+    "RecordingStudioPublishable::Publishable"
   ]
 
   # Require each configured ActiveRecord type to call recording_studio_recordable.

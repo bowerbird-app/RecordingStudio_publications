@@ -4,7 +4,7 @@ module RecordingStudioPublications
   class Publication < ApplicationRecord
     self.table_name = "recording_studio_publications_publications"
 
-    KINDS = %w[magazine newspaper journal site broadcast].freeze
+    KINDS = PublicationType::TOKENS
     ALLOWED_PARENT_TYPES = ["RecordingStudioPublications::PublicationCatalogue"].freeze
     KEY_FORMAT = /\A[a-z0-9]+(?:-[a-z0-9]+)*\z/
 
@@ -16,7 +16,16 @@ module RecordingStudioPublications
     include RecordingStudio::Capabilities::Attachable.to(
       allowed_content_types: ["image/*"],
       enabled_attachment_kinds: %i[image],
-      authorize_with: RecordingStudioPublications::LogoAuthorization
+      authorize_with: FamilyAuthorization
+    )
+
+    include RecordingStudio::Capabilities::Publishable.to(
+      public_controller: "recording_studio_publications/public_publications",
+      public_action: :show,
+      public_layout: "recording_studio_publications/public",
+      path: "/publications/:uuid/:slug",
+      schedule: true,
+      seo: true
     )
 
     validates :name, presence: true
@@ -27,8 +36,12 @@ module RecordingStudioPublications
     before_validation :assign_key_from_name, on: :create
     before_create { self.created_at ||= Time.current }
 
+    def publication_type
+      PublicationType.try_parse(kind)
+    end
+
     def kind_label
-      kind.to_s.titleize
+      publication_type&.label || kind.to_s.titleize
     end
 
     private

@@ -41,12 +41,25 @@ ensure_seed_logo = lambda do |recording, key:, actor:|
   end
 end
 
-seed_publication = lambda do |name:, key:, kind:, website:, actor:, created_at:|
+ensure_published = lambda do |recording, slug:, actor:|
+  return if recording.blank?
+  return if recording.respond_to?(:currently_published?) && recording.currently_published?
+
+  result = RecordingStudioPublishable::Services::Publishables::Update.call(
+    parent_recording: recording,
+    actor: actor,
+    attributes: { status: "published", slug: slug }
+  )
+  raise result.error if result.failure?
+end
+
+seed_publication = lambda do |name:, key:, kind:, website:, actor:, created_at:, publish: false|
   existing = RecordingStudioPublications::Publication.find_by(key: key)
   if existing
     RecordingStudioPublications::Publication.where(id: existing.id).update_all(created_at: created_at)
     recording = RecordingStudioPublications.recording_for(existing)
     ensure_seed_logo.call(recording, key: key, actor: actor) if recording
+    ensure_published.call(recording, slug: key, actor: actor) if publish
     return existing
   end
 
@@ -57,6 +70,7 @@ seed_publication = lambda do |name:, key:, kind:, website:, actor:, created_at:|
   publication = recording.recordable
   RecordingStudioPublications::Publication.where(id: publication.id).update_all(created_at: created_at)
   ensure_seed_logo.call(recording, key: key, actor: actor)
+  ensure_published.call(recording, slug: key, actor: actor) if publish
   publication
 end
 
@@ -101,7 +115,8 @@ begin
     kind: "magazine",
     website: "https://www.theatlantic.com",
     actor: user,
-    created_at: 8.weeks.ago
+    created_at: 8.weeks.ago,
+    publish: true
   )
   seed_publication.call(
     name: "The Guardian",

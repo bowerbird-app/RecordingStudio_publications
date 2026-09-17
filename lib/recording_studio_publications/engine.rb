@@ -126,8 +126,9 @@ module RecordingStudioPublications
     initializer "recording_studio_publications.family_engines", before: :load_config_initializers do
       require "recording_studio_attachable" if defined?(Bundler) || defined?(RecordingStudioAttachable)
       require "recording_studio_admin" if defined?(Bundler) || defined?(RecordingStudioAdmin)
+      require "recording_studio_publishable" if defined?(Bundler) || defined?(RecordingStudioPublishable)
     rescue LoadError
-      # Hosts that have not bundled Attachable or Admin yet still boot the engine.
+      # Hosts that have not bundled family engines yet still boot this engine.
     end
 
     initializer "recording_studio_publications.admin_definitions" do

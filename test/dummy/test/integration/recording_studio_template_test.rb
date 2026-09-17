@@ -7,7 +7,7 @@ class RecordingStudioTemplateTest < ActiveSupport::TestCase
     assert_equal [ "all_workspaces" ], RecordingStudioRootSwitchable.configuration.scopes.keys
     assert_equal :application_layout, RecordingStudioRootSwitchable.configuration.layout
     assert_includes ApplicationController.ancestors, RecordingStudio::RootSwitchable::ControllerSupport
-    assert_includes ApplicationController.ancestors, RecordingStudio::UsesDefaultLayout
+    refute_includes ApplicationController.ancestors, RecordingStudio::UsesDefaultLayout
   end
 
   test "dummy app validates recordable declarations" do
@@ -54,6 +54,8 @@ class RecordingStudioTemplateTest < ActiveSupport::TestCase
     assert_equal 3, Workspace.count
     assert AdminRoot.find_by(name: "Admin")
     assert_operator RecordingStudioPublications.publications.count, :>=, 5
+    atlantic = RecordingStudioPublications::Publication.find_by!(key: "the-atlantic")
+    assert atlantic.published?, "seeded The Atlantic should be currently published"
     created_ats = RecordingStudioPublications.publications.where(
       key: %w[the-atlantic the-guardian nature bbc-news the-verge]
     ).pluck(:created_at)
@@ -87,6 +89,6 @@ class RecordingStudioTemplateTest < ActiveSupport::TestCase
     refute RecordingStudio.capability_enabled?(:example, for: Folder)
     refute RecordingStudio.capability_enabled?(:example, for: Page)
     assert_equal [ "Workspace" ], RecordingStudio.configuration.enabled_recordable_types_for(:example)
-    assert_includes ApplicationController.ancestors, RecordingStudio::UsesDefaultLayout
+    refute_includes ApplicationController.ancestors, RecordingStudio::UsesDefaultLayout
   end
 end

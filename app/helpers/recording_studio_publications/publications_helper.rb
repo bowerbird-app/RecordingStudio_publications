@@ -29,6 +29,14 @@ module RecordingStudioPublications
       )
     end
 
+    def recording_studio_publishable
+      if respond_to?(:main_app) && main_app.respond_to?(:recording_studio_publishable)
+        return main_app.recording_studio_publishable
+      end
+
+      RecordingStudioPublishable::Engine.routes.url_helpers
+    end
+
     private
 
     def attachable_routes

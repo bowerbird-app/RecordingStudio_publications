@@ -8,8 +8,15 @@
 - Accessible `~> 0.9` (dummy GitHub tag `v0.9.0`)
 - Admin `~> 2.0` (dummy GitHub tag `2.0.1`)
 - Attachable `~> 0.5` (dummy GitHub tag `v0.5.0`)
+- Publishable `~> 0.3` (dummy GitHub tag `v0.3.0`)
 - FlatPack `~> 0.1.143` (dummy GitHub tag `v0.1.143`)
 - Public RubyGems and GitHub access for dependency installation
+
+## Publications 0.3.0
+
+Bump to `0.3.0`. Add Publishable `~> 0.3`, mount it at `/`, install its migrations, register `RecordingStudioPublishable::Publishable`, and call `FamilyManagement.install!`. Show and edit render `QuickActions` (not `EditButtonComponent`). Rename `LogoAuthorization` to `FamilyAuthorization` with no alias. Visible copy says publication type; the `kind` column and param stay. `install!` also wraps Preview so AdminRoot staff can open a draft from the status menu.
+
+Do not enable Publishable on the shared catalogue. Do not assign Publishable’s `management_authorizer` from this engine.
 
 ## Publications 0.2.1
 
@@ -34,7 +41,7 @@ Do not enable Accessible or Attachable on the shared catalogue root.
 
 ## Host layout
 
-Authenticated screens should use `RecordingStudio::UsesDefaultLayout`. Core still puts `data-theme` on `<body>`. FlatPack themes belong on `<html>`. Hosts should add `app/views/recording_studio/_default_layout_head.html.erb` that renders `layouts/default_layout_head`, and `app/views/layouts/_default_layout_head.html.erb` that copies `data-theme="rounded"` onto `document.documentElement` with `javascript_tag nonce: true`. Do not put Sign out or a workspace switcher there.
+Authenticated dummy home and docs use the host Flatpack sidebar. Title new/show/edit should use `RecordingStudio::UsesDefaultLayout`. Core still puts `data-theme` on `<body>`. FlatPack themes belong on `<html>`. Hosts should add `app/views/recording_studio/_default_layout_head.html.erb` that renders `layouts/default_layout_head`, and `app/views/layouts/_default_layout_head.html.erb` that copies `data-theme="rounded"` onto `document.documentElement` with `javascript_tag nonce: true`. Do not put Sign out or a workspace switcher there.
 
 ## Verification
 

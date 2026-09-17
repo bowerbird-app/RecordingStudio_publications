@@ -28,10 +28,10 @@
   <%= render FlatPack::Select::Component.new(
     name: "publication[kind]",
     id: "publication_kind",
-    label: "Kind",
+    label: RecordingStudioPublications::Publication.human_attribute_name(:kind),
     value: publication.kind,
-    options: RecordingStudioPublications::Publication::KINDS.map { |kind| [kind.titleize, kind] },
-    placeholder: "Select a kind",
+    options: RecordingStudioPublications::PublicationType.select_options,
+    placeholder: I18n.t("recording_studio_publications.admin.form_type_placeholder"),
     required: true,
     error: publication.errors[:kind].to_sentence.presence
   ) %>

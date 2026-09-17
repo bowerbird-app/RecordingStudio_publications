@@ -26,8 +26,10 @@ class PublicationCatalogueEngineTest < ActiveSupport::TestCase
   test "Accessible and Attachable stay off the shared catalogue root" do
     refute RecordingStudio.capability_enabled?(:accessible, for: RecordingStudioPublications::PublicationCatalogue)
     refute RecordingStudio.capability_enabled?(:attachable, for: RecordingStudioPublications::PublicationCatalogue)
+    refute RecordingStudio.capability_enabled?(:publishable, for: RecordingStudioPublications::PublicationCatalogue)
     assert RecordingStudio.capability_enabled?(:accessible, for: RecordingStudioPublications::Publication)
     assert RecordingStudio.capability_enabled?(:attachable, for: RecordingStudioPublications::Publication)
+    assert RecordingStudio.capability_enabled?(:publishable, for: RecordingStudioPublications::Publication)
   end
 
   test "catalogue_root.record creates a Publication under the shared root" do
