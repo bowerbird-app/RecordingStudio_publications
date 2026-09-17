@@ -50,8 +50,6 @@ module RecordingStudioPublications
       return unless recording.respond_to?(:recordable_type)
 
       case recording.recordable_type
-      when "RecordingStudioPublications::Publication"
-        recording
       when "RecordingStudioPublications::PublishedArticle"
         recording.parent_recording
       when "RecordingStudioAttachable::Attachment"

@@ -47,10 +47,14 @@ class PublishedArticleTest < ActiveSupport::TestCase
   end
 
   test "PublishedArticle is rejected under Workspace and the catalogue root" do
-    workspace_root = RecordingStudio.root_recording_for(Workspace.create!(name: "Not Publication #{SecureRandom.hex(4)}"))
+    workspace = Workspace.create!(name: "Not Publication #{SecureRandom.hex(4)}")
+    workspace_root = RecordingStudio.root_recording_for(workspace)
 
     workspace_error = assert_raises(RecordingStudio::InvalidParent) do
-      workspace_root.record(RecordingStudioPublications::PublishedArticle, parent_recording: workspace_root) do |article|
+      workspace_root.record(
+        RecordingStudioPublications::PublishedArticle,
+        parent_recording: workspace_root
+      ) do |article|
         article.title = "Wrong Parent"
       end
     end
@@ -141,33 +145,10 @@ class PublishedArticleTest < ActiveSupport::TestCase
 
   test "index query filters and sorts articles for one publication" do
     actor = catalogue_admin_actor
-    publication_recording = record_title!(actor: actor)
-    other_recording = record_title!(name: "Other Mag", actor: actor)
+    publication = record_title!(actor: actor).recordable
+    other = record_title!(name: "Other Mag", actor: actor).recordable
+    rainforest = seed_index_articles!(publication, other, actor)
 
-    rainforest = RecordingStudioPublications.record_article!(
-      publication_recording.recordable,
-      {
-        title: "House in the Rainforest",
-        url: "https://example.com/rainforest",
-        published_on: Date.new(2024, 3, 12),
-        byline: "Jane Architect"
-      },
-      actor: actor
-    )
-    RecordingStudioPublications.record_article!(
-      publication_recording.recordable,
-      {
-        title: "Ten Australian Houses",
-        published_on: Date.new(2023, 11, 2),
-        byline: "Sam Editor"
-      },
-      actor: actor
-    )
-    RecordingStudioPublications.record_article!(
-      other_recording.recordable,
-      { title: "House in the Rainforest", url: "https://other.example/rainforest" },
-      actor: actor
-    )
     rainforest.import_attachment(
       io: StringIO.new(ONE_PIXEL_PNG),
       filename: "rainforest.png",
@@ -176,12 +157,7 @@ class PublishedArticleTest < ActiveSupport::TestCase
       actor: actor
     )
 
-    titles = lambda { |params|
-      RecordingStudioPublications::PublishedArticles::IndexQuery.new(
-        publication: publication_recording.recordable,
-        params: params
-      ).articles.map(&:title)
-    }
+    titles = ->(params) { article_titles_for(publication, params) }
 
     assert_equal ["House in the Rainforest", "Ten Australian Houses"], titles.call({})
     assert_equal ["House in the Rainforest"], titles.call(q: "rainforest")
@@ -195,6 +171,41 @@ class PublishedArticleTest < ActiveSupport::TestCase
   end
 
   private
+
+  def article_titles_for(publication, params)
+    RecordingStudioPublications::PublishedArticles::IndexQuery.new(
+      publication: publication,
+      params: params
+    ).articles.map(&:title)
+  end
+
+  def seed_index_articles!(publication, other, actor)
+    rainforest = RecordingStudioPublications.record_article!(
+      publication,
+      {
+        title: "House in the Rainforest",
+        url: "https://example.com/rainforest",
+        published_on: Date.new(2024, 3, 12),
+        byline: "Jane Architect"
+      },
+      actor: actor
+    )
+    RecordingStudioPublications.record_article!(
+      publication,
+      {
+        title: "Ten Australian Houses",
+        published_on: Date.new(2023, 11, 2),
+        byline: "Sam Editor"
+      },
+      actor: actor
+    )
+    RecordingStudioPublications.record_article!(
+      other,
+      { title: "House in the Rainforest", url: "https://other.example/rainforest" },
+      actor: actor
+    )
+    rainforest
+  end
 
   def record_title!(name: "Article Host #{SecureRandom.hex(4)}", actor: catalogue_admin_actor)
     RecordingStudioPublications.record_publication!({ name: name, kind: "magazine" }, actor: actor)

@@ -7,7 +7,7 @@ module RecordingStudioPublications
     before_action :authorize_current_publication!
 
     def index
-      @articles_index = RecordingStudioPublications::PublishedArticles::IndexQuery.new(publication: @publication, params: params)
+      @articles_index = article_index_query
       @article_entries = @articles_index.entries
       @new_article_action = resolve_publications_admin_action(:edit, @publication)
     end
@@ -59,9 +59,7 @@ module RecordingStudioPublications
 
     def set_article
       @recording = RecordingStudio::Recording.find(params[:id])
-      unless article_belongs_to_publication?
-        raise ActiveRecord::RecordNotFound
-      end
+      raise ActiveRecord::RecordNotFound unless article_belongs_to_publication?
 
       @article = @recording.recordable
     end
@@ -107,6 +105,13 @@ module RecordingStudioPublications
 
     def article_params
       params.fetch(:article, {}).permit(:title, :url, :canonical_url, :published_on, :byline, :excerpt)
+    end
+
+    def article_index_query
+      RecordingStudioPublications::PublishedArticles::IndexQuery.new(
+        publication: @publication,
+        params: params
+      )
     end
 
     def publications_resource_action
