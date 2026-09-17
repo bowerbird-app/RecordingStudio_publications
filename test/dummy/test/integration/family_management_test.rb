@@ -79,15 +79,16 @@ class FamilyManagementTest < ActionDispatch::IntegrationTest
     assert_response :success
   end
 
-  test "show offers Publishable's edit button when edit is allowed" do
+  test "show offers Publishable's status dropdown when edit is allowed" do
     bootstrap_owner_access!(@admin, @admin_recording)
     sign_in @admin
 
     get recording_studio_publications.admin_publication_path(@publication_recording)
     assert_response :success
-    assert_includes response.body, "Publish"
+    assert_includes response.body, "publishable_quick_actions_#{@publication_recording.id}"
+    assert_includes response.body, "Draft"
+    assert_includes response.body, "Publish now"
     refute_includes response.body, "Public page"
-    assert_includes response.body, "/recordings/#{@publication_recording.id}/publishable/edit"
     assert_includes response.body, "Edit"
   end
 
@@ -103,14 +104,16 @@ class FamilyManagementTest < ActionDispatch::IntegrationTest
 
     get recording_studio_publications.admin_publication_path(@publication_recording)
     assert_response :success
+    assert_includes response.body, "publishable_quick_actions_#{@publication_recording.id}"
     assert_includes response.body, "Published"
+    assert_includes response.body, "Unpublish"
     refute_includes response.body, "Public page"
     refute_match(/>Publish</, response.body)
-    assert_includes response.body, "/recordings/#{@publication_recording.id}/publishable/edit"
 
     get recording_studio_publications.edit_admin_publication_path(@publication_recording)
     assert_response :success
     assert_includes response.body, "Published"
+    assert_includes response.body, "Unpublish"
     refute_includes response.body, "Public page"
     refute_match(/>Publish</, response.body)
   end

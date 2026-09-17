@@ -2,7 +2,7 @@
 
 Publication directory addon for Recording Studio 4.x hosts.
 
-This gem is the `recording_studio_publications` engine (`RecordingStudioPublications`). Version 0.3.0 adds Publishable on each title, a public page at `/publications/:uuid/:slug`, and family-management composition. It keeps the 0.2 grant-less shared catalogue and family-admin CRUD, and pins Accessible `~> 0.9`, Attachable `~> 0.5`, Publishable `~> 0.2`, and Flatpack `~> 0.1.143`. It does not ship Featured In or a per-title Manage-access UI.
+This gem is the `recording_studio_publications` engine (`RecordingStudioPublications`). Version 0.3.0 adds Publishable on each title, a public page at `/publications/:uuid/:slug`, and family-management composition. It keeps the 0.2 grant-less shared catalogue and family-admin CRUD, and pins Accessible `~> 0.9`, Attachable `~> 0.5`, Publishable `~> 0.3`, and Flatpack `~> 0.1.143`. It does not ship Featured In or a per-title Manage-access UI.
 
 ## What's Included
 
@@ -10,7 +10,7 @@ This gem is the `recording_studio_publications` engine (`RecordingStudioPublicat
 - **Publication** — nested titles under that catalogue only. Required name, required publication type stored as `kind` (`magazine`, `newspaper`, `journal`, `site`, `broadcast`), optional website, and a stable key.
 - **One Attachable logo** per title. Images only. Create the title first, then add or change the logo on Attachable’s own upload and attachment screens. Persist stays on `import_attachment` / `replace_attachment_file`. There is no FileInput on New or Edit, and no Publications upload wrapper.
 - **Family admin** — one `publications` section in RecordingStudioAdmin 2.0. The section title is **Admin publications**. The inventory, count card, catalogue label, and dummy `app_name` stay **Publications**. Staff CRUD is gated by an owned host `AdminRoot` plus `RecordingStudioAdmin::Resource` `required_role: :admin`. The hub primary action is **Publication** (plus heroicon) and the inventory action is **View all**. The hub also exposes family Access on that AdminRoot (`recording_studio_accessible_avatars`), a total-count widget (`type :number`), a publications-over-time line chart (`type :chart`, `chart_type :line`, widget key `widgets.publications.over_time`), and a publication-types bar chart (`type :chart`, `chart_type :bar`, widget key `widgets.publications.by_kind`). Inventory search is a Screen `filter :search`. Admin does not need a grant on each title.
-- **Publishable on Publication only** — one `RecordingStudioPublishable::Publishable` child holds slug, schedule, SEO, and social state. Staff open Publishable’s screen from show/edit. Readers hit `/publications/:uuid/:slug` without signing in. Draft, scheduled, and expired URLs 404. A stale slug redirects. `PublicationCatalogue` stays capability-free.
+- **Publishable on Publication only** — one `RecordingStudioPublishable::Publishable` child holds slug, schedule, SEO, and social state. Staff change state from show/edit with Publishable’s `QuickActions` dropdown. Readers hit `/publications/:uuid/:slug` without signing in. Draft, scheduled, and expired URLs 404. A stale slug redirects. `PublicationCatalogue` stays capability-free.
 - **Dummy host** (`test/dummy/`) — thin Devise host, FlatPack Rounded on `<html>` via the PWA head workaround, seeded titles with a real 128px logo PNG, and `/admin` as the catalogue. Dummy Tailwind `@source` scans Flatpack, Admin, and Attachable under `vendor/bundle`, `/usr/local/bundle`, and `/usr/local/lib/ruby/gems` so Cloud Agent images still emit Grid/Table classes.
 
 This is a directory gem, not a two-sided marketplace. Hosts stay thin: they register recordable types, own `AdminRoot`, seed first staff access, and mount the engines.
@@ -101,7 +101,7 @@ The gem registers a Section, Screen, Resource, and widgets with `blast_radius :s
 
 The hub primary action is **Publication** with Flatpack’s plus heroicon; **View all** opens inventory. Compact total-count (`type :number`) sits above a full `type :chart` / `chart_type :line` widget of cumulative titles by week, then a `type :chart` / `chart_type :bar` widget of title counts per publication type. Inventory is the family Admin Screen template: `filter :search`, a registered Screen `button :new_publication` labelled **New**, and the family Screen `chart` (`type :area`, cumulative count by `created_at`, weekly buckets). Family Screen widgets always render as compact cards, so inventory does not register a widget that would duplicate that growth chart. The inventory table is Name, Publication type, Website, and Actions — no Key column. The form still posts `publication[kind]`. The table already shows the row count, so the number widget stays on the hub only. Admin’s table `title` only assigns a present value, so the family default “Table data” heading stays. Access grants live on the owned AdminRoot (`required_role :admin`), via the section PageNav avatars and the Accessible mount at `/admin/access`. Do not put Accessible on the shared catalogue. FlatPack `Chart::Component` is rendered by family Admin — this gem does not add a chart library. Admin 2.0.1 `Section#link` cannot pass `icon:` or `href:`, so the hub template is overridden at `app/overrides/recording_studio_admin/sections/show.html.erb` for those Button props only.
 
-New, show, and edit stay this gem’s controllers and forms. New/edit forms are Name, Key, Publication type, and Website — one field per row. Publication type is the closed `kind` list, not a second recordable. Cancel and Save are separate Buttons. Show (and Edit) display the current logo when one exists, plus a FlatPack Button to Attachable’s add or change screens. When Edit is allowed, show and edit render Publishable’s `EditButtonComponent` (label **Publish** until a child exists, then Draft / Published / Scheduled). That control opens Publishable’s management screen. New has no logo field.
+New, show, and edit stay this gem’s controllers and forms. New/edit forms are Name, Key, Publication type, and Website — one field per row. Publication type is the closed `kind` list, not a second recordable. Cancel and Save are separate Buttons. Show (and Edit) display the current logo when one exists, plus a FlatPack Button to Attachable’s add or change screens. When Edit is allowed, show and edit render Publishable’s `QuickActions` dropdown (closed label **Draft**, a scheduled date, or **Published**). The menu holds Publish now, Schedule or Change schedule, Unpublish, Preview or View, then SEO and Social. Inline publish and unpublish stay on the title page. New has no logo field.
 
 ### Capabilities
 
@@ -130,7 +130,7 @@ All views use FlatPack ViewComponents. The live reference is [flatpack.bowerbird
 8. Mount `recording_studio_admin_for :admin, at: "/admin", root_section: :publications`.
 9. Mount `RecordingStudioAccessible::Engine` at `/admin/access` so the section Access avatars open the family Access UI on the AdminRoot.
 10. Mount `RecordingStudioAttachable::Engine` (dummy: `/recording_studio_attachable`) so add/change logo can use Attachable’s screens. Keep Attachable on its blank layout so core `default_layout` does not add a second back.
-11. Add `recording_studio_publishable ~> 0.2`, install its migrations, and mount `RecordingStudioPublishable::Engine` at `/`. Call `RecordingStudioPublications::FamilyManagement.install!` from a host initializer. Scan Publishable views in Tailwind `@source`.
+11. Add `recording_studio_publishable ~> 0.3`, install its migrations, and mount `RecordingStudioPublishable::Engine` at `/`. Call `RecordingStudioPublications::FamilyManagement.install!` from a host initializer. Scan Publishable views and components in Tailwind `@source`.
 12. Bootstrap first-owner admin access on the AdminRoot recording.
 
 Authenticated screens should keep `RecordingStudio::UsesDefaultLayout`. If core puts `data-theme` on `<body>`, render `layouts/_default_layout_head` from the `recording_studio/default_layout_head` hook so `<html>` gets `data-theme="rounded"`. Do not put Sign out or a workspace switcher in that slot.
@@ -154,7 +154,7 @@ Authenticated screens should keep `RecordingStudio::UsesDefaultLayout`. If core 
 | Accessible      | `~> 0.9` (dummy GitHub tag `v0.9.0`) |
 | Admin           | `~> 2.0` (dummy GitHub tag `2.0.1`) |
 | Attachable      | `~> 0.5` (dummy GitHub tag `v0.5.0`) |
-| Publishable     | `~> 0.2` (dummy GitHub tag `v0.2.1`) |
+| Publishable     | `~> 0.3` (dummy GitHub tag `v0.3.0`) |
 | Root Switchable | dummy GitHub tag `v0.5.0` |
 | FlatPack        | `~> 0.1.143` (dummy GitHub tag `v0.1.143`) |
 | Devise          | latest  |

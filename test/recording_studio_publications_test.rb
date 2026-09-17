@@ -19,7 +19,7 @@ class RecordingStudioPublicationsTest < Minitest::Test
     assert_includes gemspec, 'spec.add_dependency "recording_studio_accessible", "~> 0.9"'
     assert_includes gemspec, 'spec.add_dependency "recording_studio_admin", "~> 2.0"'
     assert_includes gemspec, 'spec.add_dependency "recording_studio_attachable", "~> 0.5"'
-    assert_includes gemspec, 'spec.add_dependency "recording_studio_publishable", "~> 0.2"'
+    assert_includes gemspec, 'spec.add_dependency "recording_studio_publishable", "~> 0.3"'
     assert_includes gemspec, 'spec.add_dependency "flat_pack", "~> 0.1.143"'
   end
 
@@ -29,7 +29,7 @@ class RecordingStudioPublicationsTest < Minitest::Test
     assert_includes gemfile, 'github: "bowerbird-app/RecordingStudio", tag: "v4.2.0"'
     assert_includes gemfile, 'github: "bowerbird-app/RecordingStudio_accessible", tag: "v0.9.0"'
     assert_includes gemfile, 'github: "bowerbird-app/RecordingStudio_attachable", tag: "v0.5.0"'
-    assert_includes gemfile, 'github: "bowerbird-app/RecordingStudio_publishable", tag: "v0.2.1"'
+    assert_includes gemfile, 'github: "bowerbird-app/RecordingStudio_publishable", tag: "v0.3.0"'
     assert_includes gemfile, 'github: "bowerbird-app/RecordingStudio_admin", tag: "2.0.1"'
     assert_includes gemfile, 'github: "bowerbird-app/RecordingStudio_root_switchable", tag: "v0.5.0"'
     assert_includes gemfile, 'github: "bowerbird-app/flatpack", tag: "v0.1.143"'
@@ -67,14 +67,20 @@ class RecordingStudioPublicationsTest < Minitest::Test
     assert_includes public_layout, 'stylesheet_link_tag "flat_pack/rich_text"'
     refute_includes public_layout, "Go back"
     refute_includes public_layout, "PageNav"
+
+    public_show = File.read(
+      File.expand_path("../app/views/recording_studio_publications/public_publications/show.html.erb", __dir__)
+    )
+    assert_includes public_show, "publishable_preview_badge"
   end
 
-  def test_show_and_edit_use_publishable_edit_button
+  def test_show_and_edit_use_publishable_quick_actions
     show = File.read(File.expand_path("../app/views/recording_studio_publications/publications/show.html.erb", __dir__))
     edit = File.read(File.expand_path("../app/views/recording_studio_publications/publications/edit.html.erb", __dir__))
 
     [show, edit].each do |view|
-      assert_includes view, "RecordingStudioPublishable::EditButtonComponent"
+      assert_includes view, "RecordingStudioPublishable::QuickActions::Component"
+      refute_includes view, "EditButtonComponent"
       refute_includes view, "StatusBadge"
       refute_includes view, "Public page"
       refute_includes view, "publication_public_page_button_text"

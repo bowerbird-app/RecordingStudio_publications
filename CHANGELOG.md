@@ -12,14 +12,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 Publishable on each title, a public press page, family-management composition, and publication-type copy.
 
 ### Added
-- `recording_studio_publishable ~> 0.2` runtime dependency. Dummy pins GitHub tag `v0.2.1`
+- `recording_studio_publishable ~> 0.3` runtime dependency. Dummy pins GitHub tag `v0.3.0`
 - `RecordingStudio::Capabilities::Publishable.to` on `Publication` only, with public path `/publications/:uuid/:slug`
 - `PublicationType` closed token registry. `Publication::KINDS` derives from it. `#publication_type` is a reader
 - `FamilyAuthorization` replaces `LogoAuthorization` for logos and publish screens (AdminRoot first, then per-title Accessible)
 - `FamilyManagement.install!` wraps the current Publishable authorizer and close-URL resolver. Idempotent. The engine does not assign those globals on boot
 - `PublishedPublication` public page model and a callback-free `PublicPublicationsController#show`
 - Public layout `recording_studio_publications/public` with no PageNav and no competing Open Graph tags
-- Show and edit render Publishable’s `EditButtonComponent` (not a custom badge plus button) to open the public-page screen
+- Show and edit render Publishable’s `QuickActions` dropdown (not `EditButtonComponent`). Closed labels are Draft, a scheduled date, or Published. Inline publish and unpublish stay on the title page
 - Hub line chart **Publications over time** (`widgets.publications.over_time`) before the type chart
 
 ### Changed
@@ -30,10 +30,10 @@ Publishable on each title, a public press page, family-management composition, a
 
 ### Upgrade notes
 - Bump to `0.3.0`
-- Add `recording_studio_publishable ~> 0.2`, install its migrations, register `RecordingStudioPublishable::Publishable`, and mount `RecordingStudioPublishable::Engine` at `/`
+- Add `recording_studio_publishable ~> 0.3`, install its migrations, register `RecordingStudioPublishable::Publishable`, and mount `RecordingStudioPublishable::Engine` at `/`. Replace `EditButtonComponent` with `QuickActions::Component` on host title pages
 - Call `RecordingStudioPublications::FamilyManagement.install!` after any host Publishable authorizer for other types
 - Rename `LogoAuthorization` callers to `FamilyAuthorization`. There is no alias
-- Scan Publishable views in Tailwind `@source`
+- Scan Publishable views and components in Tailwind `@source`
 - Form posts stay `publication[kind]`. Only the visible label changed
 
 ## [0.2.1] - 2026-09-02
