@@ -15,4 +15,10 @@ class FamilyManagementTest < Minitest::Test
       FakeRecording.new("Page", nil)
     )
   end
+
+  def test_preview_wrap_is_part_of_family_management
+    assert RecordingStudioPublications::FamilyManagement.const_defined?(:Preview)
+    assert RecordingStudioPublications::FamilyManagement::Preview.const_defined?(:Authorization)
+    assert RecordingStudioPublications::FamilyManagement::Preview.const_defined?(:EnsureChild)
+  end
 end

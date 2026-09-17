@@ -27,6 +27,14 @@ class FamilyManagementTest < ActionDispatch::IntegrationTest
     Current.actor = nil
   end
 
+  test "install wraps publishable preview authorization and the preview action" do
+    ancestors = RecordingStudioPublishable::PublishablesController.ancestors
+    config_ancestors = RecordingStudioPublishable.configuration.singleton_class.ancestors
+
+    assert_includes ancestors, RecordingStudioPublications::FamilyManagement::Preview::EnsureChild
+    assert_includes config_ancestors, RecordingStudioPublications::FamilyManagement::Preview::Authorization
+  end
+
   test "install is idempotent and does not restack wrappers" do
     config = RecordingStudioPublishable.configuration
     first = RecordingStudioPublications::FamilyManagement.install!(config)
@@ -77,6 +85,43 @@ class FamilyManagementTest < ActionDispatch::IntegrationTest
 
     get recording_studio_publishable.edit_recording_publishable_path(recording_id: @publication_recording.id)
     assert_response :success
+  end
+
+  test "AdminRoot staff can preview a draft that has no publishable child yet" do
+    bootstrap_owner_access!(@admin, @admin_recording)
+    sign_in @admin
+    assert_nil @publication_recording.publishable_child_recording
+
+    get recording_studio_publishable.preview_recording_publishable_path(recording_id: @publication_recording.id)
+
+    assert_response :success
+    assert_includes response.body, "Family Mag"
+    assert_includes response.body, "Preview"
+    assert_includes response.body, '<meta name="robots" content="noindex,nofollow">'
+    refute_includes response.body, "Sign out"
+    assert @publication_recording.reload.publishable_child_recording.present?
+  end
+
+  test "signed-in member without AdminRoot cannot preview" do
+    sign_in @member
+
+    get recording_studio_publishable.preview_recording_publishable_path(recording_id: @publication_recording.id)
+    assert_response :not_found
+  end
+
+  test "per-title view grant is enough to preview" do
+    grant_admin_access_for_test!(recording: @publication_recording, actor: @member, role: :view)
+    sign_in @member
+
+    get recording_studio_publishable.preview_recording_publishable_path(recording_id: @publication_recording.id)
+    assert_response :success
+    assert_includes response.body, "Family Mag"
+    assert_includes response.body, "Preview"
+  end
+
+  test "logged out preview is not found" do
+    get recording_studio_publishable.preview_recording_publishable_path(recording_id: @publication_recording.id)
+    assert_response :not_found
   end
 
   test "show offers Publishable's status dropdown when edit is allowed" do

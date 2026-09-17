@@ -177,7 +177,11 @@ class RecordingStudioPublicationsTest < Minitest::Test
     assert_includes initializer_source, '"RecordingStudioPublications::Publication"'
     assert_includes initializer_source, '"RecordingStudioAttachable::Attachment"'
     assert_includes initializer_source, '"RecordingStudioPublishable::Publishable"'
+    family_management = File.read(
+      File.expand_path("../lib/recording_studio_publications/family_management.rb", __dir__)
+    )
     engine_source = File.read(File.expand_path("../lib/recording_studio_publications/engine.rb", __dir__))
+    assert_includes family_management, "Preview.install!(config)"
     refute_includes engine_source, "management_authorizer ="
     refute_includes engine_source, "FamilyManagement.install!"
     refute_includes initializer_source, "config.include_children"

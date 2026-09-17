@@ -16,7 +16,7 @@ Publishable on each title, a public press page, family-management composition, a
 - `RecordingStudio::Capabilities::Publishable.to` on `Publication` only, with public path `/publications/:uuid/:slug`
 - `PublicationType` closed token registry. `Publication::KINDS` derives from it. `#publication_type` is a reader
 - `FamilyAuthorization` replaces `LogoAuthorization` for logos and publish screens (AdminRoot first, then per-title Accessible)
-- `FamilyManagement.install!` wraps the current Publishable authorizer and close-URL resolver. Idempotent. The engine does not assign those globals on boot
+- `FamilyManagement.install!` wraps the current Publishable authorizer, close-URL resolver, and Preview authorization (`FamilyAuthorization` `:view`). Idempotent. The engine does not assign those globals on boot. Draft Preview also ensures a publishable child so QuickActions Preview does not 404
 - `PublishedPublication` public page model and a callback-free `PublicPublicationsController#show`
 - Public layout `recording_studio_publications/public` with no PageNav and no competing Open Graph tags
 - Show and edit render Publishable’s `QuickActions` dropdown (not `EditButtonComponent`). Closed labels are Draft, a scheduled date, or Published. Inline publish and unpublish stay on the title page
@@ -31,7 +31,7 @@ Publishable on each title, a public press page, family-management composition, a
 ### Upgrade notes
 - Bump to `0.3.0`
 - Add `recording_studio_publishable ~> 0.3`, install its migrations, register `RecordingStudioPublishable::Publishable`, and mount `RecordingStudioPublishable::Engine` at `/`. Replace `EditButtonComponent` with `QuickActions::Component` on host title pages
-- Call `RecordingStudioPublications::FamilyManagement.install!` after any host Publishable authorizer for other types
+- Call `RecordingStudioPublications::FamilyManagement.install!` after any host Publishable authorizer for other types. Preview for titles uses family `:view` (AdminRoot first), not a per-title Accessible grant alone
 - Rename `LogoAuthorization` callers to `FamilyAuthorization`. There is no alias
 - Scan Publishable views and components in Tailwind `@source`
 - Form posts stay `publication[kind]`. Only the visible label changed

@@ -14,7 +14,7 @@
 
 ## Publications 0.3.0
 
-Bump to `0.3.0`. Add Publishable `~> 0.3`, mount it at `/`, install its migrations, register `RecordingStudioPublishable::Publishable`, and call `FamilyManagement.install!`. Show and edit render `QuickActions` (not `EditButtonComponent`). Rename `LogoAuthorization` to `FamilyAuthorization` with no alias. Visible copy says publication type; the `kind` column and param stay.
+Bump to `0.3.0`. Add Publishable `~> 0.3`, mount it at `/`, install its migrations, register `RecordingStudioPublishable::Publishable`, and call `FamilyManagement.install!`. Show and edit render `QuickActions` (not `EditButtonComponent`). Rename `LogoAuthorization` to `FamilyAuthorization` with no alias. Visible copy says publication type; the `kind` column and param stay. `install!` also wraps Preview so AdminRoot staff can open a draft from the status menu.
 
 Do not enable Publishable on the shared catalogue. Do not assign Publishable’s `management_authorizer` from this engine.
 
