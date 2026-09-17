@@ -11,7 +11,7 @@ This Rails app exists to validate the Recording Studio publications gem in a rea
 - `PublishedArticle` children under a Publication. Dummy seeds three Atlantic articles and one screenshot
 - Attachable enabled on Publication (logo) and PublishedArticle (screenshot), images only, added after the record exists
 - Publishable enabled on Publication only. Seeded The Atlantic is currently published
-- Family admin at `/admin` (`recording_studio_admin_for`, section `:publications`, title Admin publications)
+- Family admin at `/admin` (`recording_studio_admin_for`, section `:publications`, title Publications)
 - Accessible mounted at `/admin/access` so the publications hub can manage AdminRoot grants
 - Attachable mounted at `/recording_studio_attachable` for add/change logo, using Attachable’s blank layout so those screens have one PageNav (not a second back from default_layout)
 - Flatpack sidebar (`flat_pack_sidebar`) for authenticated home and docs. Recording Studio default layout only on gem title and article new/show/edit. FlatPack assets and Tailwind `@source` scanning for `vendor/bundle`, `/usr/local/bundle`, and `/usr/local/lib/ruby/gems` so Cloud Agent images still emit Grid/Table classes
@@ -38,9 +38,10 @@ Then open the app and sign in with:
 ## Useful Routes
 
 - `/` - dummy app home and a short link into publications admin
-- `/admin` - publications hub (family RecordingStudioAdmin: Publication with plus heroicon, View all, count widget, publications-over-time line chart, publication-types bar chart, Access). Section title is Admin publications
+- `/admin` - publications hub (title Publications and a button to inventory)
 - `/admin/access` - family Access UI for the owned AdminRoot
-- `/admin/screens/publications` - inventory with family search, the Screen titles-over-time chart, and Name / Publication type / Website columns
+- `/admin/publications` - inventory with family search, the Screen titles-over-time chart, Name / Publication type / Website / Articles columns, and **Publication** under the title
+- `/admin/articles` - articles inventory with a publication filter
 - `/publications/:uuid/:slug` - public page for a currently published title
 - `/recording_studio_publications/admin/publications/new` - new title (no logo field)
 - `/recording_studio_publications/admin/publications/:id/articles` - articles for that title

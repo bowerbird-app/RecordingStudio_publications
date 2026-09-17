@@ -112,6 +112,8 @@ class DocsControllerTest < ActionDispatch::IntegrationTest
     assert_includes response.body, "Record an article"
     assert_includes response.body, "RecordingStudioPublications.record_article!"
     assert_includes response.body, "RecordingStudioPublications.articles_for"
+    assert_includes response.body, "RecordingStudioPublications.articles"
+    assert_includes response.body, "RecordingStudioPublications.publication_for"
   end
 
   test "authenticated docs pages use the dummy sidebar layout" do

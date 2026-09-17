@@ -38,7 +38,9 @@
     language: :ruby,
     code: <<~'CODE'
       articles = RecordingStudioPublications.articles_for(publication)
+      all_articles = RecordingStudioPublications.articles
       screenshot = RecordingStudioPublications.screenshot_recording_for(articles.first)
+      parent = RecordingStudioPublications.publication_for(articles.first)
     CODE
   ) %>
 </div>

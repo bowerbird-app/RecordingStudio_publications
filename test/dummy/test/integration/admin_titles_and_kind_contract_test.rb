@@ -24,10 +24,12 @@ class AdminTitlesAndKindContractTest < ActionDispatch::IntegrationTest
   test "section title is independent of screen widget catalogue and app name" do
     assert_equal "publications", RecordingStudioPublications::Admin::SECTION_KEY
     assert_equal "publications", RecordingStudioPublications::Admin::SCREEN_KEY
+    assert_equal "articles", RecordingStudioPublications::Admin::ARTICLES_SCREEN_KEY
     assert_equal "widgets.publications.over_time", RecordingStudioPublications::Admin::WIDGET_OVER_TIME
     assert_equal "widgets.publications.by_kind", RecordingStudioPublications::Admin::WIDGET_BY_KIND
-    assert_equal "Admin publications", RecordingStudioPublications::Admin::PublicationsSection.title
+    assert_equal "Publications", RecordingStudioPublications::Admin::PublicationsSection.title
     assert_equal "Publications", RecordingStudioPublications::Admin::PublicationsScreen.title
+    assert_equal "Articles", RecordingStudioPublications::Admin::ArticlesScreen.title
     assert_equal "Publications",
                  RecordingStudioPublications::Admin::TotalPublicationsWidget.title
     assert_equal "Publications over time",
@@ -37,8 +39,9 @@ class AdminTitlesAndKindContractTest < ActionDispatch::IntegrationTest
     assert_equal "Publications",
                  RecordingStudio.recordable_declaration_for("RecordingStudioPublications::PublicationCatalogue").label
     assert_equal "Publications", RecordingStudio.configuration.app_name
-    assert_equal "Admin publications", I18n.t("recording_studio_publications.admin.section_title")
+    assert_equal "Publications", I18n.t("recording_studio_publications.admin.section_title")
     assert_equal "Publications", I18n.t("recording_studio_publications.admin.screen_title")
+    assert_equal "Articles", I18n.t("recording_studio_publications.admin.articles_screen_title")
     assert_equal "Publications", I18n.t("recording_studio_publications.admin.total_widget_title")
     assert_equal "Publications over time", I18n.t("recording_studio_publications.admin.over_time_widget_title")
     assert_equal "Publication types", I18n.t("recording_studio_publications.admin.by_type_widget_title")

@@ -27,6 +27,19 @@ module RecordingStudioPublications
       Publication.where(id: current_publication_recordings.select(:recordable_id)).order(:name)
     end
 
+    def articles
+      ids = RecordingStudio::Recording.where(
+        recordable_type: PublishedArticle.name,
+        parent_recording_id: current_publication_recordings.select(:id),
+        trashed_at: nil
+      ).select(:recordable_id)
+      PublishedArticle.where(id: ids).order(:title)
+    end
+
+    def publication_for(article)
+      article_recording_for(article)&.parent_recording&.recordable
+    end
+
     def current_publication_recordings
       RecordingStudio::Recording.where(
         recordable_type: Publication.name,

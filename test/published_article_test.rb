@@ -43,7 +43,10 @@ class PublishedArticleTest < ActiveSupport::TestCase
     assert_equal "https://example.com/house", article_recording.recordable.url
     assert_includes RecordingStudioPublications.articles_for(publication_recording.recordable).map(&:title),
                     "House in the Rainforest"
+    assert_includes RecordingStudioPublications.articles.map(&:title), "House in the Rainforest"
     assert_equal article_recording, RecordingStudioPublications.article_recording_for(article_recording.recordable)
+    assert_equal publication_recording.recordable,
+                 RecordingStudioPublications.publication_for(article_recording.recordable)
   end
 
   test "PublishedArticle is rejected under Workspace and the catalogue root" do

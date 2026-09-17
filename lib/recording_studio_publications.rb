@@ -57,8 +57,16 @@ module RecordingStudioPublications
       Catalogue.revise_article!(...)
     end
 
+    def articles
+      Catalogue.articles
+    end
+
     def articles_for(...)
       Catalogue.articles_for(...)
+    end
+
+    def publication_for(...)
+      Catalogue.publication_for(...)
     end
 
     def article_recordings_for(...)

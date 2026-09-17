@@ -5,8 +5,9 @@ en:
         kind: "Publication type"
   recording_studio_publications:
     admin:
-      section_title: "Admin publications"
+      section_title: "Publications"
       screen_title: "Publications"
+      articles_screen_title: "Articles"
       total_widget_title: "Publications"
       over_time_widget_title: "Publications over time"
       by_type_widget_title: "Publication types"
@@ -14,4 +15,4 @@ en:
       form_type_placeholder: "Select a publication type"
       show_type_label: "Publication type"
       new_link: "Publication"
-      inventory_link: "View all"
+      inventory_link: "Publications"

@@ -17,8 +17,10 @@ Articles published by a title, nested under that Publication recording.
 - Live URL uniqueness among siblings of the same title. The same URL may exist under a different title
 - Optional Attachable screenshot on the article (images only). Persist stays on `import_attachment` / `replace_attachment_file`. No capture, crawl, download, or PDF storage
 - Nested engine routes at `/recording_studio_publications/admin/publications/:id/articles`. Index filters: search, year, author, has URL, has screenshot, chronological or title sort
+- Family articles Screen at `/admin/articles` with a publication filter. Inventory at `/admin/publications` lists an Articles count that opens that Screen
 - Reusable article index, list, card, show, and screenshot partials. Title show lists recent articles with View all and Add article
 - Dummy seeds three Atlantic articles. One has a screenshot
+- Admin hub is title **Publications** plus one button to `/admin/publications`. Inventory **Publication** (plus heroicon) sits under the title. Table Name links to the admin show page
 
 ### Upgrade notes
 - Bump to `0.4.0`

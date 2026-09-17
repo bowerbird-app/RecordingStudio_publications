@@ -102,7 +102,7 @@ module RecordingStudioPublications
     end
 
     def inventory_path
-      recording_studio_admin_context.admin_screen_path(RecordingStudioPublications::Admin::SCREEN_KEY)
+      RecordingStudioPublications::Admin.publications_screen_path(recording_studio_admin_context)
     end
   end
 end
