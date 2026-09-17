@@ -7,10 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-### Changed
-- Dummy authenticated home and docs use Flatpack `flat_pack_sidebar`. Recording Studio default layout stays on gem clear-action screens (title new/show/edit). Attachable stays blank so that layout does not add a second back.
-
-## [0.3.0] - 2026-09-03
+## [0.3.0] - 2026-09-17
 
 Publishable on each title, a public press page, family-management composition, and publication-type copy.
 
@@ -30,6 +27,7 @@ Publishable on each title, a public press page, family-management composition, a
 - Visible copy says **Publication type**. The `kind` column, param, sort key, and `widgets.publications.by_kind` stay `kind`
 - Hub type chart title is **Publication types**
 - Hub primary action is **Publication** with Flatpack’s plus heroicon. Secondary inventory action is **View all**. Admin 2.0.1 `Section#link` has no icon field and passes `url:` (Flatpack only links on `href:`), so this gem overrides `sections/show` for those two Button props. Inventory Screen still uses **New**
+- Dummy authenticated home and docs use Flatpack `flat_pack_sidebar`. Recording Studio default layout stays on gem clear-action screens (title new/show/edit). Attachable stays blank so that layout does not add a second back
 
 ### Upgrade notes
 - Bump to `0.3.0`
@@ -38,6 +36,7 @@ Publishable on each title, a public press page, family-management composition, a
 - Rename `LogoAuthorization` callers to `FamilyAuthorization`. There is no alias
 - Scan Publishable views and components in Tailwind `@source`
 - Form posts stay `publication[kind]`. Only the visible label changed
+- Dummy hosts that put home/docs on Recording Studio default layout should switch those pages to a host sidebar. Title new/show/edit stay on `UsesDefaultLayout`
 
 ## [0.2.1] - 2026-09-02
 
