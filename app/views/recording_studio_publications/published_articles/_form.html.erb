@@ -1,0 +1,67 @@
+<div class="space-y-4">
+  <% if article.errors.any? %>
+    <%= render FlatPack::Alert::Component.new(
+      title: "This article could not be saved",
+      description: article.errors.full_messages.to_sentence,
+      style: :danger
+    ) %>
+  <% end %>
+
+  <%= render FlatPack::TextInput::Component.new(
+    name: "article[title]",
+    id: "article_title",
+    label: "Title",
+    value: article.title,
+    required: true,
+    error: article.errors[:title].to_sentence.presence
+  ) %>
+
+  <%= render FlatPack::UrlInput::Component.new(
+    name: "article[url]",
+    id: "article_url",
+    label: "URL",
+    value: article.url,
+    placeholder: "https://",
+    error: article.errors[:url].to_sentence.presence
+  ) %>
+
+  <%= render FlatPack::UrlInput::Component.new(
+    name: "article[canonical_url]",
+    id: "article_canonical_url",
+    label: "Canonical URL",
+    value: article.canonical_url,
+    placeholder: "https://",
+    help_text: "Use when the article URL is a short or tracking link.",
+    error: article.errors[:canonical_url].to_sentence.presence
+  ) %>
+
+  <%= render FlatPack::DateInput::Component.new(
+    name: "article[published_on]",
+    id: "article_published_on",
+    label: "Published date",
+    value: article.published_on,
+    error: article.errors[:published_on].to_sentence.presence
+  ) %>
+
+  <%= render FlatPack::TextInput::Component.new(
+    name: "article[byline]",
+    id: "article_byline",
+    label: "Author",
+    value: article.byline,
+    error: article.errors[:byline].to_sentence.presence
+  ) %>
+
+  <%= render FlatPack::TextArea::Component.new(
+    name: "article[excerpt]",
+    id: "article_excerpt",
+    label: "Excerpt",
+    value: article.excerpt,
+    rows: 4,
+    error: article.errors[:excerpt].to_sentence.presence
+  ) %>
+
+  <div class="flex items-center gap-2 pt-2">
+    <%= render FlatPack::Button::Component.new(text: "Cancel", href: cancel_url, style: :secondary) %>
+    <%= render FlatPack::Button::Component.new(text: "Save", type: :submit, style: :primary) %>
+  </div>
+</div>

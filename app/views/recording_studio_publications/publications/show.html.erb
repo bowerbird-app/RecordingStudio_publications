@@ -38,5 +38,12 @@
       <% table.column(title: "Attribute") { |attribute_row| attribute_row.fetch(:attribute) } %>
       <% table.column(title: "Value") { |attribute_row| attribute_row.fetch(:value) } %>
     <% end %>
+
+    <%= render "articles",
+               article_entries: @article_entries,
+               publication_recording: @recording,
+               publication: @publication,
+               articles_count: @articles_count,
+               edit_publication_action: @edit_publication_action %>
   </div>
 <% end %>

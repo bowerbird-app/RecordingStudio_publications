@@ -2,6 +2,7 @@
 
 require_relative "catalogue/writes"
 require_relative "catalogue/logos"
+require_relative "catalogue/articles"
 
 module RecordingStudioPublications
   # Public write and lookup helpers for the shared Publications catalogue.
@@ -10,6 +11,7 @@ module RecordingStudioPublications
 
     extend Writes
     extend Logos
+    extend Articles
 
     module_function
 

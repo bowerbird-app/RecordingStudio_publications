@@ -7,7 +7,7 @@ Next steps:
 3. Install the engine migrations with `bin/rails generate recording_studio_publications:migrations`.
 4. Apply the migrations with `bin/rails db:migrate`.
 5. Install Accessible, Admin, Attachable, Publishable, and Active Storage migrations if this host does not already have them.
-6. Register `RecordingStudioPublications::PublicationCatalogue`, `RecordingStudioPublications::Publication`, host `AdminRoot`, `RecordingStudioAttachable::Attachment`, and `RecordingStudioPublishable::Publishable` in `RecordingStudio.configure`.
+6. Register `RecordingStudioPublications::PublicationCatalogue`, `RecordingStudioPublications::Publication`, `RecordingStudioPublications::PublishedArticle`, host `AdminRoot`, `RecordingStudioAttachable::Attachment`, and `RecordingStudioPublishable::Publishable` in `RecordingStudio.configure`.
 7. Create an owned `AdminRoot` (`shared: false`), enable Accessible on it, and `section :publications`. Point RecordingStudioAdmin resolvers at that recording and bootstrap first-owner admin access.
 8. Run `bin/rails tailwindcss:build` if you use Tailwind CSS. Scan RecordingStudioAdmin, Attachable, and Publishable views as well as this engine.
 9. Mount routes are added at the configured mount path. Also mount `recording_studio_admin_for`, `RecordingStudioAccessible::Engine` at `/admin/access` (AdminRoot Access UI), `RecordingStudioAttachable::Engine` so logo add/change uses Attachable’s screens, and `RecordingStudioPublishable::Engine` at `/`. Call `RecordingStudioPublications::FamilyManagement.install!` after any other Publishable authorizer so title Preview uses family AdminRoot policy. Adjust auth, layout, and current actor integration to match your host app.
