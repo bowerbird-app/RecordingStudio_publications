@@ -41,6 +41,7 @@ class PublicPublicationTest < ActionDispatch::IntegrationTest
     refute_includes response.body, "attachment_file_path"
     refute_includes response.body, "Go back"
     refute_includes response.body, "flat-pack-page-nav"
+    refute_includes response.body, ">Preview<"
     assert_includes response.body, 'data-theme="rounded"'
     assert_includes response.body, "<body"
     assert_includes response.body, "flat_pack/variables"

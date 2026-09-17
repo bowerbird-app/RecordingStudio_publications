@@ -95,6 +95,7 @@ module RecordingStudioPublications
       config.management_close_url_resolver = lambda { |controller:, recording: nil, **|
         close_url_with(config, controller: controller, recording: recording)
       }
+      Preview.install!(config)
     end
 
     def invoke(callable, **kwargs)
@@ -112,3 +113,5 @@ module RecordingStudioPublications
     end
   end
 end
+
+require_relative "family_management/preview"
