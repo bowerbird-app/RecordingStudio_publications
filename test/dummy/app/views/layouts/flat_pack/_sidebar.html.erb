@@ -11,9 +11,9 @@
     <nav class="py-4 space-y-1" aria-label="Main navigation">
       <%= render FlatPack::Sidebar::Item::Component.new(
             text: "Home",
-            href: "/",
+            href: main_app.root_path,
             icon: :home,
-            current: request.path == "/"
+            current: request.path == main_app.root_path
           ) %>
       <%= render FlatPack::Sidebar::Item::Component.new(
             text: "Publications admin",
@@ -23,39 +23,39 @@
           ) %>
       <%= render FlatPack::Sidebar::Item::Component.new(
             text: "Install",
-            href: docs_install_path,
+            href: main_app.docs_install_path,
             icon: :folder,
-            current: request.path == docs_install_path
+            current: request.path == main_app.docs_install_path
           ) %>
       <%= render FlatPack::Sidebar::Item::Component.new(
             text: "Config",
-            href: docs_config_path,
+            href: main_app.docs_config_path,
             icon: :cog_6_tooth,
-            current: request.path == docs_config_path
+            current: request.path == main_app.docs_config_path
           ) %>
       <%= render FlatPack::Sidebar::Item::Component.new(
             text: "Recordable types",
-            href: docs_recordable_types_path,
+            href: main_app.docs_recordable_types_path,
             icon: :queue_list,
-            current: request.path == docs_recordable_types_path
+            current: request.path == main_app.docs_recordable_types_path
           ) %>
       <%= render FlatPack::Sidebar::Item::Component.new(
             text: "Recordings tree",
-            href: docs_recordings_tree_path,
+            href: main_app.docs_recordings_tree_path,
             icon: :folder,
-            current: request.path == docs_recordings_tree_path
+            current: request.path == main_app.docs_recordings_tree_path
           ) %>
       <%= render FlatPack::Sidebar::Item::Component.new(
             text: "Gem views",
-            href: docs_gem_views_path,
+            href: main_app.docs_gem_views_path,
             icon: :document,
-            current: request.path == docs_gem_views_path
+            current: request.path == main_app.docs_gem_views_path
           ) %>
       <%= render FlatPack::Sidebar::Item::Component.new(
             text: "Methods",
-            href: docs_methods_path,
+            href: main_app.docs_methods_path,
             icon: :code_bracket,
-            current: request.path == docs_methods_path
+            current: request.path == main_app.docs_methods_path
           ) %>
     </nav>
   <% end %>
