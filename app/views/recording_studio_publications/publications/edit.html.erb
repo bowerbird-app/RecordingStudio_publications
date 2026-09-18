@@ -23,7 +23,7 @@
     <%= form_with model: @publication,
                   url: admin_publication_path(@recording),
                   method: :patch do %>
-      <%= keep_anchor_url_field %>
+      <%= hidden_field_tag :anchor_url, page_nav_anchor_url if page_nav_anchor_url.present? %>
       <%= render "form",
                  publication: @publication,
                  cancel_url: preserve_anchor_url(admin_publication_path(@recording)) %>

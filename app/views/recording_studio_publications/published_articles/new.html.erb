@@ -13,7 +13,7 @@
                 as: :article,
                 url: admin_publication_articles_path(@publication_recording),
                 method: :post do %>
-    <%= keep_anchor_url_field %>
+    <%= hidden_field_tag :anchor_url, page_nav_anchor_url if page_nav_anchor_url.present? %>
     <%= render "form",
                article: @article,
                cancel_url: action_close_url(default: articles_admin_path(@publication)) %>

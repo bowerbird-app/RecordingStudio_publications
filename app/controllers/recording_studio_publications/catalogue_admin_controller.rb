@@ -8,8 +8,7 @@ module RecordingStudioPublications
     before_action :set_current_actor
 
     helper_method :recording_studio_admin_context, :page_nav_anchor_url, :preserve_anchor_url,
-                  :inventory_path, :articles_admin_path, :keep_anchor_url_field, :action_close_url,
-                  :hub_url_from_action
+                  :inventory_path, :articles_admin_path, :action_close_url, :hub_url_from_action
 
     private
 
@@ -46,13 +45,6 @@ module RecordingStudioPublications
 
     def hub_url_from_action(url)
       RecordingStudioPublications::Admin.append_anchor_url(url, request.path)
-    end
-
-    def keep_anchor_url_field
-      origin = page_nav_anchor_url
-      return if origin.blank?
-
-      hidden_field_tag(:anchor_url, origin)
     end
 
     def authorize_publications_admin_action!(record = nil)

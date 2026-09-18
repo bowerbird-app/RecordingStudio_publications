@@ -12,7 +12,7 @@
   <%= form_with model: @publication,
                 url: admin_publications_path,
                 method: :post do %>
-    <%= keep_anchor_url_field %>
+    <%= hidden_field_tag :anchor_url, page_nav_anchor_url if page_nav_anchor_url.present? %>
     <%= render "form", publication: @publication, cancel_url: action_close_url(default: inventory_path) %>
   <% end %>
 <% end %>
