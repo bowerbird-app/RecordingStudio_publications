@@ -39,26 +39,6 @@ module RecordingStudioPublications
         )
       end
 
-      def publication_type_count_cell(row, context)
-        linked_cell(
-          row.publications_count.to_s,
-          with_originating_anchor("#{publications_screen_path(context)}?publication_type=#{row.token}", context),
-          context
-        )
-      end
-
-      def publication_type_rows
-        counts = RecordingStudioPublications.publications.reorder(nil).group(:kind).count
-
-        PublicationType::TOKENS.map do |token|
-          PublicationTypeRow.new(
-            token: token,
-            label: PublicationType.parse(token).label,
-            publications_count: counts[token].to_i
-          )
-        end
-      end
-
       def article_title_cell(article, context)
         linked_cell(article.title, article_show_path(article, context), context)
       end
@@ -68,48 +48,6 @@ module RecordingStudioPublications
         return "—" if publication.blank?
 
         linked_cell(publication.name, publication_show_path(publication, context), context)
-      end
-
-      def titles_by_kind_series
-        counts = RecordingStudioPublications.publications.reorder(nil).group(:kind).count
-
-        [{
-          name: "Titles",
-          data: PublicationType::TOKENS.map { |kind| { x: PublicationType.parse(kind).label, y: counts[kind].to_i } }
-        }]
-      end
-
-      def titles_over_time_series
-        [{ name: "Publications", data: cumulative_weekly_counts(weekly_title_counts) }]
-      end
-
-      def articles_over_time_series
-        [{ name: "Articles", data: cumulative_weekly_counts(weekly_article_counts) }]
-      end
-
-      def cumulative_weekly_counts(points)
-        running = 0
-
-        points.map do |point|
-          running += point[:y].to_i
-          { x: point[:x], y: running }
-        end
-      end
-
-      def weekly_title_counts
-        RecordingStudioAdmin::AdminActivityLogsSupport.date_series(
-          RecordingStudioPublications.publications.reorder(nil),
-          field: :created_at,
-          bucket: :week
-        )
-      end
-
-      def weekly_article_counts
-        RecordingStudioAdmin::AdminActivityLogsSupport.date_series(
-          RecordingStudioPublications.articles.reorder(nil),
-          field: :created_at,
-          bucket: :week
-        )
       end
 
       def safe_like(value)
@@ -146,7 +84,5 @@ module RecordingStudioPublications
         )
       end
     end
-
-    PublicationTypeRow = Struct.new(:token, :label, :publications_count, keyword_init: true)
   end
 end

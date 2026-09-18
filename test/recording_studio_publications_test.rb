@@ -302,15 +302,20 @@ class RecordingStudioPublicationsTest < Minitest::Test
     admin = File.read(File.expand_path("../lib/recording_studio_publications/admin.rb", __dir__))
     section = File.read(File.expand_path("../lib/recording_studio_publications/admin/publications_section.rb", __dir__))
     paths = File.read(File.expand_path("../lib/recording_studio_publications/admin/paths.rb", __dir__))
+    anchors = File.read(File.expand_path("../lib/recording_studio_publications/admin/anchor_urls.rb", __dir__))
     controller = File.read(
       File.expand_path("../app/controllers/recording_studio_publications/catalogue_admin_controller.rb", __dir__)
     )
     show = File.read(File.expand_path("../app/views/recording_studio_publications/publications/show.html.erb", __dir__))
 
     assert_includes admin, 'TYPES_SCREEN_KEY = "publication_types"'
-    assert File.exist?(File.expand_path("../lib/recording_studio_publications/admin/publication_types_screen.rb", __dir__))
+    types_screen = File.expand_path(
+      "../lib/recording_studio_publications/admin/publication_types_screen.rb",
+      __dir__
+    )
+    assert File.exist?(types_screen)
     assert_includes section, "link :publication_types"
-    assert_includes paths, "def originating_page_for"
+    assert_includes anchors, "def originating_page_for"
     assert_includes paths, "publication_types"
     assert_includes controller, "def action_close_url"
     assert_includes show, "action_close_url(default: inventory_path)"

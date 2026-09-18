@@ -18,7 +18,10 @@ module RecordingStudioPublications
 end
 
 require_relative "admin/paths"
+require_relative "admin/anchor_urls"
 require_relative "admin/support"
+require_relative "admin/series"
+require_relative "admin/type_rows"
 require_relative "admin/publications_section"
 require_relative "admin/publications_screen"
 require_relative "admin/articles_screen"
@@ -28,7 +31,10 @@ require_relative "admin/publications_resource"
 module RecordingStudioPublications
   module Admin
     extend Paths
+    extend AnchorUrls
     extend Support
+    extend Series
+    extend TypeRows
 
     TotalPublicationsWidget = RecordingStudioAdmin::Widget.new(WIDGET_TOTAL, blast_radius: :site) do
       type :number
@@ -86,11 +92,19 @@ module RecordingStudioPublications
     def self.register!
       return unless defined?(::RecordingStudioAdmin)
 
+      register_screens!
+      register_widgets!
+    end
+
+    def self.register_screens!
       RecordingStudioAdmin.register_section(PublicationsSection)
       RecordingStudioAdmin.register_screen(PublicationsScreen)
       RecordingStudioAdmin.register_screen(ArticlesScreen)
       RecordingStudioAdmin.register_screen(PublicationTypesScreen)
       RecordingStudioAdmin.register_resource(PublicationsResource)
+    end
+
+    def self.register_widgets!
       RecordingStudioAdmin.register_widget(TotalPublicationsWidget)
       RecordingStudioAdmin.register_widget(TotalArticlesWidget)
       RecordingStudioAdmin.register_widget(TitlesOverTimeWidget)
