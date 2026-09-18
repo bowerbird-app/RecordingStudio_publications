@@ -12,6 +12,10 @@
 - FlatPack `~> 0.1.143` (dummy GitHub tag `v0.1.143`)
 - Public RubyGems and GitHub access for dependency installation
 
+## Publications 0.4.1
+
+Bump to `0.4.1`. The publications section renders total and over-time widgets for titles and articles, plus buttons to both inventories. Dummy `/admin` is a host `:root` section. Hosts that still want `/admin` to open the publications section can keep `root_section: :publications`.
+
 ## Publications 0.4.0
 
 Bump to `0.4.0`. Install the published-articles migration and register `RecordingStudioPublications::PublishedArticle`. Articles nest under a Publication recording only. Screenshots use Attachable images. Do not enable Publishable or Accessible on articles.

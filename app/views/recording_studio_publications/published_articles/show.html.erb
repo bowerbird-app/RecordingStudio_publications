@@ -12,7 +12,6 @@
   <% attribute_rows = [
        { attribute: "Title", value: @article.title },
        { attribute: "URL", value: @article.url.presence || "—" },
-       { attribute: "Canonical URL", value: @article.canonical_url.presence || "—" },
        { attribute: "Published", value: @article.published_on&.to_fs(:long) || "—" },
        { attribute: "Author", value: @article.byline.presence || "—" },
        { attribute: "Excerpt", value: @article.excerpt.presence || "—" }

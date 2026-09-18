@@ -9,20 +9,24 @@
     subtitle: @article.title
   ) %>
 
-  <div class="space-y-6">
-    <%= render "screenshot",
-               screenshot_recording: @screenshot_recording,
-               article_recording: @recording,
-               article: @article,
-               return_to: edit_admin_publication_article_path(@publication_recording, @recording) %>
+  <%= render FlatPack::Grid::Component.new(cols: 2, gap: :lg, align: :start, class: "mt-4") do %>
+    <div>
+      <%= form_with model: @article,
+                    as: :article,
+                    url: admin_publication_article_path(@publication_recording, @recording),
+                    method: :patch do %>
+        <%= render "form",
+                   article: @article,
+                   cancel_url: admin_publication_article_path(@publication_recording, @recording) %>
+      <% end %>
+    </div>
 
-    <%= form_with model: @article,
-                  as: :article,
-                  url: admin_publication_article_path(@publication_recording, @recording),
-                  method: :patch do %>
-      <%= render "form",
+    <div>
+      <%= render "screenshot",
+                 screenshot_recording: @screenshot_recording,
+                 article_recording: @recording,
                  article: @article,
-                 cancel_url: admin_publication_article_path(@publication_recording, @recording) %>
-    <% end %>
-  </div>
+                 return_to: edit_admin_publication_article_path(@publication_recording, @recording) %>
+    </div>
+  <% end %>
 <% end %>

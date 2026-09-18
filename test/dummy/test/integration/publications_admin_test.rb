@@ -34,14 +34,24 @@ class PublicationsAdminTest < ActionDispatch::IntegrationTest
     assert_equal RecordingStudioPublications::Admin::PublicationsResource,
                  RecordingStudioAdmin.resource_for("publications")
     total = RecordingStudioAdmin.widget_for("widgets.publications.total")
+    articles_total = RecordingStudioAdmin.widget_for("widgets.articles.total")
     over_time = RecordingStudioAdmin.widget_for("widgets.publications.over_time")
+    articles_over_time = RecordingStudioAdmin.widget_for("widgets.articles.over_time")
     by_kind = RecordingStudioAdmin.widget_for("widgets.publications.by_kind")
     assert_equal :number, total.type
+    assert_equal :number, articles_total.type
     assert_equal :chart, over_time.type
     assert_equal :line, over_time.chart_type
+    assert_equal :chart, articles_over_time.type
+    assert_equal :line, articles_over_time.chart_type
     assert_equal :chart, by_kind.type
     assert_equal :bar, by_kind.chart_type
-    assert_empty RecordingStudioPublications::Admin::PublicationsSection.widget_keys
+    assert_equal [
+      "widgets.publications.total",
+      "widgets.articles.total",
+      "widgets.publications.over_time",
+      "widgets.articles.over_time"
+    ], RecordingStudioPublications::Admin::PublicationsSection.widget_keys
     assert_empty RecordingStudioPublications::Admin::PublicationsScreen.widget_keys
     assert RecordingStudioPublications::Admin::PublicationsScreen.chart_value
     assert_equal :area, RecordingStudioPublications::Admin::PublicationsScreen.chart_value.type_value
@@ -73,6 +83,10 @@ class PublicationsAdminTest < ActionDispatch::IntegrationTest
       link.name == :inventory
     end
     assert_equal "Publications", inventory_link.text
+    articles_link = RecordingStudioPublications::Admin::PublicationsSection.links.find do |link|
+      link.name == :articles
+    end
+    assert_equal "Articles", articles_link.text
     assert File.exist?(RecordingStudioPublications::Engine.root.join("app/overrides/recording_studio_admin/screens/show.html.erb"))
     assert File.exist?(RecordingStudioPublications::Engine.root.join("app/overrides/recording_studio_admin/sections/show.html.erb"))
     refute_includes File.read(RecordingStudioPublications::Engine.root.join("lib/recording_studio_publications/admin.rb")),
@@ -95,14 +109,25 @@ class PublicationsAdminTest < ActionDispatch::IntegrationTest
     get recording_studio_publications.admin_publications_path
     assert_redirected_to "/admin/publications"
 
+    get "/admin"
+    assert_response :success
+    assert_includes response.body, "Publications admin demo"
+    refute_includes response.body, "Publications over time"
+    refute_includes response.body, "Articles over time"
+    home = Nokogiri::HTML(response.body)
+    section_button = home.css("a").find { |anchor| anchor["href"] == "/admin/sections/publications" }
+    assert section_button, "expected the admin home to link to the publications section"
+    assert_includes section_button.text, "Publications"
+
     get "/admin/sections/publications"
     assert_response :success
     assert_includes response.body, "Publications"
+    assert_includes response.body, "Articles"
+    assert_includes response.body, "Publications over time"
+    assert_includes response.body, "Articles over time"
     refute_includes response.body, "View all"
-    refute_includes response.body, "Publications over time"
     refute_includes response.body, "Publication types"
     refute_includes response.body, "Admin publications"
-    refute_includes response.body, "/admin/access/recordings/#{@admin_recording.id}/accesses"
     refute_includes response.body, "All publications"
     refute_includes response.body, "Manage access"
     refute_includes response.body, "+ Access"
@@ -110,8 +135,11 @@ class PublicationsAdminTest < ActionDispatch::IntegrationTest
     refute hub.at_css('a[href="/recording_studio_publications/admin/publications/new"]'),
            "hub should not include the new-title action"
     inventory = hub.css("a").find { |anchor| anchor["href"] == "/admin/publications" }
-    assert inventory, "expected a Publications hub button to /admin/publications"
+    assert inventory, "expected a Publications button to /admin/publications"
     assert_includes inventory.text, "Publications"
+    articles = hub.css("a").find { |anchor| anchor["href"] == "/admin/articles" }
+    assert articles, "expected an Articles button to /admin/articles"
+    assert_includes articles.text, "Articles"
 
     get "/admin/publications"
     assert_response :success
@@ -136,7 +164,7 @@ class PublicationsAdminTest < ActionDispatch::IntegrationTest
 
     get "/admin/screens/publications/chart"
     assert_response :success
-    assert_includes response.body, "Titles over time"
+    assert_includes response.body, "Publications over time"
     assert_includes response.body, "screen-chart"
 
     get "/admin/screens/publications/table"

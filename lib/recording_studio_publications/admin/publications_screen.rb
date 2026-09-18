@@ -42,7 +42,7 @@ module RecordingStudioPublications
         default_sort :name, direction: :asc
       end
       chart do
-        title "Titles over time"
+        title I18n.t("recording_studio_publications.admin.over_time_widget_title", default: "Publications over time")
         type :area
         series { |_context| RecordingStudioPublications::Admin.titles_over_time_series }
       end

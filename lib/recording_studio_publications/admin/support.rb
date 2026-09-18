@@ -56,13 +56,17 @@ module RecordingStudioPublications
       end
 
       def titles_over_time_series
-        [{ name: "Titles", data: cumulative_weekly_title_counts }]
+        [{ name: "Publications", data: cumulative_weekly_counts(weekly_title_counts) }]
       end
 
-      def cumulative_weekly_title_counts
+      def articles_over_time_series
+        [{ name: "Articles", data: cumulative_weekly_counts(weekly_article_counts) }]
+      end
+
+      def cumulative_weekly_counts(points)
         running = 0
 
-        weekly_title_counts.map do |point|
+        points.map do |point|
           running += point[:y].to_i
           { x: point[:x], y: running }
         end
@@ -71,6 +75,14 @@ module RecordingStudioPublications
       def weekly_title_counts
         RecordingStudioAdmin::AdminActivityLogsSupport.date_series(
           RecordingStudioPublications.publications.reorder(nil),
+          field: :created_at,
+          bucket: :week
+        )
+      end
+
+      def weekly_article_counts
+        RecordingStudioAdmin::AdminActivityLogsSupport.date_series(
+          RecordingStudioPublications.articles.reorder(nil),
           field: :created_at,
           bucket: :week
         )
