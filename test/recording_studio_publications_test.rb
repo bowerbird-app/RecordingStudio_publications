@@ -4,7 +4,7 @@ require "test_helper"
 
 class RecordingStudioPublicationsTest < Minitest::Test
   def test_version_matches_release
-    assert_equal "0.4.0", ::RecordingStudioPublications::VERSION
+    assert_equal "0.4.1", ::RecordingStudioPublications::VERSION
   end
 
   def test_engine_exists
@@ -127,6 +127,10 @@ class RecordingStudioPublicationsTest < Minitest::Test
     assert File.exist?(File.expand_path("dummy/app/views/layouts/flat_pack/_top_nav.html.erb", __dir__))
     assert_includes gem_controller_source, "layout \"recording_studio/default_layout\""
     assert_includes default_layout_initializer, "RecordingStudio::ApplicationController.include(RecordingStudio::UsesDefaultLayout)"
+    page_nav_aliases = File.read(
+      File.expand_path("dummy/config/initializers/flatpack_page_nav_url_aliases.rb", __dir__)
+    )
+    assert_includes page_nav_aliases, "kwargs[:anchor_href] = kwargs[:anchor_url]"
   end
 
   def test_dummy_login_layout_keeps_flatpack_assets_without_tight_main_offset
@@ -292,5 +296,28 @@ class RecordingStudioPublicationsTest < Minitest::Test
     view_path = File.expand_path("../app/views/recording_studio_publications/home/index.html.erb", __dir__)
 
     refute File.exist?(view_path)
+  end
+
+  def test_admin_types_screen_and_action_origin_helpers_are_wired
+    admin = File.read(File.expand_path("../lib/recording_studio_publications/admin.rb", __dir__))
+    section = File.read(File.expand_path("../lib/recording_studio_publications/admin/publications_section.rb", __dir__))
+    paths = File.read(File.expand_path("../lib/recording_studio_publications/admin/paths.rb", __dir__))
+    anchors = File.read(File.expand_path("../lib/recording_studio_publications/admin/anchor_urls.rb", __dir__))
+    controller = File.read(
+      File.expand_path("../app/controllers/recording_studio_publications/catalogue_admin_controller.rb", __dir__)
+    )
+    show = File.read(File.expand_path("../app/views/recording_studio_publications/publications/show.html.erb", __dir__))
+
+    assert_includes admin, 'TYPES_SCREEN_KEY = "publication_types"'
+    types_screen = File.expand_path(
+      "../lib/recording_studio_publications/admin/publication_types_screen.rb",
+      __dir__
+    )
+    assert File.exist?(types_screen)
+    assert_includes section, "link :publication_types"
+    assert_includes anchors, "def originating_page_for"
+    assert_includes paths, "publication_types"
+    assert_includes controller, "def action_close_url"
+    assert_includes show, "action_close_url(default: inventory_path)"
   end
 end

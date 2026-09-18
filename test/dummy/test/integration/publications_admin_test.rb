@@ -31,17 +31,29 @@ class PublicationsAdminTest < ActionDispatch::IntegrationTest
                  RecordingStudioAdmin.screen_for("publications")
     assert_equal RecordingStudioPublications::Admin::ArticlesScreen,
                  RecordingStudioAdmin.screen_for("articles")
+    assert_equal RecordingStudioPublications::Admin::PublicationTypesScreen,
+                 RecordingStudioAdmin.screen_for("publication_types")
     assert_equal RecordingStudioPublications::Admin::PublicationsResource,
                  RecordingStudioAdmin.resource_for("publications")
     total = RecordingStudioAdmin.widget_for("widgets.publications.total")
+    articles_total = RecordingStudioAdmin.widget_for("widgets.articles.total")
     over_time = RecordingStudioAdmin.widget_for("widgets.publications.over_time")
+    articles_over_time = RecordingStudioAdmin.widget_for("widgets.articles.over_time")
     by_kind = RecordingStudioAdmin.widget_for("widgets.publications.by_kind")
     assert_equal :number, total.type
+    assert_equal :number, articles_total.type
     assert_equal :chart, over_time.type
     assert_equal :line, over_time.chart_type
+    assert over_time.value
+    assert_equal :chart, articles_over_time.type
+    assert_equal :line, articles_over_time.chart_type
+    assert articles_over_time.value
     assert_equal :chart, by_kind.type
     assert_equal :bar, by_kind.chart_type
-    assert_empty RecordingStudioPublications::Admin::PublicationsSection.widget_keys
+    assert_equal [
+      "widgets.publications.over_time",
+      "widgets.articles.over_time"
+    ], RecordingStudioPublications::Admin::PublicationsSection.widget_keys
     assert_empty RecordingStudioPublications::Admin::PublicationsScreen.widget_keys
     assert RecordingStudioPublications::Admin::PublicationsScreen.chart_value
     assert_equal :area, RecordingStudioPublications::Admin::PublicationsScreen.chart_value.type_value
@@ -73,6 +85,14 @@ class PublicationsAdminTest < ActionDispatch::IntegrationTest
       link.name == :inventory
     end
     assert_equal "Publications", inventory_link.text
+    articles_link = RecordingStudioPublications::Admin::PublicationsSection.links.find do |link|
+      link.name == :articles
+    end
+    assert_equal "Articles", articles_link.text
+    types_link = RecordingStudioPublications::Admin::PublicationsSection.links.find do |link|
+      link.name == :publication_types
+    end
+    assert_equal "Publication types", types_link.text
     assert File.exist?(RecordingStudioPublications::Engine.root.join("app/overrides/recording_studio_admin/screens/show.html.erb"))
     assert File.exist?(RecordingStudioPublications::Engine.root.join("app/overrides/recording_studio_admin/sections/show.html.erb"))
     refute_includes File.read(RecordingStudioPublications::Engine.root.join("lib/recording_studio_publications/admin.rb")),
@@ -95,29 +115,51 @@ class PublicationsAdminTest < ActionDispatch::IntegrationTest
     get recording_studio_publications.admin_publications_path
     assert_redirected_to "/admin/publications"
 
+    get "/admin"
+    assert_response :success
+    assert_includes response.body, "Publications demo"
+    refute_includes response.body, "Publications admin demo"
+    refute_includes response.body, "Publications over time"
+    refute_includes response.body, "Articles over time"
+    refute_includes response.body, "/admin/access/recordings/"
+    home = Nokogiri::HTML(response.body)
+    section_button = home.css("a").find { |anchor| anchor["href"] == "/admin/sections/publications" }
+    assert section_button, "expected the admin home to link to the publications section"
+    assert_includes section_button.text, "Publications"
+
     get "/admin/sections/publications"
     assert_response :success
     assert_includes response.body, "Publications"
+    assert_includes response.body, "Articles"
+    assert_includes response.body, "Publication types"
+    assert_includes response.body, "/admin/access/recordings/#{@admin_recording.id}/accesses"
     refute_includes response.body, "View all"
-    refute_includes response.body, "Publications over time"
-    refute_includes response.body, "Publication types"
     refute_includes response.body, "Admin publications"
-    refute_includes response.body, "/admin/access/recordings/#{@admin_recording.id}/accesses"
     refute_includes response.body, "All publications"
-    refute_includes response.body, "Manage access"
     refute_includes response.body, "+ Access"
     hub = Nokogiri::HTML(response.body)
     refute hub.at_css('a[href="/recording_studio_publications/admin/publications/new"]'),
            "hub should not include the new-title action"
     inventory = hub.css("a").find { |anchor| anchor["href"] == "/admin/publications" }
-    assert inventory, "expected a Publications hub button to /admin/publications"
+    assert inventory, "expected a Publications button to /admin/publications"
     assert_includes inventory.text, "Publications"
+    articles = hub.css("a").find { |anchor| anchor["href"] == "/admin/articles" }
+    assert articles, "expected an Articles button to /admin/articles"
+    assert_includes articles.text, "Articles"
+    types = hub.css("a").find { |anchor| anchor["href"] == "/admin/publication_types" }
+    assert types, "expected a Publication types button to /admin/publication_types"
+    assert_includes types.text, "Publication types"
+    assert hub.at_css("[data-controller='flat-pack--chart']"),
+           "expected cumulative publications and articles charts on the section"
 
     get "/admin/publications"
     assert_response :success
     inventory_page = Nokogiri::HTML(response.body)
-    new_control = inventory_page.at_css('a[href="/recording_studio_publications/admin/publications/new"]')
+    new_control = inventory_page.css("a").find do |anchor|
+      anchor["href"]&.start_with?("/recording_studio_publications/admin/publications/new")
+    end
     assert new_control, "expected + Publication under the inventory title"
+    assert_includes new_control["href"], "anchor_url=%2Fadmin%2Fpublications"
     assert_includes new_control.text, "Publication"
     refute_includes new_control.text, "New"
     assert new_control.at_css('[data-flat-pack--icon-name-value="plus"]'),
@@ -136,7 +178,7 @@ class PublicationsAdminTest < ActionDispatch::IntegrationTest
 
     get "/admin/screens/publications/chart"
     assert_response :success
-    assert_includes response.body, "Titles over time"
+    assert_includes response.body, "Publications over time"
     assert_includes response.body, "screen-chart"
 
     get "/admin/screens/publications/table"
@@ -355,7 +397,8 @@ class PublicationsAdminTest < ActionDispatch::IntegrationTest
     table = Nokogiri::HTML(response.body)
     name_link = table.css("a").find { |anchor| anchor.text.strip == "Linked Atlantic" }
     assert name_link, "expected the publication name to link to show"
-    assert_equal recording_studio_publications.admin_publication_path(publication_recording), name_link["href"]
+    assert_equal "#{recording_studio_publications.admin_publication_path(publication_recording)}?anchor_url=%2Fadmin%2Fpublications",
+                 name_link["href"]
     count_link = table.css("a").find { |anchor| anchor["href"]&.include?("/admin/articles") }
     assert count_link, "expected an article count link"
     assert_equal "2", count_link.text.strip
@@ -376,10 +419,10 @@ class PublicationsAdminTest < ActionDispatch::IntegrationTest
     assert title_link, "expected the article title to link to the article show page"
     article = RecordingStudioPublications.articles_for(publication_recording.recordable).find_by!(title: "House in the Rainforest")
     article_recording = RecordingStudioPublications.article_recording_for(article)
-    assert_equal recording_studio_publications.admin_publication_article_path(
+    assert_equal "#{recording_studio_publications.admin_publication_article_path(
       publication_recording,
       article_recording
-    ), title_link["href"]
+    )}?anchor_url=%2Fadmin%2Farticles", title_link["href"]
 
     get "/admin/screens/articles/table"
     assert_response :success

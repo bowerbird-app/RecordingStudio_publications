@@ -32,7 +32,11 @@ module RecordingStudioPublications
 
       def article_count_cell(publication, context)
         count = RecordingStudioPublications.articles_for(publication).count
-        linked_cell(count.to_s, articles_screen_path(context, publication: publication), context)
+        linked_cell(
+          count.to_s,
+          with_originating_anchor(articles_screen_path(context, publication: publication), context),
+          context
+        )
       end
 
       def article_title_cell(article, context)
@@ -44,36 +48,6 @@ module RecordingStudioPublications
         return "—" if publication.blank?
 
         linked_cell(publication.name, publication_show_path(publication, context), context)
-      end
-
-      def titles_by_kind_series
-        counts = RecordingStudioPublications.publications.reorder(nil).group(:kind).count
-
-        [{
-          name: "Titles",
-          data: PublicationType::TOKENS.map { |kind| { x: PublicationType.parse(kind).label, y: counts[kind].to_i } }
-        }]
-      end
-
-      def titles_over_time_series
-        [{ name: "Titles", data: cumulative_weekly_title_counts }]
-      end
-
-      def cumulative_weekly_title_counts
-        running = 0
-
-        weekly_title_counts.map do |point|
-          running += point[:y].to_i
-          { x: point[:x], y: running }
-        end
-      end
-
-      def weekly_title_counts
-        RecordingStudioAdmin::AdminActivityLogsSupport.date_series(
-          RecordingStudioPublications.publications.reorder(nil),
-          field: :created_at,
-          bucket: :week
-        )
       end
 
       def safe_like(value)
@@ -104,7 +78,10 @@ module RecordingStudioPublications
         parent = article_recording&.parent_recording
         return if article_recording.blank? || parent.blank?
 
-        publication_routes(context).admin_publication_article_path(parent, article_recording)
+        with_originating_anchor(
+          publication_routes(context).admin_publication_article_path(parent, article_recording),
+          context
+        )
       end
     end
   end

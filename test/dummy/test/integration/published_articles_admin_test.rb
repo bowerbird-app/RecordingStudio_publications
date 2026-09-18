@@ -89,6 +89,7 @@ class PublishedArticlesAdminTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_includes response.body, "House in the Rainforest"
     assert_includes response.body, "Jane Architect"
+    refute_includes response.body, "Canonical URL"
     assert_includes response.body, "Add screenshot"
     refute_includes response.body, "Change screenshot"
     refute_includes response.body, "FileInput"
@@ -121,6 +122,12 @@ class PublishedArticlesAdminTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_includes response.body, "Edit article"
     assert_includes response.body, "Change screenshot"
+    assert_includes response.body, "grid-cols-2"
+    save_index = response.body.index(">Save<")
+    cancel_index = response.body.index(">Cancel<")
+    assert save_index, "expected a Save button on edit"
+    assert cancel_index, "expected a Cancel button on edit"
+    assert save_index < cancel_index, "Save should come before Cancel"
 
     patch recording_studio_publications.admin_publication_article_path(publication_recording, article_recording),
           params: {

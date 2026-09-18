@@ -1,7 +1,7 @@
 <%= render layout: "recording_studio_admin/shared/page_shell" do %>
   <% recording_studio_page_nav(
     title: @article.title,
-    page_nav_anchor_url: page_nav_anchor_url(default: admin_publication_articles_path(@publication_recording))
+    page_nav_anchor_url: action_close_url(default: articles_admin_path(@publication))
   ) %>
 
   <%= render FlatPack::PageTitle::Component.new(
@@ -12,7 +12,6 @@
   <% attribute_rows = [
        { attribute: "Title", value: @article.title },
        { attribute: "URL", value: @article.url.presence || "—" },
-       { attribute: "Canonical URL", value: @article.canonical_url.presence || "—" },
        { attribute: "Published", value: @article.published_on&.to_fs(:long) || "—" },
        { attribute: "Author", value: @article.byline.presence || "—" },
        { attribute: "Excerpt", value: @article.excerpt.presence || "—" }

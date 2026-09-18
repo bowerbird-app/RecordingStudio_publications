@@ -7,6 +7,28 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.4.1] - 2026-09-18
+
+Publications section widgets, inventory chart title, and article edit layout.
+
+### Changed
+- Inventory Screen chart title is **Publications over time**
+- Publications section shows two normal chart widgets (cumulative titles and articles over time, each with a total count) plus **Publications**, **Articles**, and **Publication types** buttons. Accessible avatars sit in the page-nav right slot on that section.
+- Article show no longer lists Canonical URL
+- Article edit uses a two-column Flatpack Grid (form, then screenshot) and puts Save before Cancel
+- Dummy `/admin` is a host `:root` section titled **Publications demo** with one primary button to the publications section
+- Title and article default-layout actions take `anchor_url` from the inventory or section that first opened them. Close, Cancel, and save redirects keep that origin so back does not loop through the action stack
+
+### Added
+- Publication types Screen at `/admin/publication_types`. Each closed category is a table row with a count of titles using it
+
+### Upgrade notes
+- Bump to `0.4.1`
+- The publications section renders widgets again. Hosts that used that section as a title-only hub should add their own `:root` section if they still want a bare home
+- Dummy mounts `root_section: :root`. Hosts that want `/admin` to open the publications section can keep `root_section: :publications`
+- Inventory Show, Edit, and Publication links now append `anchor_url` for the inventory. Hosts that copy those URLs should keep the query so Close returns to the list
+- Map Recording Studio default layout `anchor_url` to Flatpack `anchor_href` if Close does not appear (dummy: `config/initializers/flatpack_page_nav_url_aliases.rb`)
+
 ## [0.4.0] - 2026-09-17
 
 Articles published by a title, nested under that Publication recording.
@@ -131,7 +153,8 @@ First `recording_studio_publications` identity. This release is rename, dependen
 - Keep `RecordingStudio::UsesDefaultLayout` for authenticated screens. If core puts theme on `body`, render `layouts/_default_layout_head` from the `recording_studio/default_layout_head` hook so `html` gets `data-theme="rounded"`
 - Do not put Sign out or a workspace switcher in the default-layout slot or that head partial
 
-[Unreleased]: https://github.com/bowerbird-app/RecordingStudio_publications/compare/v0.4.0...HEAD
+[Unreleased]: https://github.com/bowerbird-app/RecordingStudio_publications/compare/v0.4.1...HEAD
+[0.4.1]: https://github.com/bowerbird-app/RecordingStudio_publications/releases/tag/v0.4.1
 [0.4.0]: https://github.com/bowerbird-app/RecordingStudio_publications/releases/tag/v0.4.0
 [0.3.0]: https://github.com/bowerbird-app/RecordingStudio_publications/releases/tag/v0.3.0
 [0.2.1]: https://github.com/bowerbird-app/RecordingStudio_publications/releases/tag/v0.2.1

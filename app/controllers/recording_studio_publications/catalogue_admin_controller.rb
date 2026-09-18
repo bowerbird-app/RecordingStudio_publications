@@ -8,7 +8,7 @@ module RecordingStudioPublications
     before_action :set_current_actor
 
     helper_method :recording_studio_admin_context, :page_nav_anchor_url, :preserve_anchor_url,
-                  :inventory_path, :articles_admin_path
+                  :inventory_path, :articles_admin_path, :action_close_url, :hub_url_from_action
 
     private
 
@@ -28,7 +28,7 @@ module RecordingStudioPublications
       )
     end
 
-    def page_nav_anchor_url(default: RecordingStudioAdmin.configuration.default_mount_path)
+    def page_nav_anchor_url(default: nil)
       safe_url = RecordingStudioAdmin::UrlSafety.safe_href(params[:anchor_url], allow_external: true)
       return default if safe_url.blank? || safe_url == "#"
 
@@ -36,18 +36,15 @@ module RecordingStudioPublications
     end
 
     def preserve_anchor_url(url)
-      safe_url = RecordingStudioAdmin::UrlSafety.safe_href(url)
-      anchor_url = page_nav_anchor_url
+      RecordingStudioPublications::Admin.append_anchor_url(url, page_nav_anchor_url)
+    end
 
-      return safe_url if safe_url.blank? || anchor_url.blank? || anchor_url == "#"
-      return safe_url unless safe_url.start_with?("/")
+    def action_close_url(default:)
+      page_nav_anchor_url(default: default)
+    end
 
-      uri = URI.parse(safe_url)
-      query = Rack::Utils.parse_nested_query(uri.query)
-      uri.query = query.reverse_merge("anchor_url" => anchor_url).to_query.presence
-      uri.to_s
-    rescue URI::InvalidURIError
-      safe_url
+    def hub_url_from_action(url)
+      RecordingStudioPublications::Admin.append_anchor_url(url, request.path)
     end
 
     def authorize_publications_admin_action!(record = nil)

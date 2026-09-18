@@ -15,16 +15,20 @@ module RecordingStudioPublications
         "#{path}?#{{ publication: key }.to_query}"
       end
 
+      def publication_types_screen_path(context = nil)
+        "#{admin_mount_path(context)}/publication_types"
+      end
+
       def new_publication_url(context = nil)
-        publication_routes(context).new_admin_publication_path
+        with_originating_anchor(publication_routes(context).new_admin_publication_path, context)
       end
 
       def publication_url(context, recording)
-        publication_routes(context).admin_publication_path(recording)
+        with_originating_anchor(publication_routes(context).admin_publication_path(recording), context)
       end
 
       def edit_publication_url(context, recording)
-        publication_routes(context).edit_admin_publication_path(recording)
+        with_originating_anchor(publication_routes(context).edit_admin_publication_path(recording), context)
       end
 
       def publication_routes(context)
@@ -46,20 +50,26 @@ module RecordingStudioPublications
 
       def draw_pretty_admin_routes!
         return unless defined?(RecordingStudioAdmin::Engine)
-        return if pretty_admin_route_drawn?("publications")
 
-        RecordingStudioAdmin::Engine.routes.append do
-          get "publications", to: "screens#show", defaults: { key: "publications" }
-          get "articles", to: "screens#show", defaults: { key: "articles" }
-        end
+        draw_pretty_admin_route!("publications", "publications")
+        draw_pretty_admin_route!("articles", "articles")
+        draw_pretty_admin_route!("publication_types", "publication_types")
       end
 
       private
 
+      def draw_pretty_admin_route!(path, screen_key)
+        return if pretty_admin_route_drawn?(path)
+
+        RecordingStudioAdmin::Engine.routes.append do
+          get path, to: "screens#show", defaults: { key: screen_key }
+        end
+      end
+
       def pretty_admin_route_drawn?(path)
         RecordingStudioAdmin::Engine.routes.routes.any? do |route|
-          spec = route.path.spec.to_s
-          spec.start_with?("/#{path}") && route.defaults[:controller].to_s.end_with?("screens")
+          spec = route.path.spec.to_s.split("(").first
+          spec == "/#{path}" && route.defaults[:controller].to_s.end_with?("screens")
         end
       end
 
