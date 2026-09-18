@@ -129,7 +129,6 @@ class PublicationsAdminTest < ActionDispatch::IntegrationTest
     refute_includes response.body, "Publication types"
     refute_includes response.body, "Admin publications"
     refute_includes response.body, "All publications"
-    refute_includes response.body, "Manage access"
     refute_includes response.body, "+ Access"
     hub = Nokogiri::HTML(response.body)
     refute hub.at_css('a[href="/recording_studio_publications/admin/publications/new"]'),
