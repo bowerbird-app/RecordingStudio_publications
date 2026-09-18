@@ -1,0 +1,33 @@
+<%= render layout: "recording_studio_admin/shared/page_shell" do %>
+  <% recording_studio_page_nav(
+    title: "Articles",
+    page_nav_anchor_url: page_nav_anchor_url(default: admin_publication_path(@publication_recording))
+  ) %>
+
+  <%= render FlatPack::PageTitle::Component.new(
+    title: "Articles",
+    subtitle: @publication.name
+  ) %>
+
+  <div class="space-y-6">
+    <% if @new_article_action %>
+      <div class="flex items-center gap-2 pt-2">
+        <%= render FlatPack::Button::Component.new(
+          text: "Add article",
+          href: preserve_anchor_url(new_admin_publication_article_path(@publication_recording)),
+          style: :primary
+        ) %>
+      </div>
+    <% end %>
+
+    <%= render "filters",
+               articles_index: @articles_index,
+               publication_recording: @publication_recording %>
+
+    <%= render "index_results",
+               article_entries: @article_entries,
+               publication_recording: @publication_recording,
+               publication: @publication,
+               new_article_action: @new_article_action %>
+  </div>
+<% end %>

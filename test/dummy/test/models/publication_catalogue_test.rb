@@ -35,4 +35,14 @@ class PublicationCatalogueTest < ActiveSupport::TestCase
     assert RecordingStudio.capability_enabled?(:attachable, for: RecordingStudioPublications::Publication)
     assert RecordingStudio.capability_enabled?(:publishable, for: RecordingStudioPublications::Publication)
   end
+
+  test "PublishedArticle only allows Publication as a parent" do
+    declaration = RecordingStudio.recordable_declaration_for("RecordingStudioPublications::PublishedArticle")
+
+    assert_equal ["RecordingStudioPublications::Publication"], declaration.allowed_parent_types
+    refute declaration.root?
+    refute RecordingStudio.capability_enabled?(:accessible, for: RecordingStudioPublications::PublishedArticle)
+    refute RecordingStudio.capability_enabled?(:publishable, for: RecordingStudioPublications::PublishedArticle)
+    assert RecordingStudio.capability_enabled?(:attachable, for: RecordingStudioPublications::PublishedArticle)
+  end
 end

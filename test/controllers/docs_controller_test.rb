@@ -108,11 +108,12 @@ class DocsControllerTest < ActionDispatch::IntegrationTest
     get docs_methods_path
     assert_response :success
     assert_select "h1", text: "Methods"
-    assert_includes response.body, "Document the public methods your addon exposes."
-    assert_includes response.body, "Example method"
-    assert_includes response.body, "recordingstudio_addon.example_method"
-    assert_includes response.body, "# Explain what this method does before the example."
-    assert_includes response.body, "Provide one section title and codeblock for each method"
+    assert_includes response.body, "Public write and lookup helpers on RecordingStudioPublications."
+    assert_includes response.body, "Record an article"
+    assert_includes response.body, "RecordingStudioPublications.record_article!"
+    assert_includes response.body, "RecordingStudioPublications.articles_for"
+    assert_includes response.body, "RecordingStudioPublications.articles"
+    assert_includes response.body, "RecordingStudioPublications.publication_for"
   end
 
   test "authenticated docs pages use the dummy sidebar layout" do

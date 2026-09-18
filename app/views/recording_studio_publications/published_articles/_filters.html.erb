@@ -1,0 +1,65 @@
+<% articles_index = local_assigns.fetch(:articles_index) %>
+<% publication_recording = local_assigns.fetch(:publication_recording) %>
+
+<%= form_with url: admin_publication_articles_path(publication_recording),
+              method: :get,
+              local: true,
+              class: "space-y-4" do %>
+  <%= hidden_field_tag :anchor_url, page_nav_anchor_url if params[:anchor_url].present? %>
+
+  <div class="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+    <%= render FlatPack::SearchInput::Component.new(
+      name: "q",
+      id: "article_search",
+      label: "Search",
+      value: articles_index.search_value,
+      placeholder: "Title, author, URL, or excerpt"
+    ) %>
+
+    <%= render FlatPack::Select::Component.new(
+      name: "year",
+      id: "article_year",
+      label: "Year",
+      value: articles_index.year_value,
+      options: [["Any year", ""]] + articles_index.year_options,
+      placeholder: "Any year"
+    ) %>
+
+    <%= render FlatPack::TextInput::Component.new(
+      name: "byline",
+      id: "article_byline",
+      label: "Author",
+      value: articles_index.byline_value
+    ) %>
+
+    <%= render FlatPack::Select::Component.new(
+      name: "sort",
+      id: "article_sort",
+      label: "Sort",
+      value: articles_index.sort_key,
+      options: article_sort_options
+    ) %>
+
+    <%= render FlatPack::Select::Component.new(
+      name: "has_url",
+      id: "article_has_url",
+      label: "Has URL",
+      value: articles_index.url_filter,
+      options: article_presence_options,
+      placeholder: "Any"
+    ) %>
+
+    <%= render FlatPack::Select::Component.new(
+      name: "has_screenshot",
+      id: "article_has_screenshot",
+      label: "Has screenshot",
+      value: articles_index.screenshot_filter,
+      options: article_presence_options,
+      placeholder: "Any"
+    ) %>
+  </div>
+
+  <div class="flex items-center gap-2">
+    <%= render FlatPack::Button::Component.new(text: "Apply filters", type: :submit, style: :secondary) %>
+  </div>
+<% end %>

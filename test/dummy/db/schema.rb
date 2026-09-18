@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_09_03_000002) do
+ActiveRecord::Schema[8.1].define(version: 2026_09_17_223000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pgcrypto"
@@ -117,6 +117,19 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_03_000002) do
     t.index ["key"], name: "index_recording_studio_publications_publications_on_key"
     t.index ["kind"], name: "index_recording_studio_publications_publications_on_kind"
     t.index ["name"], name: "index_recording_studio_publications_publications_on_name"
+  end
+
+  create_table "recording_studio_publications_published_articles", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.string "byline"
+    t.string "canonical_url"
+    t.datetime "created_at", null: false
+    t.text "excerpt"
+    t.date "published_on"
+    t.string "title", null: false
+    t.string "url"
+    t.index ["byline"], name: "idx_on_byline_7f5d44a42c"
+    t.index ["published_on"], name: "idx_on_published_on_30409ed1e2"
+    t.index ["title"], name: "idx_on_title_0f458f6b6a"
   end
 
   create_table "recording_studio_publishable_publishables", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|

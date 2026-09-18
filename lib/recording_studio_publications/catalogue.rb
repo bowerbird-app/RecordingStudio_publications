@@ -2,6 +2,7 @@
 
 require_relative "catalogue/writes"
 require_relative "catalogue/logos"
+require_relative "catalogue/articles"
 
 module RecordingStudioPublications
   # Public write and lookup helpers for the shared Publications catalogue.
@@ -10,6 +11,7 @@ module RecordingStudioPublications
 
     extend Writes
     extend Logos
+    extend Articles
 
     module_function
 
@@ -23,6 +25,19 @@ module RecordingStudioPublications
 
     def publications
       Publication.where(id: current_publication_recordings.select(:recordable_id)).order(:name)
+    end
+
+    def articles
+      ids = RecordingStudio::Recording.where(
+        recordable_type: PublishedArticle.name,
+        parent_recording_id: current_publication_recordings.select(:id),
+        trashed_at: nil
+      ).select(:recordable_id)
+      PublishedArticle.where(id: ids).order(:title)
+    end
+
+    def publication_for(article)
+      article_recording_for(article)&.parent_recording&.recordable
     end
 
     def current_publication_recordings

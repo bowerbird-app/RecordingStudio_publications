@@ -7,6 +7,27 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.4.0] - 2026-09-17
+
+Articles published by a title, nested under that Publication recording.
+
+### Added
+- `RecordingStudioPublications::PublishedArticle` domain child of `Publication` only (`allowed_parent_types`). Required title. Optional URL, canonical URL, published date, author (`byline`), and excerpt
+- Catalogue writes `record_article!` / `revise_article!` pass `parent_recording:` to the title recording. `Recording#record` otherwise parents to the catalogue root
+- Live URL uniqueness among siblings of the same title. The same URL may exist under a different title
+- Optional Attachable screenshot on the article (images only). Persist stays on `import_attachment` / `replace_attachment_file`. No capture, crawl, download, or PDF storage
+- Nested engine routes at `/recording_studio_publications/admin/publications/:id/articles`. Index filters: search, year, author, has URL, has screenshot, chronological or title sort
+- Family articles Screen at `/admin/articles` with a publication filter. Inventory at `/admin/publications` filters by search and Publication type, and lists an Articles count that opens that Screen
+- Reusable article index, card, show, and screenshot partials. Title show is an attribute table; Articles is a count that opens `/admin/articles?publication=`
+- Dummy seeds three Atlantic articles. One has a screenshot
+- Admin hub is title **Publications** plus one button to `/admin/publications`. Inventory **Publication** (plus heroicon) sits under the title. Table Name links to the admin show page
+
+### Upgrade notes
+- Bump to `0.4.0`
+- Install the `create_recording_studio_publications_published_articles` migration
+- Register `RecordingStudioPublications::PublishedArticle` in `RecordingStudio.configure`
+- Article screens stay on Recording Studio default layout. Copy says **article**, not recordable names
+
 ## [0.3.0] - 2026-09-17
 
 Publishable on each title, a public press page, family-management composition, and publication-type copy.
@@ -110,7 +131,8 @@ First `recording_studio_publications` identity. This release is rename, dependen
 - Keep `RecordingStudio::UsesDefaultLayout` for authenticated screens. If core puts theme on `body`, render `layouts/_default_layout_head` from the `recording_studio/default_layout_head` hook so `html` gets `data-theme="rounded"`
 - Do not put Sign out or a workspace switcher in the default-layout slot or that head partial
 
-[Unreleased]: https://github.com/bowerbird-app/RecordingStudio_publications/compare/v0.3.0...HEAD
+[Unreleased]: https://github.com/bowerbird-app/RecordingStudio_publications/compare/v0.4.0...HEAD
+[0.4.0]: https://github.com/bowerbird-app/RecordingStudio_publications/releases/tag/v0.4.0
 [0.3.0]: https://github.com/bowerbird-app/RecordingStudio_publications/releases/tag/v0.3.0
 [0.2.1]: https://github.com/bowerbird-app/RecordingStudio_publications/releases/tag/v0.2.1
 [0.2.0]: https://github.com/bowerbird-app/RecordingStudio_publications/releases/tag/v0.2.0

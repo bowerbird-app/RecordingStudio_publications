@@ -24,11 +24,13 @@ class PublicationsAdminTest < ActionDispatch::IntegrationTest
     Current.actor = nil
   end
 
-  test "registers the publications section, screen, resource, and widgets" do
+  test "registers the publications section, screens, resource, and widgets" do
     assert_equal RecordingStudioPublications::Admin::PublicationsSection,
                  RecordingStudioAdmin.section_for("publications")
     assert_equal RecordingStudioPublications::Admin::PublicationsScreen,
                  RecordingStudioAdmin.screen_for("publications")
+    assert_equal RecordingStudioPublications::Admin::ArticlesScreen,
+                 RecordingStudioAdmin.screen_for("articles")
     assert_equal RecordingStudioPublications::Admin::PublicationsResource,
                  RecordingStudioAdmin.resource_for("publications")
     total = RecordingStudioAdmin.widget_for("widgets.publications.total")
@@ -39,39 +41,39 @@ class PublicationsAdminTest < ActionDispatch::IntegrationTest
     assert_equal :line, over_time.chart_type
     assert_equal :chart, by_kind.type
     assert_equal :bar, by_kind.chart_type
-    section_widget_keys = RecordingStudioPublications::Admin::PublicationsSection.widget_keys
-    screen_widget_keys = RecordingStudioPublications::Admin::PublicationsScreen.widget_keys
-    assert_equal [
-      "widgets.publications.total",
-      "widgets.publications.over_time",
-      "widgets.publications.by_kind"
-    ], section_widget_keys
-    refute_includes screen_widget_keys, "widgets.publications.total"
-    refute_includes screen_widget_keys, "widgets.publications.over_time"
-    assert_empty screen_widget_keys
+    assert_empty RecordingStudioPublications::Admin::PublicationsSection.widget_keys
+    assert_empty RecordingStudioPublications::Admin::PublicationsScreen.widget_keys
     assert RecordingStudioPublications::Admin::PublicationsScreen.chart_value
     assert_equal :area, RecordingStudioPublications::Admin::PublicationsScreen.chart_value.type_value
     assert_equal :site, RecordingStudioPublications::Admin::PublicationsSection.blast_radius
     assert_equal :site, RecordingStudioPublications::Admin::PublicationsScreen.blast_radius
+    assert_equal :site, RecordingStudioPublications::Admin::ArticlesScreen.blast_radius
     assert_equal :site, RecordingStudioPublications::Admin::PublicationsResource.blast_radius
     assert_equal :admin, RecordingStudioPublications::Admin::PublicationsResource.action_for(:edit).required_access_role
     assert_equal :admin, RecordingStudioPublications::Admin::PublicationsResource.action_for(:new).required_access_role
     search_filter = RecordingStudioPublications::Admin::PublicationsScreen.filters.find { |filter| filter.key == :search }
     assert search_filter
+    type_filter = RecordingStudioPublications::Admin::PublicationsScreen.filters.find do |filter|
+      filter.key == :publication_type
+    end
+    assert type_filter
+    assert_equal :kind, type_filter.options[:field]
+    assert_equal RecordingStudioPublications::PublicationType::TOKENS, type_filter.options[:values]
+    publication_filter = RecordingStudioPublications::Admin::ArticlesScreen.filters.find do |filter|
+      filter.key == :publication
+    end
+    assert publication_filter
     new_button = RecordingStudioPublications::Admin::PublicationsScreen.buttons_value.find do |button|
       button.name == :new_publication
     end
     assert new_button
-    assert_equal "New", new_button.text
-    new_link = RecordingStudioPublications::Admin::PublicationsSection.links.find do |link|
-      link.name == :new_publication
-    end
+    assert_equal "Publication", new_button.text
+    refute RecordingStudioPublications::Admin::PublicationsSection.links.any? { |link| link.name == :new_publication }
     inventory_link = RecordingStudioPublications::Admin::PublicationsSection.links.find do |link|
       link.name == :inventory
     end
-    assert_equal "Publication", new_link.text
-    assert_equal "View all", inventory_link.text
-    refute File.exist?(RecordingStudioPublications::Engine.root.join("app/overrides/recording_studio_admin/screens/show.html.erb"))
+    assert_equal "Publications", inventory_link.text
+    assert File.exist?(RecordingStudioPublications::Engine.root.join("app/overrides/recording_studio_admin/screens/show.html.erb"))
     assert File.exist?(RecordingStudioPublications::Engine.root.join("app/overrides/recording_studio_admin/sections/show.html.erb"))
     refute_includes File.read(RecordingStudioPublications::Engine.root.join("lib/recording_studio_publications/admin.rb")),
                     "instance_variable_set"
@@ -91,40 +93,46 @@ class PublicationsAdminTest < ActionDispatch::IntegrationTest
     bootstrap_owner_access!(@admin, @admin_recording)
 
     get recording_studio_publications.admin_publications_path
-    assert_redirected_to "/admin/screens/publications"
+    assert_redirected_to "/admin/publications"
 
     get "/admin/sections/publications"
     assert_response :success
     assert_includes response.body, "Publications"
-    assert_includes response.body, "View all"
-    assert_includes response.body, "Publications over time"
-    assert_includes response.body, "Publication types"
-    assert_includes response.body, "Admin publications"
-    assert_includes response.body, "/admin/access/recordings/#{@admin_recording.id}/accesses"
+    refute_includes response.body, "View all"
+    refute_includes response.body, "Publications over time"
+    refute_includes response.body, "Publication types"
+    refute_includes response.body, "Admin publications"
+    refute_includes response.body, "/admin/access/recordings/#{@admin_recording.id}/accesses"
     refute_includes response.body, "All publications"
-    assert(
-      response.body.include?("Manage access") || response.body.include?("+ Access"),
-      "expected family Access UI on the AdminRoot publications section"
-    )
+    refute_includes response.body, "Manage access"
+    refute_includes response.body, "+ Access"
     hub = Nokogiri::HTML(response.body)
-    new_control = hub.at_css('a[href="/recording_studio_publications/admin/publications/new"]')
-    assert new_control, "expected family Publication control to point at this gem's new-title path"
+    refute hub.at_css('a[href="/recording_studio_publications/admin/publications/new"]'),
+           "hub should not include the new-title action"
+    inventory = hub.css("a").find { |anchor| anchor["href"] == "/admin/publications" }
+    assert inventory, "expected a Publications hub button to /admin/publications"
+    assert_includes inventory.text, "Publications"
+
+    get "/admin/publications"
+    assert_response :success
+    inventory_page = Nokogiri::HTML(response.body)
+    new_control = inventory_page.at_css('a[href="/recording_studio_publications/admin/publications/new"]')
+    assert new_control, "expected + Publication under the inventory title"
     assert_includes new_control.text, "Publication"
     refute_includes new_control.text, "New"
     assert new_control.at_css('[data-flat-pack--icon-name-value="plus"]'),
-           "expected the Publication hub action to use the plus heroicon"
-    view_all = hub.css("a").find { |anchor| anchor.text.include?("View all") }
-    assert view_all, "expected a View all hub action"
-    assert_includes view_all["href"], "/admin/screens/publications"
-
-    get "/admin/screens/publications"
-    assert_response :success
-    assert_includes response.body, "New"
+           "expected the Publication inventory action to use the plus heroicon"
+    refute inventory_page.at_css(".recording-studio-page-nav a[href='/recording_studio_publications/admin/publications/new']")
     assert_includes response.body, 'name="search"'
-    assert_includes response.body, 'href="/recording_studio_publications/admin/publications/new"'
+    assert_includes response.body, 'name="publication_type"'
+    assert_includes response.body, "Publication type"
     assert_includes response.body, "screen-chart"
     refute_includes response.body, "widgets.publications.over_time"
     refute_includes response.body, ">Publications</h3>"
+
+    get "/admin/screens/publications"
+    assert_response :success
+    assert_includes response.body, "Publication"
 
     get "/admin/screens/publications/chart"
     assert_response :success
@@ -137,6 +145,7 @@ class PublicationsAdminTest < ActionDispatch::IntegrationTest
     assert_includes response.body, "Name"
     assert_includes response.body, "Publication type"
     assert_includes response.body, "Website"
+    assert_includes response.body, "Articles"
     refute_match(/<th[^>]*>Key<\/th>/i, response.body)
   end
 
@@ -301,6 +310,83 @@ class PublicationsAdminTest < ActionDispatch::IntegrationTest
     refute_includes response.body, "Other Gazette"
   end
 
+  test "inventory publication type filter scopes the table to that kind" do
+    bootstrap_owner_access!(@admin, @admin_recording)
+    sign_in @admin
+    RecordingStudioPublications.record_publication!(
+      { name: "Typed Magazine", key: "typed-magazine", kind: "magazine" },
+      actor: @admin
+    )
+    RecordingStudioPublications.record_publication!(
+      { name: "Typed Newspaper", key: "typed-newspaper", kind: "newspaper" },
+      actor: @admin
+    )
+
+    get "/admin/screens/publications/table", params: { publication_type: "magazine" }
+    assert_response :success
+    assert_includes response.body, "Typed Magazine"
+    refute_includes response.body, "Typed Newspaper"
+  end
+
+  test "inventory name and article count link to show and the articles screen" do
+    bootstrap_owner_access!(@admin, @admin_recording)
+    sign_in @admin
+    publication_recording = RecordingStudioPublications.record_publication!(
+      { name: "Linked Atlantic", key: "linked-atlantic", kind: "magazine" },
+      actor: @admin
+    )
+    other_recording = RecordingStudioPublications.record_publication!(
+      { name: "Linked Gazette", key: "linked-gazette", kind: "newspaper" },
+      actor: @admin
+    )
+    RecordingStudioPublications.record_article!(
+      publication_recording.recordable,
+      { title: "House in the Rainforest", url: "https://example.com/house" },
+      actor: @admin
+    )
+    RecordingStudioPublications.record_article!(
+      publication_recording.recordable,
+      { title: "Second Piece", url: "https://example.com/second" },
+      actor: @admin
+    )
+
+    get "/admin/screens/publications/table", params: { search: "Linked Atlantic" }
+    assert_response :success
+    table = Nokogiri::HTML(response.body)
+    name_link = table.css("a").find { |anchor| anchor.text.strip == "Linked Atlantic" }
+    assert name_link, "expected the publication name to link to show"
+    assert_equal recording_studio_publications.admin_publication_path(publication_recording), name_link["href"]
+    count_link = table.css("a").find { |anchor| anchor["href"]&.include?("/admin/articles") }
+    assert count_link, "expected an article count link"
+    assert_equal "2", count_link.text.strip
+    assert_includes count_link["href"], "/admin/articles"
+    assert_includes count_link["href"], "publication=linked-atlantic"
+
+    get "/admin/articles", params: { publication: "linked-atlantic" }
+    assert_response :success
+    assert_includes response.body, 'name="publication"'
+    assert_includes response.body, "linked-atlantic"
+
+    get "/admin/screens/articles/table", params: { publication: "linked-atlantic" }
+    assert_response :success
+    assert_includes response.body, "House in the Rainforest"
+    refute_includes response.body, "Linked Gazette"
+    articles_table = Nokogiri::HTML(response.body)
+    title_link = articles_table.css("a").find { |anchor| anchor.text.strip == "House in the Rainforest" }
+    assert title_link, "expected the article title to link to the article show page"
+    article = RecordingStudioPublications.articles_for(publication_recording.recordable).find_by!(title: "House in the Rainforest")
+    article_recording = RecordingStudioPublications.article_recording_for(article)
+    assert_equal recording_studio_publications.admin_publication_article_path(
+      publication_recording,
+      article_recording
+    ), title_link["href"]
+
+    get "/admin/screens/articles/table"
+    assert_response :success
+    assert_includes response.body, "House in the Rainforest"
+    assert other_recording
+  end
+
   test "publication CRUD pages do not ship a per-title Manage-access UI" do
     bootstrap_owner_access!(@admin, @admin_recording)
     sign_in @admin
@@ -310,6 +396,7 @@ class PublicationsAdminTest < ActionDispatch::IntegrationTest
     )
 
     [
+      "/admin/publications",
       "/admin/screens/publications",
       recording_studio_publications.admin_publication_path(recording),
       recording_studio_publications.edit_admin_publication_path(recording),

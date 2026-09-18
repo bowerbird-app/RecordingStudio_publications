@@ -1,30 +1,46 @@
 <div class="flex w-full flex-col gap-6">
   <%= render FlatPack::PageTitle::Component.new(
     title: "Methods",
-    subtitle: "Document the public methods your addon exposes.",
+    subtitle: "Public write and lookup helpers on RecordingStudioPublications.",
     variant: :h1
   ) %>
 
   <%= render FlatPack::SectionTitle::Component.new(
-    title: "Example method",
-    subtitle: "recordingstudio_addon.example_method",
+    title: "Record an article",
+    subtitle: "RecordingStudioPublications.record_article!",
   ) %>
 
   <%= render FlatPack::CodeBlock::Component.new(
     language: :ruby,
     code: <<~'CODE'
-      # Explain what this method does before the example.
-      result = RecordingstudioAddon.example_method(
-        # Replace with the real arguments this method accepts.
-        input: "demo value"
+      recording = RecordingStudioPublications.record_article!(
+        publication,
+        {
+          title: "House in the Rainforest",
+          url: "https://www.theatlantic.com/house-in-the-rainforest",
+          published_on: Date.new(2024, 3, 12),
+          byline: "Jane Architect",
+          excerpt: "A house designed around the existing trees."
+        },
+        actor: current_user
       )
 
-      # Show what the method returns or what side effect it creates.
-      puts result
+      recording.parent_recording == RecordingStudioPublications.recording_for(publication)
     CODE
   ) %>
 
-  <p class="text-sm text-(--body-muted-content-color)">
-    Provide one section title and codeblock for each method
-  </p>
+  <%= render FlatPack::SectionTitle::Component.new(
+    title: "List articles for a title",
+    subtitle: "RecordingStudioPublications.articles_for",
+  ) %>
+
+  <%= render FlatPack::CodeBlock::Component.new(
+    language: :ruby,
+    code: <<~'CODE'
+      articles = RecordingStudioPublications.articles_for(publication)
+      all_articles = RecordingStudioPublications.articles
+      screenshot = RecordingStudioPublications.screenshot_recording_for(articles.first)
+      parent = RecordingStudioPublications.publication_for(articles.first)
+    CODE
+  ) %>
 </div>

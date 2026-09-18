@@ -9,6 +9,7 @@ RecordingStudio.configure do |config|
     "AdminRoot",
     "RecordingStudioPublications::PublicationCatalogue",
     "RecordingStudioPublications::Publication",
+    "RecordingStudioPublications::PublishedArticle",
     "RecordingStudioAttachable::Attachment",
     "RecordingStudioPublishable::Publishable"
   ]

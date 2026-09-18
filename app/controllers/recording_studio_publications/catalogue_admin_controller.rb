@@ -8,7 +8,7 @@ module RecordingStudioPublications
     before_action :set_current_actor
 
     helper_method :recording_studio_admin_context, :page_nav_anchor_url, :preserve_anchor_url,
-                  :inventory_path
+                  :inventory_path, :articles_admin_path
 
     private
 
@@ -102,7 +102,11 @@ module RecordingStudioPublications
     end
 
     def inventory_path
-      recording_studio_admin_context.admin_screen_path(RecordingStudioPublications::Admin::SCREEN_KEY)
+      RecordingStudioPublications::Admin.publications_screen_path(recording_studio_admin_context)
+    end
+
+    def articles_admin_path(publication = nil)
+      RecordingStudioPublications::Admin.articles_screen_path(recording_studio_admin_context, publication: publication)
     end
   end
 end

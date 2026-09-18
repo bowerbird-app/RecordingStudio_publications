@@ -6,6 +6,9 @@ RecordingStudioPublications::Engine.routes.draw do
   # RecordingStudioPublications::Admin and would shadow the family admin
   # definitions in lib/recording_studio_publications/admin.rb.
   scope path: "admin", as: "admin" do
-    resources :publications, only: %i[index new create show edit update]
+    resources :publications, only: %i[index new create show edit update] do
+      resources :published_articles, path: "articles", as: :articles,
+                                     only: %i[index new create show edit update]
+    end
   end
 end

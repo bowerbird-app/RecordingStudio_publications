@@ -1,0 +1,25 @@
+<% screenshot_recording = local_assigns[:screenshot_recording] %>
+<% article_recording = local_assigns.fetch(:article_recording) %>
+<% article = local_assigns.fetch(:article) %>
+<% return_to = local_assigns.fetch(:return_to) %>
+<% preview_path = article_screenshot_preview_path(screenshot_recording) %>
+
+<div class="flex flex-wrap items-center gap-4">
+  <% if preview_path.present? %>
+    <%= image_tag preview_path, alt: "#{article.title} screenshot", class: "h-24 w-40 object-cover" %>
+  <% end %>
+
+  <% if screenshot_recording.present? %>
+    <%= render FlatPack::Button::Component.new(
+      text: "Change screenshot",
+      href: article_screenshot_replace_path(screenshot_recording, return_to: return_to),
+      style: :secondary
+    ) %>
+  <% else %>
+    <%= render FlatPack::Button::Component.new(
+      text: "Add screenshot",
+      href: article_screenshot_upload_path(article_recording, return_to: return_to),
+      style: :secondary
+    ) %>
+  <% end %>
+</div>

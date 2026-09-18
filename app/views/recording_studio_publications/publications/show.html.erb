@@ -13,7 +13,8 @@
        { attribute: "Name", value: @publication.name },
        { attribute: "Key", value: @publication.key },
        { attribute: RecordingStudioPublications::Publication.human_attribute_name(:kind), value: @publication.kind_label },
-       { attribute: "Website", value: @publication.website.presence || "—" }
+       { attribute: "Website", value: @publication.website.presence || "—" },
+       { attribute: "Articles", value: link_to(@articles_count.to_s, articles_admin_path(@publication)) }
      ] %>
 
   <div class="space-y-4">

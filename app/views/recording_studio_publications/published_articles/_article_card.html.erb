@@ -1,0 +1,28 @@
+<% entry = local_assigns.fetch(:entry) %>
+<% publication_recording = local_assigns.fetch(:publication_recording) %>
+<% article = entry.article %>
+<% href = admin_publication_article_path(publication_recording, entry.recording) %>
+<% preview_path = article_screenshot_preview_path(entry.screenshot_recording) %>
+
+<%= render FlatPack::Card::Component.new(style: :interactive, clickable: true, href: preserve_anchor_url(href)) do |card| %>
+  <% if preview_path.present? %>
+    <% card.media(aspect_ratio: "16/9", padding: :none) do %>
+      <%= image_tag preview_path, alt: "#{article.title} screenshot", class: "h-full w-full object-cover" %>
+    <% end %>
+  <% end %>
+
+  <% card.header do %>
+    <%= render FlatPack::PageTitle::Component.new(
+      title: article.title,
+      subtitle: [article.byline.presence, article.published_on&.to_fs(:long)].compact.join(" · "),
+      variant: :h3,
+      class: "mb-0 pb-0"
+    ) %>
+  <% end %>
+
+  <% if article.excerpt.present? %>
+    <% card.body do %>
+      <p class="text-sm leading-6 text-(--surface-muted-content-color)"><%= article.excerpt %></p>
+    <% end %>
+  <% end %>
+<% end %>

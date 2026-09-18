@@ -23,4 +23,16 @@ class FamilyAuthorizationTest < Minitest::Test
 
     refute denied
   end
+
+  FakeRecording = Struct.new(:recordable_type, :parent_recording)
+
+  def test_policy_recording_walks_article_and_attachment_to_publication
+    publication = FakeRecording.new("RecordingStudioPublications::Publication", nil)
+    article = FakeRecording.new("RecordingStudioPublications::PublishedArticle", publication)
+    screenshot = FakeRecording.new("RecordingStudioAttachable::Attachment", article)
+
+    assert_equal publication, RecordingStudioPublications::FamilyAuthorization.policy_recording_for(article)
+    assert_equal publication, RecordingStudioPublications::FamilyAuthorization.policy_recording_for(screenshot)
+    assert_equal publication, RecordingStudioPublications::FamilyAuthorization.policy_recording_for(publication)
+  end
 end

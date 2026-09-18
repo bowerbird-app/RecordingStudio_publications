@@ -1,0 +1,43 @@
+<%= render layout: "recording_studio_admin/shared/page_shell" do %>
+  <% recording_studio_page_nav(
+    title: @article.title,
+    page_nav_anchor_url: page_nav_anchor_url(default: admin_publication_articles_path(@publication_recording))
+  ) %>
+
+  <%= render FlatPack::PageTitle::Component.new(
+    title: @article.title,
+    subtitle: @publication.name
+  ) %>
+
+  <% attribute_rows = [
+       { attribute: "Title", value: @article.title },
+       { attribute: "URL", value: @article.url.presence || "—" },
+       { attribute: "Canonical URL", value: @article.canonical_url.presence || "—" },
+       { attribute: "Published", value: @article.published_on&.to_fs(:long) || "—" },
+       { attribute: "Author", value: @article.byline.presence || "—" },
+       { attribute: "Excerpt", value: @article.excerpt.presence || "—" }
+     ] %>
+
+  <div class="space-y-4">
+    <% if @edit_article_action %>
+      <div class="flex items-center gap-2 pt-2">
+        <%= render FlatPack::Button::Component.new(
+          text: "Edit",
+          href: preserve_anchor_url(edit_admin_publication_article_path(@publication_recording, @recording)),
+          style: :primary
+        ) %>
+      </div>
+    <% end %>
+
+    <%= render "screenshot",
+               screenshot_recording: @screenshot_recording,
+               article_recording: @recording,
+               article: @article,
+               return_to: admin_publication_article_path(@publication_recording, @recording) %>
+
+    <%= render FlatPack::Table::Component.new(data: attribute_rows, class: "text-sm") do |table| %>
+      <% table.column(title: "Attribute") { |attribute_row| attribute_row.fetch(:attribute) } %>
+      <% table.column(title: "Value") { |attribute_row| attribute_row.fetch(:value) } %>
+    <% end %>
+  </div>
+<% end %>

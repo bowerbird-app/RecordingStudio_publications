@@ -137,6 +137,7 @@ module RecordingStudioPublications
 
         require "recording_studio_publications/admin"
         RecordingStudioPublications::Admin.register!
+        RecordingStudioPublications::Admin.draw_pretty_admin_routes!
       end
     end
 

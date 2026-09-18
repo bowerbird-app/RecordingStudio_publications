@@ -4,7 +4,7 @@ require "test_helper"
 
 class RecordingStudioPublicationsTest < Minitest::Test
   def test_version_matches_release
-    assert_equal "0.3.0", ::RecordingStudioPublications::VERSION
+    assert_equal "0.4.0", ::RecordingStudioPublications::VERSION
   end
 
   def test_engine_exists
@@ -186,6 +186,7 @@ class RecordingStudioPublicationsTest < Minitest::Test
     assert_includes initializer_source, '"AdminRoot"'
     assert_includes initializer_source, '"RecordingStudioPublications::PublicationCatalogue"'
     assert_includes initializer_source, '"RecordingStudioPublications::Publication"'
+    assert_includes initializer_source, '"RecordingStudioPublications::PublishedArticle"'
     assert_includes initializer_source, '"RecordingStudioAttachable::Attachment"'
     assert_includes initializer_source, '"RecordingStudioPublishable::Publishable"'
     family_management = File.read(

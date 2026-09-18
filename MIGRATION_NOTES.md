@@ -12,6 +12,10 @@
 - FlatPack `~> 0.1.143` (dummy GitHub tag `v0.1.143`)
 - Public RubyGems and GitHub access for dependency installation
 
+## Publications 0.4.0
+
+Bump to `0.4.0`. Install the published-articles migration and register `RecordingStudioPublications::PublishedArticle`. Articles nest under a Publication recording only. Screenshots use Attachable images. Do not enable Publishable or Accessible on articles.
+
 ## Publications 0.3.0
 
 Bump to `0.3.0`. Add Publishable `~> 0.3`, mount it at `/`, install its migrations, register `RecordingStudioPublishable::Publishable`, and call `FamilyManagement.install!`. Show and edit render `QuickActions` (not `EditButtonComponent`). Rename `LogoAuthorization` to `FamilyAuthorization` with no alias. Visible copy says publication type; the `kind` column and param stay. `install!` also wraps Preview so AdminRoot staff can open a draft from the status menu.
@@ -31,7 +35,7 @@ Hosts need the engine catalogue migration plus, if missing:
 - Active Storage tables
 - RecordingStudioAttachable attachments table and indexes
 
-Register `PublicationCatalogue`, `Publication`, `AdminRoot`, and `RecordingStudioAttachable::Attachment` before `RecordingStudio.validate_recordable_declarations!`.
+Register `PublicationCatalogue`, `Publication`, `PublishedArticle`, `AdminRoot`, and `RecordingStudioAttachable::Attachment` before `RecordingStudio.validate_recordable_declarations!`.
 
 Mount `RecordingStudioAccessible::Engine` at `/admin/access` so the publications section can open family Access on the owned AdminRoot. Do not enable Accessible on the shared catalogue.
 
@@ -41,7 +45,7 @@ Do not enable Accessible or Attachable on the shared catalogue root.
 
 ## Host layout
 
-Authenticated dummy home and docs use the host Flatpack sidebar. Title new/show/edit should use `RecordingStudio::UsesDefaultLayout`. Core still puts `data-theme` on `<body>`. FlatPack themes belong on `<html>`. Hosts should add `app/views/recording_studio/_default_layout_head.html.erb` that renders `layouts/default_layout_head`, and `app/views/layouts/_default_layout_head.html.erb` that copies `data-theme="rounded"` onto `document.documentElement` with `javascript_tag nonce: true`. Do not put Sign out or a workspace switcher there.
+Authenticated dummy home and docs use the host Flatpack sidebar. Title and article new/show/edit should use `RecordingStudio::UsesDefaultLayout`. Core still puts `data-theme` on `<body>`. FlatPack themes belong on `<html>`. Hosts should add `app/views/recording_studio/_default_layout_head.html.erb` that renders `layouts/default_layout_head`, and `app/views/layouts/_default_layout_head.html.erb` that copies `data-theme="rounded"` onto `document.documentElement` with `javascript_tag nonce: true`. Do not put Sign out or a workspace switcher there.
 
 ## Verification
 

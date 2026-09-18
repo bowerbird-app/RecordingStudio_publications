@@ -1,0 +1,30 @@
+<% article_entries = local_assigns.fetch(:article_entries) %>
+<% publication_recording = local_assigns.fetch(:publication_recording) %>
+<% publication = local_assigns.fetch(:publication) %>
+<% new_article_action = local_assigns[:new_article_action] %>
+
+<% if article_entries.empty? %>
+  <%= render FlatPack::EmptyState::Component.new(
+    title: "No articles",
+    description: "Articles published by #{publication.name} will appear here.",
+    icon: :inbox
+  ) do |empty_state| %>
+    <% if new_article_action %>
+      <% empty_state.slot do %>
+        <%= render FlatPack::Button::Component.new(
+          text: "Add article",
+          href: preserve_anchor_url(new_admin_publication_article_path(publication_recording)),
+          style: :primary
+        ) %>
+      <% end %>
+    <% end %>
+  <% end %>
+<% else %>
+  <div class="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+    <% article_entries.each do |entry| %>
+      <%= render "recording_studio_publications/published_articles/article_card",
+                 entry: entry,
+                 publication_recording: publication_recording %>
+    <% end %>
+  </div>
+<% end %>

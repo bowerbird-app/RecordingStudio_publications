@@ -74,7 +74,22 @@ seed_publication = lambda do |name:, key:, kind:, website:, actor:, created_at:,
   publication
 end
 
-# Create the admin user
+ensure_seed_article = lambda do |publication:, title:, url:, published_on:, byline:, excerpt:, actor:|
+  existing = RecordingStudioPublications.articles_for(publication).find_by(title: title, url: url)
+  return existing if existing
+
+  RecordingStudioPublications.record_article!(
+    publication,
+    {
+      title: title,
+      url: url,
+      published_on: published_on,
+      byline: byline,
+      excerpt: excerpt
+    },
+    actor: actor
+  ).recordable
+end
 user = User.find_or_create_by!(email: "admin@admin.com") do |u|
   u.password = "Password"
   u.password_confirmation = "Password"
@@ -109,7 +124,7 @@ begin
   admin_root_recording = RecordingStudio.root_recording_for(admin_root)
   bootstrap_owner_access.call(user, admin_root_recording)
 
-  seed_publication.call(
+  atlantic = seed_publication.call(
     name: "The Atlantic",
     key: "the-atlantic",
     kind: "magazine",
@@ -118,6 +133,45 @@ begin
     created_at: 8.weeks.ago,
     publish: true
   )
+  rainforest = ensure_seed_article.call(
+    publication: atlantic,
+    title: "House in the Rainforest",
+    url: "https://www.theatlantic.com/house-in-the-rainforest",
+    published_on: Date.new(2024, 3, 12),
+    byline: "Jane Architect",
+    excerpt: "A house designed around the existing trees.",
+    actor: user
+  )
+  ensure_seed_article.call(
+    publication: atlantic,
+    title: "Ten Australian Houses",
+    url: "https://www.theatlantic.com/ten-australian-houses",
+    published_on: Date.new(2023, 11, 2),
+    byline: "Sam Editor",
+    excerpt: "A survey of recent Australian residential work.",
+    actor: user
+  )
+  ensure_seed_article.call(
+    publication: atlantic,
+    title: "New Architecture in Melbourne",
+    url: "https://www.theatlantic.com/new-architecture-melbourne",
+    published_on: Date.new(2025, 1, 18),
+    byline: "Jane Architect",
+    excerpt: "Civic buildings reshaping the city’s centre.",
+    actor: user
+  )
+  rainforest_recording = RecordingStudioPublications.article_recording_for(rainforest)
+  if rainforest_recording && RecordingStudioPublications.screenshot_recording_for(rainforest).blank?
+    File.open(SEED_LOGO_PATH, "rb") do |io|
+      rainforest_recording.import_attachment(
+        io: io,
+        filename: "house-in-the-rainforest.png",
+        content_type: "image/png",
+        name: "Screenshot",
+        actor: user
+      )
+    end
+  end
   seed_publication.call(
     name: "The Guardian",
     key: "the-guardian",
@@ -162,4 +216,5 @@ puts "Seeded: Workspace '#{private_workspace.name}' with root recording ##{priva
 puts "Seeded: Folder '#{folder.name}' and page '#{page.title}'"
 puts "Seeded: Admin root with first-owner admin access for the publications directory"
 puts "Seeded: #{RecordingStudioPublications.publications.count} publication titles under the shared Publications catalogue"
+puts "Seeded: #{RecordingStudioPublications::PublishedArticle.count} articles under those titles"
 puts "Unused member account: #{member.email}"
