@@ -14,7 +14,9 @@
 
 ## Publications 0.4.1
 
-Bump to `0.4.1`. The publications section renders total and over-time widgets for titles and articles, plus buttons to both inventories. Dummy `/admin` is a host `:root` section. Hosts that still want `/admin` to open the publications section can keep `root_section: :publications`.
+Bump to `0.4.1`. The publications section renders total and over-time widgets for titles and articles, plus buttons to both inventories and **Publication types**. Dummy `/admin` is a host `:root` section. Hosts that still want `/admin` to open the publications section can keep `root_section: :publications`.
+
+Title and article action screens are Recording Studio default layout. Pass `anchor_url` from the inventory or section that opened them, and keep it on redirects, or Close walks the action stack. Dummy maps layout `anchor_url` to Flatpack `anchor_href` in `config/initializers/flatpack_page_nav_url_aliases.rb`.
 
 ## Publications 0.4.0
 

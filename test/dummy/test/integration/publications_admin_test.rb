@@ -31,6 +31,8 @@ class PublicationsAdminTest < ActionDispatch::IntegrationTest
                  RecordingStudioAdmin.screen_for("publications")
     assert_equal RecordingStudioPublications::Admin::ArticlesScreen,
                  RecordingStudioAdmin.screen_for("articles")
+    assert_equal RecordingStudioPublications::Admin::PublicationTypesScreen,
+                 RecordingStudioAdmin.screen_for("publication_types")
     assert_equal RecordingStudioPublications::Admin::PublicationsResource,
                  RecordingStudioAdmin.resource_for("publications")
     total = RecordingStudioAdmin.widget_for("widgets.publications.total")
@@ -87,6 +89,10 @@ class PublicationsAdminTest < ActionDispatch::IntegrationTest
       link.name == :articles
     end
     assert_equal "Articles", articles_link.text
+    types_link = RecordingStudioPublications::Admin::PublicationsSection.links.find do |link|
+      link.name == :publication_types
+    end
+    assert_equal "Publication types", types_link.text
     assert File.exist?(RecordingStudioPublications::Engine.root.join("app/overrides/recording_studio_admin/screens/show.html.erb"))
     assert File.exist?(RecordingStudioPublications::Engine.root.join("app/overrides/recording_studio_admin/sections/show.html.erb"))
     refute_includes File.read(RecordingStudioPublications::Engine.root.join("lib/recording_studio_publications/admin.rb")),
@@ -125,9 +131,9 @@ class PublicationsAdminTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_includes response.body, "Publications"
     assert_includes response.body, "Articles"
+    assert_includes response.body, "Publication types"
     assert_includes response.body, "/admin/access/recordings/#{@admin_recording.id}/accesses"
     refute_includes response.body, "View all"
-    refute_includes response.body, "Publication types"
     refute_includes response.body, "Admin publications"
     refute_includes response.body, "All publications"
     refute_includes response.body, "+ Access"
@@ -140,14 +146,20 @@ class PublicationsAdminTest < ActionDispatch::IntegrationTest
     articles = hub.css("a").find { |anchor| anchor["href"] == "/admin/articles" }
     assert articles, "expected an Articles button to /admin/articles"
     assert_includes articles.text, "Articles"
+    types = hub.css("a").find { |anchor| anchor["href"] == "/admin/publication_types" }
+    assert types, "expected a Publication types button to /admin/publication_types"
+    assert_includes types.text, "Publication types"
     assert hub.at_css("[data-controller='flat-pack--chart']"),
            "expected cumulative publications and articles charts on the section"
 
     get "/admin/publications"
     assert_response :success
     inventory_page = Nokogiri::HTML(response.body)
-    new_control = inventory_page.at_css('a[href="/recording_studio_publications/admin/publications/new"]')
+    new_control = inventory_page.css("a").find do |anchor|
+      anchor["href"]&.start_with?("/recording_studio_publications/admin/publications/new")
+    end
     assert new_control, "expected + Publication under the inventory title"
+    assert_includes new_control["href"], "anchor_url=%2Fadmin%2Fpublications"
     assert_includes new_control.text, "Publication"
     refute_includes new_control.text, "New"
     assert new_control.at_css('[data-flat-pack--icon-name-value="plus"]'),
@@ -385,7 +397,8 @@ class PublicationsAdminTest < ActionDispatch::IntegrationTest
     table = Nokogiri::HTML(response.body)
     name_link = table.css("a").find { |anchor| anchor.text.strip == "Linked Atlantic" }
     assert name_link, "expected the publication name to link to show"
-    assert_equal recording_studio_publications.admin_publication_path(publication_recording), name_link["href"]
+    assert_equal "#{recording_studio_publications.admin_publication_path(publication_recording)}?anchor_url=%2Fadmin%2Fpublications",
+                 name_link["href"]
     count_link = table.css("a").find { |anchor| anchor["href"]&.include?("/admin/articles") }
     assert count_link, "expected an article count link"
     assert_equal "2", count_link.text.strip
@@ -406,10 +419,10 @@ class PublicationsAdminTest < ActionDispatch::IntegrationTest
     assert title_link, "expected the article title to link to the article show page"
     article = RecordingStudioPublications.articles_for(publication_recording.recordable).find_by!(title: "House in the Rainforest")
     article_recording = RecordingStudioPublications.article_recording_for(article)
-    assert_equal recording_studio_publications.admin_publication_article_path(
+    assert_equal "#{recording_studio_publications.admin_publication_article_path(
       publication_recording,
       article_recording
-    ), title_link["href"]
+    )}?anchor_url=%2Fadmin%2Farticles", title_link["href"]
 
     get "/admin/screens/articles/table"
     assert_response :success

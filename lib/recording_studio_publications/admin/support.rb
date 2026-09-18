@@ -32,7 +32,31 @@ module RecordingStudioPublications
 
       def article_count_cell(publication, context)
         count = RecordingStudioPublications.articles_for(publication).count
-        linked_cell(count.to_s, articles_screen_path(context, publication: publication), context)
+        linked_cell(
+          count.to_s,
+          with_originating_anchor(articles_screen_path(context, publication: publication), context),
+          context
+        )
+      end
+
+      def publication_type_count_cell(row, context)
+        linked_cell(
+          row.publications_count.to_s,
+          with_originating_anchor("#{publications_screen_path(context)}?publication_type=#{row.token}", context),
+          context
+        )
+      end
+
+      def publication_type_rows
+        counts = RecordingStudioPublications.publications.reorder(nil).group(:kind).count
+
+        PublicationType::TOKENS.map do |token|
+          PublicationTypeRow.new(
+            token: token,
+            label: PublicationType.parse(token).label,
+            publications_count: counts[token].to_i
+          )
+        end
       end
 
       def article_title_cell(article, context)
@@ -116,8 +140,13 @@ module RecordingStudioPublications
         parent = article_recording&.parent_recording
         return if article_recording.blank? || parent.blank?
 
-        publication_routes(context).admin_publication_article_path(parent, article_recording)
+        with_originating_anchor(
+          publication_routes(context).admin_publication_article_path(parent, article_recording),
+          context
+        )
       end
     end
+
+    PublicationTypeRow = Struct.new(:token, :label, :publications_count, keyword_init: true)
   end
 end

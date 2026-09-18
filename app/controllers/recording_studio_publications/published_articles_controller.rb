@@ -25,7 +25,7 @@ module RecordingStudioPublications
       recording = persist_new_article!
       return render_new_invalid unless recording
 
-      redirect_to admin_publication_article_path(@publication_recording, recording)
+      redirect_to preserve_anchor_url(admin_publication_article_path(@publication_recording, recording))
     rescue ActiveRecord::RecordInvalid => e
       @article = e.record
       render :new, status: :unprocessable_entity
@@ -39,7 +39,7 @@ module RecordingStudioPublications
       recording = persist_revised_article!
       return render :edit, status: :unprocessable_entity unless recording
 
-      redirect_to admin_publication_article_path(@publication_recording, recording)
+      redirect_to preserve_anchor_url(admin_publication_article_path(@publication_recording, recording))
     rescue ActiveRecord::RecordInvalid => e
       @article = e.record
       @recording = RecordingStudioPublications.article_recording_for(@article) || @recording

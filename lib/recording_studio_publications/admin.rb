@@ -6,6 +6,7 @@ module RecordingStudioPublications
   module Admin
     SCREEN_KEY = "publications"
     ARTICLES_SCREEN_KEY = "articles"
+    TYPES_SCREEN_KEY = "publication_types"
     SECTION_KEY = "publications"
     RESOURCE_KEY = "publications"
     WIDGET_TOTAL = "widgets.publications.total"
@@ -21,6 +22,7 @@ require_relative "admin/support"
 require_relative "admin/publications_section"
 require_relative "admin/publications_screen"
 require_relative "admin/articles_screen"
+require_relative "admin/publication_types_screen"
 require_relative "admin/publications_resource"
 
 module RecordingStudioPublications
@@ -87,6 +89,7 @@ module RecordingStudioPublications
       RecordingStudioAdmin.register_section(PublicationsSection)
       RecordingStudioAdmin.register_screen(PublicationsScreen)
       RecordingStudioAdmin.register_screen(ArticlesScreen)
+      RecordingStudioAdmin.register_screen(PublicationTypesScreen)
       RecordingStudioAdmin.register_resource(PublicationsResource)
       RecordingStudioAdmin.register_widget(TotalPublicationsWidget)
       RecordingStudioAdmin.register_widget(TotalArticlesWidget)

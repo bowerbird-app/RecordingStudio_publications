@@ -1,7 +1,7 @@
 <%= render layout: "recording_studio_admin/shared/page_shell" do %>
   <% recording_studio_page_nav(
     title: "Edit article",
-    page_nav_anchor_url: page_nav_anchor_url(default: admin_publication_article_path(@publication_recording, @recording))
+    page_nav_anchor_url: action_close_url(default: articles_admin_path(@publication))
   ) %>
 
   <%= render FlatPack::PageTitle::Component.new(
@@ -15,9 +15,10 @@
                     as: :article,
                     url: admin_publication_article_path(@publication_recording, @recording),
                     method: :patch do %>
+        <%= keep_anchor_url_field %>
         <%= render "form",
                    article: @article,
-                   cancel_url: admin_publication_article_path(@publication_recording, @recording) %>
+                   cancel_url: preserve_anchor_url(admin_publication_article_path(@publication_recording, @recording)) %>
       <% end %>
     </div>
 

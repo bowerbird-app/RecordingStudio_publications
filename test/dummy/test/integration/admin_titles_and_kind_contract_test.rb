@@ -25,6 +25,7 @@ class AdminTitlesAndKindContractTest < ActionDispatch::IntegrationTest
     assert_equal "publications", RecordingStudioPublications::Admin::SECTION_KEY
     assert_equal "publications", RecordingStudioPublications::Admin::SCREEN_KEY
     assert_equal "articles", RecordingStudioPublications::Admin::ARTICLES_SCREEN_KEY
+    assert_equal "publication_types", RecordingStudioPublications::Admin::TYPES_SCREEN_KEY
     assert_equal "widgets.publications.over_time", RecordingStudioPublications::Admin::WIDGET_OVER_TIME
     assert_equal "widgets.articles.total", RecordingStudioPublications::Admin::WIDGET_ARTICLES_TOTAL
     assert_equal "widgets.articles.over_time", RecordingStudioPublications::Admin::WIDGET_ARTICLES_OVER_TIME
@@ -32,6 +33,7 @@ class AdminTitlesAndKindContractTest < ActionDispatch::IntegrationTest
     assert_equal "Publications", RecordingStudioPublications::Admin::PublicationsSection.title
     assert_equal "Publications", RecordingStudioPublications::Admin::PublicationsScreen.title
     assert_equal "Articles", RecordingStudioPublications::Admin::ArticlesScreen.title
+    assert_equal "Publication types", RecordingStudioPublications::Admin::PublicationTypesScreen.title
     assert_equal "Publications",
                  RecordingStudioPublications::Admin::TotalPublicationsWidget.title
     assert_equal "Articles",
@@ -48,6 +50,7 @@ class AdminTitlesAndKindContractTest < ActionDispatch::IntegrationTest
     assert_equal "Publications", I18n.t("recording_studio_publications.admin.section_title")
     assert_equal "Publications", I18n.t("recording_studio_publications.admin.screen_title")
     assert_equal "Articles", I18n.t("recording_studio_publications.admin.articles_screen_title")
+    assert_equal "Publication types", I18n.t("recording_studio_publications.admin.types_screen_title")
     assert_equal "Publications", I18n.t("recording_studio_publications.admin.total_widget_title")
     assert_equal "Articles", I18n.t("recording_studio_publications.admin.articles_total_widget_title")
     assert_equal "Publications over time", I18n.t("recording_studio_publications.admin.over_time_widget_title")

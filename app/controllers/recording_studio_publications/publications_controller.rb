@@ -6,7 +6,7 @@ module RecordingStudioPublications
     before_action :authorize_current_publication!
 
     def index
-      redirect_to inventory_path
+      redirect_to preserve_anchor_url(inventory_path)
     end
 
     def show
@@ -23,7 +23,7 @@ module RecordingStudioPublications
       recording = persist_new_publication!
       return render_new_invalid unless recording
 
-      redirect_to admin_publication_path(recording)
+      redirect_to preserve_anchor_url(admin_publication_path(recording))
     rescue ActiveRecord::RecordInvalid => e
       @publication = e.record
       render :new, status: :unprocessable_entity
@@ -37,7 +37,7 @@ module RecordingStudioPublications
       recording = persist_revised_publication!
       return render :edit, status: :unprocessable_entity unless recording
 
-      redirect_to admin_publication_path(recording)
+      redirect_to preserve_anchor_url(admin_publication_path(recording))
     rescue ActiveRecord::RecordInvalid => e
       @publication = e.record
       @recording = RecordingStudioPublications.recording_for(@publication) || @recording
