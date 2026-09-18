@@ -13,10 +13,10 @@ Publications section widgets, inventory chart title, and article edit layout.
 
 ### Changed
 - Inventory Screen chart title is **Publications over time**
-- Publications section shows compact total widgets and over-time charts for titles and articles. Each widget and the **Publications** / **Articles** buttons link to the matching inventory
+- Publications section shows two normal chart widgets (cumulative titles and articles over time, each with a total count) plus **Publications** and **Articles** buttons. Accessible avatars sit in the page-nav right slot on that section.
 - Article show no longer lists Canonical URL
 - Article edit uses a two-column Flatpack Grid (form, then screenshot) and puts Save before Cancel
-- Dummy `/admin` is a host `:root` section titled **Publications admin demo** with one button to the publications section
+- Dummy `/admin` is a host `:root` section titled **Publications demo** with one primary button to the publications section
 
 ### Upgrade notes
 - Bump to `0.4.1`

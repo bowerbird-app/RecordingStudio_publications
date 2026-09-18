@@ -25,8 +25,6 @@ module RecordingStudioPublications
            text: "Articles inventory",
            url: ->(context) { context.admin_screen_path(ARTICLES_SCREEN_KEY) }
 
-      widget WIDGET_TOTAL, view_variant: :compact
-      widget WIDGET_ARTICLES_TOTAL, view_variant: :compact
       widget WIDGET_OVER_TIME
       widget WIDGET_ARTICLES_OVER_TIME
     end

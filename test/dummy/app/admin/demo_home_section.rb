@@ -3,7 +3,7 @@
 class DemoHomeSection < RecordingStudioAdmin::Section
   key "root"
   icon :newspaper
-  title "Publications admin demo"
+  title "Publications demo"
   blast_radius :site
 
   link :publications,

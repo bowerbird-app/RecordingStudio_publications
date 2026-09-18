@@ -36,9 +36,9 @@ class AdminTitlesAndKindContractTest < ActionDispatch::IntegrationTest
                  RecordingStudioPublications::Admin::TotalPublicationsWidget.title
     assert_equal "Articles",
                  RecordingStudioPublications::Admin::TotalArticlesWidget.title
-    assert_equal "Publications over time",
+    assert_equal "Publications",
                  RecordingStudioPublications::Admin::TitlesOverTimeWidget.title
-    assert_equal "Articles over time",
+    assert_equal "Articles",
                  RecordingStudioPublications::Admin::ArticlesOverTimeWidget.title
     assert_equal "Publication types",
                  RecordingStudioPublications::Admin::TitlesByKindWidget.title

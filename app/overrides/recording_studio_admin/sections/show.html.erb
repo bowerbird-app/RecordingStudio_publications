@@ -1,21 +1,26 @@
 <%# Family Admin 2.0.1 Section#link cannot pass href:, so Buttons use href here.
-    Hidden enable_* links exist only so family Admin can enable Screens. %>
+    Hidden enable_* links exist only so family Admin can enable Screens.
+    The dummy :root section is title plus one primary button. %>
+<% root_section = @section.key.to_s == "root" %>
+<% publications_section = @section.key.to_s == "publications" %>
+<% visible_links = @section.links.reject { |link| link.name.to_s.start_with?("enable_") || link.text == "Admin Sections" } %>
+<% access_recording = recording_studio_admin_context.root_recording || recording_studio_admin_context.access_recording %>
+
 <%= render layout: "recording_studio_admin/shared/page_shell" do %>
-  <% access_recording = recording_studio_admin_context.root_recording || recording_studio_admin_context.access_recording %>
-  <% visible_links = @section.links.reject { |link| link.name.to_s.start_with?("enable_") || link.text == "Admin Sections" } %>
-
-  <% recording_studio_page_nav(
-       title: @section.title,
-       page_nav_anchor_url: page_nav_anchor_url(default: RecordingStudioAdmin.configuration.default_mount_path)
-     ) %>
-  <% if access_recording.present? && @section.widgets.any? %>
-    <% recording_studio_page_nav_right do %>
-      <%= recording_studio_accessible_avatars(access_recording, button_style: :ghost, button_size: :md) %>
+  <% unless root_section %>
+    <% recording_studio_page_nav(
+         title: @section.title,
+         page_nav_anchor_url: page_nav_anchor_url(default: RecordingStudioAdmin.configuration.default_mount_path)
+       ) %>
+    <% if publications_section && access_recording.present? %>
+      <% recording_studio_page_nav_right do %>
+        <%= recording_studio_accessible_avatars(access_recording, button_style: :ghost, button_size: :md) %>
+      <% end %>
     <% end %>
+    <%= render "recording_studio_admin/shared/page_nav" unless recording_studio_admin_default_layout? %>
   <% end %>
-  <%= render "recording_studio_admin/shared/page_nav" unless recording_studio_admin_default_layout? %>
 
-  <%= render FlatPack::PageTitle::Component.new(title: @section.title, subtitle: @section.subtitle) do |page_title| %>
+  <%= render FlatPack::PageTitle::Component.new(title: @section.title, subtitle: (root_section ? nil : @section.subtitle)) do |page_title| %>
     <% if visible_links.any? %>
       <% visible_links_first = visible_links.first(3) %>
       <% overflow_links = visible_links.drop(3) %>
@@ -39,7 +44,7 @@
     <% end %>
   <% end %>
 
-  <% if @section.widgets.any? %>
+  <% if !root_section && @section.widgets.any? %>
     <% compact_widgets, full_widgets = @section.widgets.partition { |widget| widget.view_variant == :compact } %>
     <% widget_grid_gap = :md %>
 

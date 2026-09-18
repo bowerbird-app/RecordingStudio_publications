@@ -48,11 +48,11 @@ module RecordingStudioPublications
 
     TitlesOverTimeWidget = RecordingStudioAdmin::Widget.new(WIDGET_OVER_TIME, blast_radius: :site) do
       type :chart
-      title I18n.t("recording_studio_publications.admin.over_time_widget_title", default: "Publications over time")
+      title I18n.t("recording_studio_publications.admin.total_widget_title", default: "Publications")
+      value { |_context| RecordingStudioPublications.publications.count }
       chart_type :line
       hide_change
       hide_period
-      hide_metric
       series { |_context| RecordingStudioPublications::Admin.titles_over_time_series }
       chart_options { { height: 220 } }
       link_to { |context| RecordingStudioPublications::Admin.publications_screen_path(context) }
@@ -60,11 +60,11 @@ module RecordingStudioPublications
 
     ArticlesOverTimeWidget = RecordingStudioAdmin::Widget.new(WIDGET_ARTICLES_OVER_TIME, blast_radius: :site) do
       type :chart
-      title I18n.t("recording_studio_publications.admin.articles_over_time_widget_title", default: "Articles over time")
+      title I18n.t("recording_studio_publications.admin.articles_total_widget_title", default: "Articles")
+      value { |_context| RecordingStudioPublications.articles.count }
       chart_type :line
       hide_change
       hide_period
-      hide_metric
       series { |_context| RecordingStudioPublications::Admin.articles_over_time_series }
       chart_options { { height: 220 } }
       link_to { |context| RecordingStudioPublications::Admin.articles_screen_path(context) }

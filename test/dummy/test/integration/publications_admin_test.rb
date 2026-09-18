@@ -42,13 +42,13 @@ class PublicationsAdminTest < ActionDispatch::IntegrationTest
     assert_equal :number, articles_total.type
     assert_equal :chart, over_time.type
     assert_equal :line, over_time.chart_type
+    assert over_time.value
     assert_equal :chart, articles_over_time.type
     assert_equal :line, articles_over_time.chart_type
+    assert articles_over_time.value
     assert_equal :chart, by_kind.type
     assert_equal :bar, by_kind.chart_type
     assert_equal [
-      "widgets.publications.total",
-      "widgets.articles.total",
       "widgets.publications.over_time",
       "widgets.articles.over_time"
     ], RecordingStudioPublications::Admin::PublicationsSection.widget_keys
@@ -111,9 +111,11 @@ class PublicationsAdminTest < ActionDispatch::IntegrationTest
 
     get "/admin"
     assert_response :success
-    assert_includes response.body, "Publications admin demo"
+    assert_includes response.body, "Publications demo"
+    refute_includes response.body, "Publications admin demo"
     refute_includes response.body, "Publications over time"
     refute_includes response.body, "Articles over time"
+    refute_includes response.body, "/admin/access/recordings/"
     home = Nokogiri::HTML(response.body)
     section_button = home.css("a").find { |anchor| anchor["href"] == "/admin/sections/publications" }
     assert section_button, "expected the admin home to link to the publications section"
@@ -123,8 +125,7 @@ class PublicationsAdminTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_includes response.body, "Publications"
     assert_includes response.body, "Articles"
-    assert_includes response.body, "Publications over time"
-    assert_includes response.body, "Articles over time"
+    assert_includes response.body, "/admin/access/recordings/#{@admin_recording.id}/accesses"
     refute_includes response.body, "View all"
     refute_includes response.body, "Publication types"
     refute_includes response.body, "Admin publications"
@@ -139,6 +140,8 @@ class PublicationsAdminTest < ActionDispatch::IntegrationTest
     articles = hub.css("a").find { |anchor| anchor["href"] == "/admin/articles" }
     assert articles, "expected an Articles button to /admin/articles"
     assert_includes articles.text, "Articles"
+    assert hub.at_css("[data-controller='flat-pack--chart']"),
+           "expected cumulative publications and articles charts on the section"
 
     get "/admin/publications"
     assert_response :success
