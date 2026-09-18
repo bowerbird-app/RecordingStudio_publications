@@ -53,6 +53,12 @@ class PublicationsAdminTest < ActionDispatch::IntegrationTest
     assert_equal :admin, RecordingStudioPublications::Admin::PublicationsResource.action_for(:new).required_access_role
     search_filter = RecordingStudioPublications::Admin::PublicationsScreen.filters.find { |filter| filter.key == :search }
     assert search_filter
+    type_filter = RecordingStudioPublications::Admin::PublicationsScreen.filters.find do |filter|
+      filter.key == :publication_type
+    end
+    assert type_filter
+    assert_equal :kind, type_filter.options[:field]
+    assert_equal RecordingStudioPublications::PublicationType::TOKENS, type_filter.options[:values]
     publication_filter = RecordingStudioPublications::Admin::ArticlesScreen.filters.find do |filter|
       filter.key == :publication
     end
@@ -118,6 +124,8 @@ class PublicationsAdminTest < ActionDispatch::IntegrationTest
            "expected the Publication inventory action to use the plus heroicon"
     refute inventory_page.at_css(".recording-studio-page-nav a[href='/recording_studio_publications/admin/publications/new']")
     assert_includes response.body, 'name="search"'
+    assert_includes response.body, 'name="publication_type"'
+    assert_includes response.body, "Publication type"
     assert_includes response.body, "screen-chart"
     refute_includes response.body, "widgets.publications.over_time"
     refute_includes response.body, ">Publications</h3>"
@@ -300,6 +308,24 @@ class PublicationsAdminTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_includes response.body, "Searchable Atlantic"
     refute_includes response.body, "Other Gazette"
+  end
+
+  test "inventory publication type filter scopes the table to that kind" do
+    bootstrap_owner_access!(@admin, @admin_recording)
+    sign_in @admin
+    RecordingStudioPublications.record_publication!(
+      { name: "Typed Magazine", key: "typed-magazine", kind: "magazine" },
+      actor: @admin
+    )
+    RecordingStudioPublications.record_publication!(
+      { name: "Typed Newspaper", key: "typed-newspaper", kind: "newspaper" },
+      actor: @admin
+    )
+
+    get "/admin/screens/publications/table", params: { publication_type: "magazine" }
+    assert_response :success
+    assert_includes response.body, "Typed Magazine"
+    refute_includes response.body, "Typed Newspaper"
   end
 
   test "inventory name and article count link to show and the articles screen" do

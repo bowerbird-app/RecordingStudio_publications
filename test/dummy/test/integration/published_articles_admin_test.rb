@@ -35,8 +35,15 @@ class PublishedArticlesAdminTest < ActionDispatch::IntegrationTest
     get recording_studio_publications.admin_publication_path(publication_recording)
     assert_response :success
     assert_includes response.body, "Articles"
-    assert_includes response.body, "No articles yet."
-    assert_includes response.body, "Add article"
+    show_page = Nokogiri::HTML(response.body)
+    articles_link = show_page.css("a").find { |anchor| anchor["href"]&.include?("/admin/articles") }
+    assert articles_link, "expected an Articles count link on show"
+    assert_equal "0", articles_link.text.strip
+    assert_includes articles_link["href"], "/admin/articles"
+    assert_includes articles_link["href"], "publication="
+    refute_includes response.body, "No articles yet."
+    refute_includes response.body, "Add article"
+    refute_includes response.body, "View all"
     refute_includes response.body, "PublishedArticle"
     refute_includes response.body, "recordable"
 
@@ -132,8 +139,16 @@ class PublishedArticlesAdminTest < ActionDispatch::IntegrationTest
     assert_includes response.body, "Revised excerpt."
 
     get recording_studio_publications.admin_publication_path(publication_recording)
-    assert_includes response.body, "House in the Rainforest"
-    assert_includes response.body, "View all"
+    assert_response :success
+    refute_includes response.body, "House in the Rainforest"
+    refute_includes response.body, "View all"
+    refute_includes response.body, "Add article"
+    show_page = Nokogiri::HTML(response.body)
+    articles_link = show_page.css("a").find { |anchor| anchor["href"]&.include?("/admin/articles") }
+    assert articles_link, "expected an Articles count link on show"
+    assert_equal "1", articles_link.text.strip
+    assert_includes articles_link["href"], "/admin/articles"
+    assert_includes articles_link["href"], "publication="
   end
 
   test "view-only users cannot create articles" do

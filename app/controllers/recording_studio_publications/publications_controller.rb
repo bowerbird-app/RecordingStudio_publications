@@ -12,7 +12,6 @@ module RecordingStudioPublications
     def show
       @edit_publication_action = resolve_publications_admin_action(:edit, @publication)
       @logo_recording = RecordingStudioPublications.logo_recording_for(@recording)
-      @article_entries = article_index_entries.first(5)
       @articles_count = RecordingStudioPublications.articles_for(@publication).count
     end
 
@@ -89,10 +88,6 @@ module RecordingStudioPublications
 
     def publication_params
       params.fetch(:publication, {}).permit(:name, :key, :kind, :website)
-    end
-
-    def article_index_entries
-      RecordingStudioPublications::PublishedArticles::IndexQuery.new(publication: @publication).entries
     end
   end
 end

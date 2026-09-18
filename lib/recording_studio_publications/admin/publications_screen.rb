@@ -12,6 +12,9 @@ module RecordingStudioPublications
       filter :search, apply: lambda { |relation, value, _context|
         RecordingStudioPublications::Admin.apply_publication_search(relation, value)
       }
+      filter :publication_type,
+             field: :kind,
+             values: RecordingStudioPublications::PublicationType::TOKENS
       button :new_publication,
              text: I18n.t("recording_studio_publications.admin.new_link", default: "Publication"),
              url: ->(context) { RecordingStudioPublications::Admin.new_publication_url(context) },

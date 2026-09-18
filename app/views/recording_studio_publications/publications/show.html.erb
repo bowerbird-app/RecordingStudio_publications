@@ -13,7 +13,8 @@
        { attribute: "Name", value: @publication.name },
        { attribute: "Key", value: @publication.key },
        { attribute: RecordingStudioPublications::Publication.human_attribute_name(:kind), value: @publication.kind_label },
-       { attribute: "Website", value: @publication.website.presence || "—" }
+       { attribute: "Website", value: @publication.website.presence || "—" },
+       { attribute: "Articles", value: link_to(@articles_count.to_s, articles_admin_path(@publication)) }
      ] %>
 
   <div class="space-y-4">
@@ -38,12 +39,5 @@
       <% table.column(title: "Attribute") { |attribute_row| attribute_row.fetch(:attribute) } %>
       <% table.column(title: "Value") { |attribute_row| attribute_row.fetch(:value) } %>
     <% end %>
-
-    <%= render "articles",
-               article_entries: @article_entries,
-               publication_recording: @recording,
-               publication: @publication,
-               articles_count: @articles_count,
-               edit_publication_action: @edit_publication_action %>
   </div>
 <% end %>
